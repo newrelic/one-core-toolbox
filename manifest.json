@@ -1,0 +1,10 @@
+{
+  "name": "One Core Table Creator",
+  "id": "1028738778157278952",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "ui.html"
+}
