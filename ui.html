@@ -340,68 +340,20 @@
       </table>
     </section>
 
+    <hr>
+
+    <button class="btn-create-table">Create table</button>
+    <button class="btn-continue">Continue</button>
+
     <script>
       const allGridSquares = Array.from(document.querySelectorAll('.input__radio label'));
       const gridSelector = document.querySelector('.grid-selector');
       const gridSelectorRows = Array.from(gridSelector.children[0].children);
       const rowCountInput = document.getElementById('number-of-rows')
       const colCountInput = document.getElementById('number-of-cols')
+      const createTableButton = document.querySelector('.btn-create-table')
+      const continueButton = document.querySelector('.btn-continue')
       let activeGridSquares = [0,0];
-
-
-      // For every grid square, do this
-      allGridSquares.map(gridSquare => {
-
-        // handle mouse over behavior
-        gridSquare.addEventListener('mouseover', function(e) {
-          const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
-          const selectedRows = gridSelectorRows.filter(row => gridSelectorRows.indexOf(row) <= indexOfCurrentRow);
-          const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
-          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
-
-          // Wipe the slate clean:
-          // Start by removing the "hovered" class from all grid squares.
-          allHoveredGridSquares.map(gridSquare => {
-            gridSquare.classList.remove('hovered')
-          })
-          
-          setGridSquares('hovered', selectedRows, indexOfCurrentCol)
-        })
-
-        // handle the mouse out behavior of the grid container
-        gridSelector.addEventListener('mouseleave', function(e) {
-
-          // Wipe the slate clean:
-          // removing the "hovered" class from all grid squares
-          allGridSquares.map(gridSquare => {
-            if (gridSquare.classList.contains('hovered')) {
-              gridSquare.classList.toggle('hovered')
-            }
-          });
-        })
-
-        // handle the click behavior
-        gridSquare.addEventListener('click', function(e) {
-          const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
-          const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
-          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
-          
-          // Wipe the slate clean:
-          // Start by removing the "active" class from all grid squares.
-          allGridSquares.map(gridSquare => gridSquare.classList.remove('active'))
-
-          // Apply the "active" class to any grid square that currently has the "hovered" class
-          allHoveredGridSquares.map(gridSquare => gridSquare.classList.add('active'))
-
-          // Set the value of the inputs to match the grid selection
-          rowCountInput.value = indexOfCurrentRow + 1
-          colCountInput.value = indexOfCurrentCol + 1
-
-          // Store the current selection in a global variable
-          activeGridSquares[0] = indexOfCurrentRow + 1
-          activeGridSquares[1] = indexOfCurrentCol + 1
-        });
-      });
 
       function setGridSquares(state, selectedRows, colIndex) {
         // For every row that is currently included in the selection...
@@ -460,6 +412,60 @@
         }
       }
 
+      // For every grid square, do this
+      allGridSquares.map(gridSquare => {
+
+        // handle mouse over behavior
+        gridSquare.addEventListener('mouseover', function(e) {
+          const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
+          const selectedRows = gridSelectorRows.filter(row => gridSelectorRows.indexOf(row) <= indexOfCurrentRow);
+          const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
+          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
+
+          // Wipe the slate clean:
+          // Start by removing the "hovered" class from all grid squares.
+          allHoveredGridSquares.map(gridSquare => {
+            gridSquare.classList.remove('hovered')
+          })
+          
+          setGridSquares('hovered', selectedRows, indexOfCurrentCol)
+        })
+
+        // handle the mouse out behavior of the grid container
+        gridSelector.addEventListener('mouseleave', function(e) {
+
+          // Wipe the slate clean:
+          // removing the "hovered" class from all grid squares
+          allGridSquares.map(gridSquare => {
+            if (gridSquare.classList.contains('hovered')) {
+              gridSquare.classList.toggle('hovered')
+            }
+          });
+        })
+
+        // handle the click behavior
+        gridSquare.addEventListener('click', function(e) {
+          const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
+          const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
+          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
+          
+          // Wipe the slate clean:
+          // Start by removing the "active" class from all grid squares.
+          allGridSquares.map(gridSquare => gridSquare.classList.remove('active'))
+
+          // Apply the "active" class to any grid square that currently has the "hovered" class
+          allHoveredGridSquares.map(gridSquare => gridSquare.classList.add('active'))
+
+          // Set the value of the inputs to match the grid selection
+          rowCountInput.value = indexOfCurrentRow + 1
+          colCountInput.value = indexOfCurrentCol + 1
+
+          // Store the current selection in a global variable
+          activeGridSquares[0] = indexOfCurrentRow + 1
+          activeGridSquares[1] = indexOfCurrentCol + 1
+        });
+      });
+
       // When the row input changes, call setGridBasedOnInputs()
       rowCountInput.addEventListener('input', e => {
         setGridBasedOnInputs(parseInt(e.target.value), activeGridSquares[1])
@@ -469,6 +475,17 @@
       colCountInput.addEventListener('input', e => {
         setGridBasedOnInputs(activeGridSquares[0], parseInt(e.target.value))
       });
+
+      createTableButton.addEventListener('click', e => {
+        parent.postMessage({ 
+          pluginMessage: { 
+            type: 'create-table',
+            cols: activeGridSquares[1],
+            rows: activeGridSquares[0]
+          } 
+        }, '*')
+      })
+
     </script>
   </body>
 </html>
