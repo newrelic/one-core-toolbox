@@ -43,6 +43,11 @@
       background-color: #F0FBFC;
       box-shadow: 0 0 0 2px #019CAA; ;
     }
+    
+    table input[type=radio]~label.active.hovered {
+      background-color: #C6F2F6;
+      box-shadow: 0 0 0 2px #019CAA;
+    }
   </style>  
   <body>
     <section class="grid-selector-container">
@@ -343,36 +348,31 @@
       const colCountInput = document.getElementById('number-of-cols')
       let activeGridSquares = [0,0];
 
+
+      // For every grid square, do this
       allGridSquares.map(gridSquare => {
 
+        // handle mouse over behavior
         gridSquare.addEventListener('mouseover', function(e) {
           const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
           const selectedRows = gridSelectorRows.filter(row => gridSelectorRows.indexOf(row) <= indexOfCurrentRow);
           const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
+          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
 
+          // Wipe the slate clean:
+          // Start by removing the "hovered" class from all grid squares.
           allHoveredGridSquares.map(gridSquare => {
             gridSquare.classList.remove('hovered')
           })
           
-          selectedRows.map((row, index) => {
-            const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
-            const currentRow = Array.from(row.children)
-            const selectedCols = currentRow.filter((gridSquare, index, arr) => {
-              return arr.indexOf(gridSquare) <= indexOfCurrentCol
-            })
-
-            selectedCols.map((td, index) => {
-              const label = Array.from(row.children)[index].children[1]
-              
-              if (!label.classList.contains('hovered')) {
-                label.classList.toggle('hovered')
-              }
-            })
-          })
-  
+          setGridSquares('hovered', selectedRows, indexOfCurrentCol)
         })
 
+        // handle the mouse out behavior of the grid container
         gridSelector.addEventListener('mouseleave', function(e) {
+
+          // Wipe the slate clean:
+          // removing the "hovered" class from all grid squares
           allGridSquares.map(gridSquare => {
             if (gridSquare.classList.contains('hovered')) {
               gridSquare.classList.toggle('hovered')
@@ -380,75 +380,95 @@
           });
         })
 
+        // handle the click behavior
         gridSquare.addEventListener('click', function(e) {
           const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
           const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
           const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
           
+          // Wipe the slate clean:
+          // Start by removing the "active" class from all grid squares.
           allGridSquares.map(gridSquare => gridSquare.classList.remove('active'))
+
+          // Apply the "active" class to any grid square that currently has the "hovered" class
           allHoveredGridSquares.map(gridSquare => gridSquare.classList.add('active'))
 
+          // Set the value of the inputs to match the grid selection
           rowCountInput.value = indexOfCurrentRow + 1
           colCountInput.value = indexOfCurrentCol + 1
 
+          // Store the current selection in a global variable
           activeGridSquares[0] = indexOfCurrentRow + 1
           activeGridSquares[1] = indexOfCurrentCol + 1
-
-          console.log(activeGridSquares)
         });
       });
+
+      function setGridSquares(state, selectedRows, colIndex) {
+        // For every row that is currently included in the selection...
+        selectedRows.map((row, index) => {
+          const currentRow = Array.from(row.children)
+          
+          // get just the relevant columns
+          const selectedCols = currentRow.filter((gridSquare, index, arr) => {
+            if (state === 'hovered') {
+              return arr.indexOf(gridSquare) <= colIndex
+            } else if (state === 'active') {
+              return arr.indexOf(gridSquare) < colIndex
+            }
+          })
+
+          // for every relevant item in the row...
+          selectedCols.map((td, index) => {
+            
+            // get the <label> element within the <td>
+            const label = Array.from(row.children)[index].children[1]
+            
+            // apply the apropriate class to the <label>
+            if (state === 'active') {
+              if (!label.classList.contains('active')) {
+                label.classList.toggle('active')
+              }
+            } else if (state === 'hovered') {
+              if (!label.classList.contains('hovered')) {
+                label.classList.toggle('hovered')
+              }
+            }
+          })
+        })
+      }
 
       function setGridBasedOnInputs(x, y) {
         activeGridSquares[0] =  x ? x : activeGridSquares[0] = 0
         activeGridSquares[1] =  y ? y : activeGridSquares[1] = 0 
-
+        
         const allActiveGridSquares = Array.from(document.querySelectorAll('label.active'));
+
+        // Wipe the slate clean:
+        // Start by removing the "active" class from all grid squares.
         allActiveGridSquares.map(gridSquare => {
           gridSquare.classList.remove('active')
         })
 
-
         if (activeGridSquares[1] === 0 || activeGridSquares[0] === 0 ) {
+          // if either of the inputs is empty, do nothing
           return 
         } else {
-
+          // ...otherwise...
           const selectedRows = gridSelectorRows.filter((row, index) => index < activeGridSquares[0]);
 
-          selectedRows.map((row, index) => {
-            const currentRow = Array.from(row.children)
-            const selectedCols = currentRow.filter((gridSquare, index, arr) => {
-              return arr.indexOf(gridSquare) < activeGridSquares[1]
-            })
-
-            selectedCols.map((td, index) => {
-              const label = Array.from(row.children)[index].children[1]
-              
-              if (!label.classList.contains('active')) {
-                label.classList.toggle('active')
-              }
-            })
-          })
+          setGridSquares('active', selectedRows, activeGridSquares[1])
         }
       }
 
+      // When the row input changes, call setGridBasedOnInputs()
       rowCountInput.addEventListener('input', e => {
         setGridBasedOnInputs(parseInt(e.target.value), activeGridSquares[1])
       });
       
+      // When the column input changes, call setGridBasedOnInputs()
       colCountInput.addEventListener('input', e => {
         setGridBasedOnInputs(activeGridSquares[0], parseInt(e.target.value))
       });
-      
-  
-      // document.querySelector('create').onclick = () => {
-      //   const textbox = document.getElementById('count');
-      //   const count = parseInt(textbox.value, 10);
-      //   parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*')
-      // }
-    
-      // document.getElementById('cancel').onclick = () => {
-      //   parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*')
-      // }
     </script>
   </body>
 </html>
