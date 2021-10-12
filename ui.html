@@ -26,7 +26,7 @@
       width: 24px;
       height: 24px;
       border-radius: 2px;
-      border: 1px solid rgba(0,0,0, .175);
+      box-shadow: 0 0 0 1px rgba(0,0,0, .175);
       position: absolute;
     }
 
@@ -35,12 +35,28 @@
     }
 
     table input[type=radio]~label.hovered {
-      background-color: rgba(0,0,0, .065);
-      border-color: rgba(0,0,0, .315);
+      background-color: rgba(0,0,0, .05);
+      box-shadow: 0 0 0 1px rgba(0,0,0, .315);
+    }
+
+    table input[type=radio]~label.active {
+      background-color: #F0FBFC;
+      box-shadow: 0 0 0 2px #019CAA; ;
     }
   </style>  
   <body>
     <section class="grid-selector-container">
+      <div class="table-dimensions-config">
+        <div class="input-container">
+          <label for="number-of-cols">Columns</label>
+          <input type="number" min="0" max="24" name="number-of-cols" id="number-of-cols">
+        </div>
+        <div class="input-container">
+          <label for="number-of-rows">Rows</label>
+          <input type="number" min="0" max="1000" name="number-of-rows" id="number-of-rows">
+        </div>
+      </div>
+
       <table class="grid-selector">
         <tbody>
           <tr>
@@ -322,8 +338,11 @@
     <script>
       const allGridSquares = Array.from(document.querySelectorAll('.input__radio label'));
       const gridSelector = document.querySelector('.grid-selector');
-      const gridSelectorRows = Array.from(gridSelector.children[0].children)
-      
+      const gridSelectorRows = Array.from(gridSelector.children[0].children);
+      const rowCountInput = document.getElementById('number-of-rows')
+      const colCountInput = document.getElementById('number-of-cols')
+      let activeGridSquares = [0,0];
+
       allGridSquares.map(gridSquare => {
 
         gridSquare.addEventListener('mouseover', function(e) {
@@ -334,14 +353,14 @@
           allHoveredGridSquares.map(gridSquare => {
             gridSquare.classList.remove('hovered')
           })
-
+          
           selectedRows.map((row, index) => {
             const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
             const currentRow = Array.from(row.children)
             const selectedCols = currentRow.filter((gridSquare, index, arr) => {
               return arr.indexOf(gridSquare) <= indexOfCurrentCol
             })
-            
+
             selectedCols.map((td, index) => {
               const label = Array.from(row.children)[index].children[1]
               
@@ -349,19 +368,77 @@
                 label.classList.toggle('hovered')
               }
             })
-            
           })
   
         })
+
+        gridSelector.addEventListener('mouseleave', function(e) {
+          allGridSquares.map(gridSquare => {
+            if (gridSquare.classList.contains('hovered')) {
+              gridSquare.classList.toggle('hovered')
+            }
+          });
+        })
+
+        gridSquare.addEventListener('click', function(e) {
+          const allHoveredGridSquares = Array.from(document.querySelectorAll('label.hovered'));
+          const indexOfCurrentRow = gridSelectorRows.indexOf(gridSquare.parentElement.parentElement);
+          const indexOfCurrentCol = Array.from(gridSquare.parentElement.parentElement.children).indexOf(gridSquare.parentElement);
+          
+          allGridSquares.map(gridSquare => gridSquare.classList.remove('active'))
+          allHoveredGridSquares.map(gridSquare => gridSquare.classList.add('active'))
+
+          rowCountInput.value = indexOfCurrentRow + 1
+          colCountInput.value = indexOfCurrentCol + 1
+
+          activeGridSquares[0] = indexOfCurrentRow + 1
+          activeGridSquares[1] = indexOfCurrentCol + 1
+
+          console.log(activeGridSquares)
+        });
       });
 
-      gridSelector.addEventListener('mouseleave', function(e) {
-        allGridSquares.map(gridSquare => {
-          if (gridSquare.classList.contains('hovered')) {
-            gridSquare.classList.toggle('hovered')
-          }
-        });
-      })
+      function setGridBasedOnInputs(x, y) {
+        activeGridSquares[0] =  x ? x : activeGridSquares[0] = 0
+        activeGridSquares[1] =  y ? y : activeGridSquares[1] = 0 
+
+        const allActiveGridSquares = Array.from(document.querySelectorAll('label.active'));
+        allActiveGridSquares.map(gridSquare => {
+          gridSquare.classList.remove('active')
+        })
+
+
+        if (activeGridSquares[1] === 0 || activeGridSquares[0] === 0 ) {
+          return 
+        } else {
+
+          const selectedRows = gridSelectorRows.filter((row, index) => index < activeGridSquares[0]);
+
+          selectedRows.map((row, index) => {
+            const currentRow = Array.from(row.children)
+            const selectedCols = currentRow.filter((gridSquare, index, arr) => {
+              return arr.indexOf(gridSquare) < activeGridSquares[1]
+            })
+
+            selectedCols.map((td, index) => {
+              const label = Array.from(row.children)[index].children[1]
+              
+              if (!label.classList.contains('active')) {
+                label.classList.toggle('active')
+              }
+            })
+          })
+        }
+      }
+
+      rowCountInput.addEventListener('input', e => {
+        setGridBasedOnInputs(parseInt(e.target.value), activeGridSquares[1])
+      });
+      
+      colCountInput.addEventListener('input', e => {
+        setGridBasedOnInputs(activeGridSquares[0], parseInt(e.target.value))
+      });
+      
   
       // document.querySelector('create').onclick = () => {
       //   const textbox = document.getElementById('count');
