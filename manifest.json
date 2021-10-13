@@ -1,10 +1,11 @@
 {
   "name": "One Core Table Creator",
-  "id": "1028738778157278952",
+  "id": "00000000",
   "api": "1.0.0",
-  "main": "code.ts",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html",
   "editorType": [
-    "figma"
-  ],
-  "ui": "ui.html"
+    "figma",
+    "figjam"
+  ]
 }
