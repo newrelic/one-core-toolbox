@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import '../styles/ui.css';
 import ColumnConfiguration from './ColumnConfiguration';
 import DimensionsSelection from './DimensionsSelection';
@@ -7,9 +7,53 @@ import DimensionsSelection from './DimensionsSelection';
 declare function require(path: string): any;
 
 const App = ({}) => {
-    const [activeScreen, setActiveScreen] = useState('ColumnConfiguration')
+    const [activeScreen, setActiveScreen] = useState('DimensionsSelection')
     const [activeCol, setActiveCol] = useState(0);
     const [activeRow, setActiveRow] = useState(0);
+    const [columnConfiguration, setColumnConfiguration] = useState([]);
+
+    const handleColumnConfiguration = () => {
+        let columnConfigurationArray = [];
+        
+        if (columnConfiguration.length === 0) {
+            [...Array(activeCol).keys()].map(() => {
+                columnConfigurationArray.push(
+                    {
+                        name: '',
+                        alignment: 'left',
+                        cellType: 'text',
+                        multiValue: false
+                    }
+                )
+            })
+        } else if (columnConfiguration.length > 0) {
+            columnConfigurationArray = columnConfiguration;
+
+            if (columnConfigurationArray.length > activeCol) {
+                const columnsToRemove = columnConfigurationArray.length - activeCol;
+                [...Array(columnsToRemove).keys()].map(() => {
+                    columnConfigurationArray.pop()
+                }) 
+            } else {
+                const columnsToAdd = activeCol - columnConfigurationArray.length; 
+                [...Array(columnsToAdd).keys()].map(() => {
+                    columnConfigurationArray.push(
+                        {
+                            name: '',
+                            alignment: 'left',
+                            cellType: 'text',
+                            multiValue: false
+                        }
+                    )
+                })
+            }
+        }
+
+        setColumnConfiguration(columnConfigurationArray)
+        debugger
+    }
+
+    useEffect(handleColumnConfiguration, [activeCol])
 
     const handeGridSelectionInputs = (type) => {
         if (type === 'col') {
@@ -29,7 +73,8 @@ const App = ({}) => {
             pluginMessage: { 
               type: 'create-table',
               cols: activeCol,
-              rows: activeRow
+              rows: activeRow,
+              columnConfiguration: columnConfiguration
             } 
           }, '*')
     }
@@ -58,6 +103,8 @@ const App = ({}) => {
             return <ColumnConfiguration
                      createTable={createTable} 
                      goToDimensionsSelection={goToDimensionsSelection}
+                     activeCol={activeCol}  
+                     setColumnConfiguration={setColumnConfiguration}
                     />
         }
     }

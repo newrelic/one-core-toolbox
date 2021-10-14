@@ -133,7 +133,6 @@ table.hovered input[type=radio]~label.active.hovered {
   font-size: 11px;
   color: #b3b3b3;
   fill: #b3b3b3;
-  pointer-events: none;
   text-align: center;
 }
 
@@ -237,6 +236,13 @@ table.hovered input[type=radio]~label.active.hovered {
   background-clip: border-box;
 }
 
+button[disabled] {
+  border-color: #D1D4D4;
+  color: #D1D4D4;
+  cursor: not-allowed;
+  background-color: rgba(0,0,0, .015);
+}
+
 .column-nav { 
   display: flex;
   justify-content: space-between;
@@ -296,7 +302,7 @@ table.hovered input[type=radio]~label.active.hovered {
 
 .configuration-body label:not(.input-container),
 .configuration-body .label {
-  width: 70px;
+  width: 80px;
   flex-shrink: 0;
   color: #283636;
   font-weight: 400;

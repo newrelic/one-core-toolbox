@@ -1,10 +1,12 @@
 import * as React from 'react';
-// import { useState } from 'react';
+import { useState } from 'react';
 import '../styles/ui.css';
 
 declare function require(path: string): any;
 
-const ColumnConfiguration = ({ createTable, goToDimensionsSelection }) => {
+const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, setColumnConfiguration }) => {
+    const [activeColConfigurationScreen, setActiveColConfigurationScreen] = useState(0);
+
     const renderColumnNavigation = () => {
         return (
             <nav className="column-nav">
@@ -12,9 +14,11 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection }) => {
                 
                 <div className="select-input-container">
                     <select name="column-selection" className="column-selection-dropdown">
-                        <option value="Column 1" className="column-selection-dropdown-option">Column 1</option>
-                        <option value="Column 2" className="column-selection-dropdown-option">Column 2</option>
-                        <option value="Column 3" className="column-selection-dropdown-option">Column 3</option>
+                        {
+                            [...Array(activeCol).keys()].map((index) => {
+                                return (<option value={`Column ${index + 1}`} selected={index === (activeColConfigurationScreen - 1)} className="column-selection-dropdown-option">{`Column ${index + 1}`}</option>)
+                            })
+                        }
                     </select>
                 </div>
     
