@@ -8,15 +8,17 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection }) => {
     const renderColumnNavigation = () => {
         return (
             <nav className="column-nav">
-                <button className={"nav-arrow left-nav-arrow"}>{`<`}</button>
+                <button className={"nav-arrow left-nav-arrow"}></button>
+                
+                <div className="select-input-container">
+                    <select name="column-selection" className="column-selection-dropdown">
+                        <option value="Column 1" className="column-selection-dropdown-option">Column 1</option>
+                        <option value="Column 2" className="column-selection-dropdown-option">Column 2</option>
+                        <option value="Column 3" className="column-selection-dropdown-option">Column 3</option>
+                    </select>
+                </div>
     
-                <select name="column-selection" className="column-selection-dropdown">
-                    <option value="Column 1" className="column-selection-dropdown-option">Column 1</option>
-                    <option value="Column 2" className="column-selection-dropdown-option">Column 2</option>
-                    <option value="Column 3" className="column-selection-dropdown-option">Column 3</option>
-                </select>
-    
-                <button className={"nav-arrow right-nav-arrow"}>{`>`}</button>
+                <button className={"nav-arrow right-nav-arrow"}></button>
             </nav>
         )
     }
@@ -40,28 +42,35 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection }) => {
                 </div>
                 <div className="input-container">
                     <label htmlFor="column-alignment">Alignment</label>
-                    <select name="alignment-selection" className="column-configuration-alignment-input" id="column-alignment">
-                        <option value="left" className="column-configuration-alignment-input-option">Left</option>
-                        <option value="right" className="column-configuration-alignment-input-option">Right</option>
-                    </select>
+                    <div className="select-input-container">
+                        <select name="alignment-selection" className="column-configuration-alignment-input" id="column-alignment">
+                            <option value="left" className="column-configuration-alignment-input-option">Left</option>
+                            <option value="right" className="column-configuration-alignment-input-option">Right</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="input-container">
                     <label htmlFor="column-cell-type">Cell type</label>
-                    <select name="alignment-selection" className="column-configuration-alignment-input" id="column-cell-type">
-                        <option value="text" className="column-configuration-alignment-input-option">Text</option>
-                        <option value="link" className="column-configuration-alignment-input-option">Link</option>
-                        <option value="metric" className="column-configuration-alignment-input-option">Metric</option>
-                        <option value="entity" className="column-configuration-alignment-input-option">Entity</option>
-                        <option value="favorite" className="column-configuration-alignment-input-option">Favorite</option>
-                        <option value="user" className="column-configuration-alignment-input-option">User</option>
-                        <option value="checkbox" className="column-configuration-alignment-input-option">Checkbox</option>
-                        <option value="actions" className="column-configuration-alignment-input-option">Actions</option>
-                    </select>
+                    <div className="select-input-container">
+                        <select name="alignment-selection" className="column-configuration-alignment-input" id="column-cell-type">
+                            <option value="text" className="column-configuration-alignment-input-option">Text</option>
+                            <option value="link" className="column-configuration-alignment-input-option">Link</option>
+                            <option value="metric" className="column-configuration-alignment-input-option">Metric</option>
+                            <option value="entity" className="column-configuration-alignment-input-option">Entity</option>
+                            <option value="favorite" className="column-configuration-alignment-input-option">Favorite</option>
+                            <option value="user" className="column-configuration-alignment-input-option">User</option>
+                            <option value="checkbox" className="column-configuration-alignment-input-option">Checkbox</option>
+                            <option value="actions" className="column-configuration-alignment-input-option">Actions</option>
+                        </select>
+                    </div>
                 </div>
-                <div className="input-container">
-                    <label htmlFor="column-multi-value">Multi-value</label>
-                    <input type="checkbox" id="column-multi-value" />
-                </div>
+                <label className="input-container" htmlFor="column-multi-value">
+                    <h5 className="label">Multi-value</h5>
+                    <div className="switch">
+                        <input type="checkbox" id="column-multi-value" />
+                        <span className="slider round"></span>
+                    </div>
+                </label>
             </section>
         )
     }
