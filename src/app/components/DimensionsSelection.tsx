@@ -4,34 +4,18 @@ import '../styles/ui.css';
 
 declare function require(path: string): any;
 
-const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow }) => {
+const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow, createTable, handeGridSelectionInputs }) => {
     const [hoveredCol, setHoveredCol] = useState(0);
     const [hoveredRow, setHoveredRow] = useState(0);
     const [activeGridSquares, setActiveGridSquares] = useState([activeRow, activeCol]);
     const [tableHovered, setTableHovered] = useState(false);
-
-    const handeGridSelectionInputs = (type) => {
-        if (type === 'col') {
-            setactiveCol(parseInt(event.target.value))
-        } else if (type === 'row') {
-            setactiveRow(parseInt(event.target.value))
-        }
-    };
 
     const handleGridSquareMouseEnter = (colIndex, rowIndex ) => {
         setHoveredCol(colIndex)
         setHoveredRow(rowIndex)
     }
 
-    const createTable = () => {
-        parent.postMessage({ 
-            pluginMessage: { 
-              type: 'create-table',
-              cols: activeCol,
-              rows: activeRow
-            } 
-          }, '*')
-    }
+    
 
     const renderTable = () => {
         return (
@@ -108,7 +92,7 @@ const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow }) =>
                     <input 
                         type="number" 
                         min="0" 
-                        max="1000" 
+                        max="100" 
                         name="number-of-rows" 
                         id="number-of-rows" 
                         className="number-of-rows" 
