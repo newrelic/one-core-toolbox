@@ -7,7 +7,7 @@ import DimensionsSelection from './DimensionsSelection';
 declare function require(path: string): any;
 
 const App = ({}) => {
-    const [activeScreen, setActiveScreen] = useState('DimensionsSelection')
+    const [activeScreen, setActiveScreen] = useState('ColumnConfiguration')
     const [activeCol, setActiveCol] = useState(0);
     const [activeRow, setActiveRow] = useState(0);
 
@@ -34,6 +34,14 @@ const App = ({}) => {
           }, '*')
     }
 
+    const goToColumnConfiguration = () => {
+        setActiveScreen('ColumnConfiguration')
+    }
+    
+    const goToDimensionsSelection = () => {
+        setActiveScreen('DimensionsSelection')
+    }
+
     const handleRouting = () => {
         if (activeScreen === 'DimensionsSelection') {
             return (
@@ -43,10 +51,14 @@ const App = ({}) => {
                     activeRow={activeRow}  
                     createTable={createTable}
                     handeGridSelectionInputs={handeGridSelectionInputs}
+                    goToColumnConfiguration={goToColumnConfiguration}
                 />
             )
-        } else if (activeScreen === 'DimensionsSelection') {
-            return <ColumnConfiguration />
+        } else if (activeScreen === 'ColumnConfiguration') {
+            return <ColumnConfiguration
+                     createTable={createTable} 
+                     goToDimensionsSelection={goToDimensionsSelection}
+                    />
         }
     }
 

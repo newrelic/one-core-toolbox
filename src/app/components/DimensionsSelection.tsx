@@ -4,7 +4,17 @@ import '../styles/ui.css';
 
 declare function require(path: string): any;
 
-const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow, createTable, handeGridSelectionInputs }) => {
+const DimensionsSelection = (
+    { 
+        handleGridSquareClick, 
+        activeCol, 
+        activeRow, 
+        createTable, 
+        handeGridSelectionInputs,
+        goToColumnConfiguration
+    }
+    ) => {
+
     const [hoveredCol, setHoveredCol] = useState(0);
     const [hoveredRow, setHoveredRow] = useState(0);
     const [activeGridSquares, setActiveGridSquares] = useState([activeRow, activeCol]);
@@ -72,7 +82,7 @@ const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow, crea
     }, []);
 
     return (
-        <div>
+        <div className="dimensions-selection-container">
             <div className="table-dimensions-config">
                 <div className="input-container">
                     <label htmlFor="number-of-cols">Columns</label>
@@ -107,7 +117,7 @@ const DimensionsSelection = ({ handleGridSquareClick, activeCol, activeRow, crea
             <hr />
 
             <div className="cta-container">
-                <button className="btn">Configure Columns</button>
+                <button className="btn" onClick={goToColumnConfiguration}>Configure Columns</button>
                 <button className="btn btn-primary btn-create-table" onClick={createTable}>Create table</button>
             </div>
         </div>

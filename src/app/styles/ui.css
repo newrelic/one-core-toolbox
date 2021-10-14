@@ -1,5 +1,5 @@
 body {
-  padding: 16px;
+  margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
@@ -21,6 +21,10 @@ table td {
   padding-right: 6px;
   padding-bottom: 6px;
   box-sizing: content-box;
+}
+
+.dimensions-selection-container {
+  padding: 16px;
 }
 
 .input__radio input {
@@ -157,7 +161,7 @@ table.hovered input[type=radio]~label.active.hovered {
   color: #333;
   border: 1px solid rgba(0,0,0,.8);
   background-clip: padding-box;
-  font-size: 13px;
+  font-size: 11px;
   line-height: 16px;
   letter-spacing: .053px;
 }
@@ -167,4 +171,16 @@ table.hovered input[type=radio]~label.active.hovered {
   border-color: transparent;
   color: #fff;
   background-clip: border-box;
+}
+
+.column-nav { 
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  background-color: #FAFBFB;
+  border-bottom: 1px solid #F3F4F4;
+}
+
+.column-configuration-body {
+  padding: 16px;
 }
