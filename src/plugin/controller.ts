@@ -4,49 +4,79 @@ figma.ui.onmessage = async (msg) => {
     if (msg.type === 'create-table') {
         const tableFrame = figma.createFrame()
         let headerCell = await figma.importComponentByKeyAsync('ce8fa8e8cab07a19f83f4181ac8cbe76093c6bc3')
-        let bodyCell = await figma.importComponentByKeyAsync('8917ab43ec000963ea1d3e1c9c0cdbe23edf0c9e')
         let tableRow = figma.createComponent()
+        
+        await figma.loadFontAsync({ family: "Open Sans", style: "Regular" })
         
         tableFrame.name = 'Table';
         tableFrame.counterAxisSizingMode = 'AUTO';
         tableFrame.layoutMode = 'VERTICAL';
         
-        tableRow.layoutMode = 'HORIZONTAL';
-        tableRow.counterAxisSizingMode = 'AUTO';
-        tableRow.name = 'Row';
+        headerCell.variantProperties.Type = "Body";
 
-        headerCell.variantProperties.Type = "Body"
+        [...Array(msg.rows + 1).keys()].map((rowIndex) => {
+            
+            tableRow.layoutMode = 'HORIZONTAL';
+            tableRow.counterAxisSizingMode = 'AUTO';
+            tableRow.name = 'Row';
+            // tableRow.layoutAlign = 'STRETCH'
+            // tableRow.primaryAxisSizingMode = 'FIXED';
 
-        function createTableRow () {
-        for (let i = 0; i < msg.cols; i++) {
-            tableRow.appendChild(headerCell.createInstance())
-        }
+            msg.columnConfiguration.map(async (col) => {
+                let { name: colName, alignment: colAlignment, cellType: colCellType, multiValue: colMultiValue } = col;
 
-        tableFrame.appendChild(tableRow)
-        
-        for (let i = 0; i < msg.rows; i++) {
-            tableFrame.appendChild(tableRow.createInstance())
-        }
+                colAlignment = colAlignment[0].toUpperCase() + colAlignment.substring(1)
+                colCellType = colCellType[0].toUpperCase() + colCellType.substring(1)
+                colMultiValue = colMultiValue.toString()
+                colMultiValue = colMultiValue[0].toUpperCase() + colMultiValue.substring(1)
 
+                if (rowIndex === 0) {
+                    let thisHeaderCell = headerCell.createInstance()
+                    let textNodeOfHeaderCell = thisHeaderCell.children[0].children[0]
+                    
+                    thisHeaderCell.name = colName.length > 0 ? colName : 'Header';
 
-        tableFrame.children.map((row, index) => {
-            if (index > 0) {
-            row.children.map(cell => {
-                cell.swapComponent(bodyCell)
-            })
+                    textNodeOfHeaderCell.deleteCharacters(0, textNodeOfHeaderCell.characters.length)
+                    textNodeOfHeaderCell.insertCharacters(0, colName.length > 0 ? colName : 'Header')
+                    thisHeaderCell.setProperties({ "Alignment" : colAlignment})
+
+                    // thisHeaderCell.layoutGrow = 1;
+                    thisHeaderCell.children[0].layoutGrow = 1;
+                    
+                    
+                    tableRow.appendChild(thisHeaderCell)
+                } 
+            }) 
+
+            if (rowIndex === 0 ) {
+                tableFrame.appendChild(tableRow)
+            } else {
+                let thisTableRow = tableRow.createInstance();
+
+                // thisTableRow.layoutAlign = 'STRETCH'
+                // thisTableRow.primaryAxisSizingMode = 'FIXED';
+                
+                thisTableRow.children.map((cell, index) => {
+                    let { cellType: colCellType, multiValue: colMultiValue } = msg.columnConfiguration[index];
+    
+                    colCellType = colCellType[0].toUpperCase() + colCellType.substring(1)
+                    colMultiValue = colMultiValue.toString()
+                    colMultiValue = colMultiValue[0].toUpperCase() + colMultiValue.substring(1)
+
+                    cell.setProperties({'Type': 'Body'})
+                    cell.children[0].children[0].setProperties({
+                        "Type": colCellType,
+                        "Multi-value": colMultiValue,
+                    })
+                })
+
+                tableFrame.appendChild(thisTableRow)
             }
         })
-
-        }
-        
-        createTableRow()
-
-            // This is how figma responds back to the ui
-            figma.ui.postMessage({
-                type: 'create-rectangles',
-                message: `Created ${msg.count} Rectangles`,
-            });
-        }
-
+    }
+    
+    if (msg.type === 'creation-feedback') {
+        figma.notify('✅ Table created');
+    }
     figma.closePlugin();
 };

@@ -15,7 +15,7 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     const handleColumnConfigurationUpdate = (attr) => {
         let columnConfigurationArray = [...columnConfiguration];
 
-        columnConfigurationArray[activeColConfigurationScreen][attr] = event.target.value
+        columnConfigurationArray[activeColConfigurationScreen][attr] = attr !== 'multiValue' ? event.target.value : event.target.checked
 
         setColumnConfiguration(columnConfigurationArray)
     }

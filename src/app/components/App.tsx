@@ -20,8 +20,8 @@ const App = ({}) => {
                 columnConfigurationArray.push(
                     {
                         name: '',
-                        alignment: 'left',
-                        cellType: 'text',
+                        alignment: 'Left',
+                        cellType: 'Text',
                         multiValue: false
                     }
                 )
@@ -40,8 +40,8 @@ const App = ({}) => {
                     columnConfigurationArray.push(
                         {
                             name: '',
-                            alignment: 'left',
-                            cellType: 'text',
+                            alignment: 'Left',
+                            cellType: 'Text',
                             multiValue: false
                         }
                     )
@@ -55,10 +55,14 @@ const App = ({}) => {
     useEffect(handleColumnConfiguration, [activeCol])
 
     const handeGridSelectionInputs = (type) => {
+        let { value, min, max } = event.target;
+
+        value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+
         if (type === 'col') {
-            setActiveCol(parseInt(event.target.value))
+            setActiveCol(parseInt(value))
         } else if (type === 'row') {
-            setActiveRow(parseInt(event.target.value))
+            setActiveRow(parseInt(value))
         }
     };
 
@@ -76,6 +80,8 @@ const App = ({}) => {
               columnConfiguration: columnConfiguration
             } 
           }, '*')
+
+        parent.postMessage({pluginMessage: {type: 'creation-feedback'}}, '*');
     }
 
     const goToColumnConfiguration = () => {
