@@ -20,13 +20,30 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
         setColumnConfiguration(columnConfigurationArray)
     }
 
+    const handleNavButtonClick = (direction) => {
+        if (direction === 'previous' && activeColConfigurationScreen !== 0) {
+            setActiveColConfigurationScreen(activeColConfigurationScreen - 1 )
+        } else if (direction === 'next' && activeColConfigurationScreen !== columnConfiguration.length - 1) {
+            setActiveColConfigurationScreen(activeColConfigurationScreen + 1 )
+        }
+    }
+
     const renderColumnNavigation = () => {
         return (
             <nav className="column-nav">
-                <button className={"nav-arrow left-nav-arrow"}></button>
+                <button 
+                    className={"nav-arrow left-nav-arrow"} 
+                    onClick={() => handleNavButtonClick('previous')}
+                    disabled={activeColConfigurationScreen === 0}
+                ></button>
                 
                 <div className="select-input-container">
-                    <select name="column-selection" className="column-selection-dropdown" onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}>
+                    <select 
+                        name="column-selection" 
+                        className="column-selection-dropdown" 
+                        onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}
+                        value={activeColConfigurationScreen + 1}
+                    >
                         {
                             [...Array(activeCol).keys()].map((index) => {
                                 return (<option key={index} value={index + 1} className="column-selection-dropdown-option">{`Column ${index + 1}`}</option>)
@@ -35,7 +52,11 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
                     </select>
                 </div>
     
-                <button className={"nav-arrow right-nav-arrow"}></button>
+                <button 
+                    className={"nav-arrow right-nav-arrow"}
+                    onClick={() => handleNavButtonClick('next')}
+                    disabled={activeColConfigurationScreen === columnConfiguration.length - 1}
+                ></button>
             </nav>
         )
     }

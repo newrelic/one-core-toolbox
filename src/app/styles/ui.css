@@ -267,6 +267,19 @@ button[disabled] {
   border-radius: 3px;
 }
 
+.nav-arrow[disabled] {
+  background-color: transparent;
+}
+
+.nav-arrow[disabled]:hover {
+  background-color: transparent;
+}
+
+.nav-arrow[disabled]:after,
+.nav-arrow[disabled]:before {
+  background-color: rgba(0,0,0, .15);
+}
+
 .nav-arrow:hover {
   background-color: rgba(0,0,0, .045)
 }
