@@ -19,9 +19,16 @@ body {
 
 h4 {
   margin-top: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
   font-size: 11px;
   font-weight: 700;
+}
+
+h6 {
+  font-weight: 400;
+  color: rgba(0,0,0, .6);
+  margin: 0 0 10px;
+  line-height: 14px;
 }
 
 select {
@@ -321,6 +328,7 @@ button[disabled] {
   position: absolute;
   right: calc(5px + 8px);
   top: 12px;
+  pointer-events: none;
 }
 
 .select-input-container:before {
@@ -332,6 +340,7 @@ button[disabled] {
   position: absolute;
   right: calc(8px + 8px);
   top: 12px;
+  pointer-events: none;
 }
 
 /*-- Toggle styles --*/  

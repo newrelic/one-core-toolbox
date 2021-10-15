@@ -50,7 +50,6 @@ const App = ({}) => {
         }
 
         setColumnConfiguration(columnConfigurationArray)
-        debugger
     }
 
     useEffect(handleColumnConfiguration, [activeCol])
@@ -103,7 +102,8 @@ const App = ({}) => {
             return <ColumnConfiguration
                      createTable={createTable} 
                      goToDimensionsSelection={goToDimensionsSelection}
-                     activeCol={activeCol}  
+                     activeCol={activeCol}
+                     columnConfiguration={columnConfiguration}
                      setColumnConfiguration={setColumnConfiguration}
                     />
         }

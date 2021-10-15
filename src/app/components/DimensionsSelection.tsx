@@ -116,7 +116,7 @@ const DimensionsSelection = (
             <hr />
 
             <div className="cta-container">
-                <button className={`btn`} disabled={activeCol < 1} onClick={goToColumnConfiguration}>Configure Columns</button>
+                <button className={`btn`} disabled={activeCol < 1} onClick={goToColumnConfiguration}>Format cells</button>
                 <button className="btn btn-primary btn-create-table" onClick={createTable}>Create table</button>
             </div>
         </div>

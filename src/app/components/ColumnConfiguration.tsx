@@ -1,11 +1,24 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState,  useEffect } from 'react';
 import '../styles/ui.css';
 
 declare function require(path: string): any;
 
-const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, setColumnConfiguration }) => {
+const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, columnConfiguration, setColumnConfiguration }) => {
     const [activeColConfigurationScreen, setActiveColConfigurationScreen] = useState(0);
+    // const [localColumnConfiguration, setLocalColumnConfiguration] = useState(column)
+
+    // const handleActiveColScreenChange = () => {
+    //     debugger
+    // }
+    
+    const handleColumnConfigurationUpdate = (attr) => {
+        let columnConfigurationArray = [...columnConfiguration];
+
+        columnConfigurationArray[activeColConfigurationScreen][attr] = event.target.value
+
+        setColumnConfiguration(columnConfigurationArray)
+    }
 
     const renderColumnNavigation = () => {
         return (
@@ -13,10 +26,10 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
                 <button className={"nav-arrow left-nav-arrow"}></button>
                 
                 <div className="select-input-container">
-                    <select name="column-selection" className="column-selection-dropdown">
+                    <select name="column-selection" className="column-selection-dropdown" onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}>
                         {
                             [...Array(activeCol).keys()].map((index) => {
-                                return (<option value={`Column ${index + 1}`} selected={index === (activeColConfigurationScreen - 1)} className="column-selection-dropdown-option">{`Column ${index + 1}`}</option>)
+                                return (<option key={index} value={index + 1} className="column-selection-dropdown-option">{`Column ${index + 1}`}</option>)
                             })
                         }
                     </select>
@@ -30,24 +43,33 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     const renderConfigurationBody = () => {
         return (
             <section className="configuration-body">
-                <h4>Columns configuration</h4>
+                <div className="configuration-body-headings">
+                    <h4>Cell formatting</h4>
+                    <h6>Choose the properties for the cells in this column</h6>
+                </div>
                 
                 <div className="input-container">
-                    <label htmlFor="column-name">Name</label>
+                    <label htmlFor="column-name">Column name</label>
                     <input 
                         type="text" 
-                        name="column-name" 
+                        name="column-name"
                         className="column-configuration-name-input"
-                        placeholder="Title your column"
+                        placeholder="e.g. date, account, throughput, etc. "
                         id="column-name"
-                        // onChange={() => handeGridSelectionInputs('col')}
-                        value="" 
+                        onChange={() => handleColumnConfigurationUpdate('name')}
+                        value={columnConfiguration[activeColConfigurationScreen]['name']}
                     />
                 </div>
                 <div className="input-container">
                     <label htmlFor="column-alignment">Alignment</label>
                     <div className="select-input-container">
-                        <select name="alignment-selection" className="column-configuration-alignment-input" id="column-alignment">
+                        <select 
+                            name="alignment-selection" 
+                            className="column-configuration-alignment-input" 
+                            id="column-alignment" 
+                            onChange={() => handleColumnConfigurationUpdate('alignment')}
+                            value={columnConfiguration[activeColConfigurationScreen]['alignment']}
+                        >
                             <option value="left" className="column-configuration-alignment-input-option">Left</option>
                             <option value="right" className="column-configuration-alignment-input-option">Right</option>
                         </select>
@@ -56,7 +78,13 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
                 <div className="input-container">
                     <label htmlFor="column-cell-type">Cell type</label>
                     <div className="select-input-container">
-                        <select name="alignment-selection" className="column-configuration-alignment-input" id="column-cell-type">
+                        <select 
+                            name="alignment-selection" 
+                            className="column-configuration-alignment-input" 
+                            id="column-cell-type" 
+                            onChange={() => handleColumnConfigurationUpdate('cellType')}
+                            value={columnConfiguration[activeColConfigurationScreen]['cellType']}
+                        >
                             <option value="text" className="column-configuration-alignment-input-option">Text</option>
                             <option value="link" className="column-configuration-alignment-input-option">Link</option>
                             <option value="metric" className="column-configuration-alignment-input-option">Metric</option>
@@ -71,7 +99,12 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
                 <label className="input-container" htmlFor="column-multi-value">
                     <h5 className="label">Multi-value</h5>
                     <div className="switch">
-                        <input type="checkbox" id="column-multi-value" />
+                        <input 
+                            type="checkbox" 
+                            id="column-multi-value"  
+                            onChange={() => handleColumnConfigurationUpdate('multiValue')}
+                            checked={columnConfiguration[activeColConfigurationScreen]['multiValue']}
+                        />
                         <span className="slider round"></span>
                     </div>
                 </label>
@@ -82,7 +115,7 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     const renderCallsToAction = () => {
         return (
             <div className="cta-container">
-                <button className="btn" onClick={goToDimensionsSelection}>Choose table dimensions</button>
+                <button className="btn" onClick={goToDimensionsSelection}>Set table dimensions</button>
                 <button className="btn btn-primary btn-create-table" onClick={createTable}>Create table</button>
             </div>
         )
