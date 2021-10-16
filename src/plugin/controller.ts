@@ -5,14 +5,20 @@ figma.ui.onmessage = async (msg) => {
         const tableFrame = figma.createFrame()
         let headerCell = await figma.importComponentByKeyAsync('ce8fa8e8cab07a19f83f4181ac8cbe76093c6bc3')
         let tableRow = figma.createComponent()
+        let cellFillContainerY = false;
         
         await figma.loadFontAsync({ family: "Open Sans", style: "Regular" })
         
         tableFrame.name = 'Table';
         tableFrame.counterAxisSizingMode = 'AUTO';
         tableFrame.layoutMode = 'VERTICAL';
+        tableFrame.x = figma.viewport.center.x
+        tableFrame.y = figma.viewport.center.y
         
         headerCell.variantProperties.Type = "Body";
+
+        // if any cell is set to Multi-value, set a variable we'll use later
+        msg.columnConfiguration.find(col => cellFillContainerY = col.multiValue);
 
         [...Array(msg.rows + 1).keys()].map((rowIndex) => {
             
@@ -21,8 +27,9 @@ figma.ui.onmessage = async (msg) => {
             tableRow.name = 'Row';
             // tableRow.layoutAlign = 'STRETCH'
             // tableRow.primaryAxisSizingMode = 'FIXED';
+            
 
-            msg.columnConfiguration.map(async (col) => {
+            msg.columnConfiguration.map(async (col, i, arr) => {
                 let { name: colName, alignment: colAlignment, cellType: colCellType, multiValue: colMultiValue } = col;
 
                 colAlignment = colAlignment[0].toUpperCase() + colAlignment.substring(1)
@@ -41,7 +48,9 @@ figma.ui.onmessage = async (msg) => {
                     thisHeaderCell.setProperties({ "Alignment" : colAlignment})
 
                     // thisHeaderCell.layoutGrow = 1;
-                    thisHeaderCell.children[0].layoutGrow = 1;
+
+                    // if any cell is set to Multi-value then make all of them "fill container" vertically
+                    thisHeaderCell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
                     
                     
                     tableRow.appendChild(thisHeaderCell)
