@@ -82,10 +82,10 @@ figma.ui.onmessage = async (msg) => {
                 tableFrame.appendChild(thisTableRow)
             }
         })
+
+        figma.notify('Table created ✅');
+        
+        figma.closePlugin();
     }
     
-    if (msg.type === 'creation-feedback') {
-        figma.notify('✅ Table created');
-    }
-    figma.closePlugin();
 };
