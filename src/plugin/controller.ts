@@ -47,10 +47,13 @@ figma.ui.onmessage = async (msg) => {
                     textNodeOfHeaderCell.insertCharacters(0, colName.length > 0 ? colName : 'Header')
                     thisHeaderCell.setProperties({ "Alignment" : colAlignment})
 
+                    thisHeaderCell.resize(colMultiValue === 'True' ? 120 : thisHeaderCell.width, thisHeaderCell.height)
+
                     // thisHeaderCell.layoutGrow = 1;
 
                     // if any cell is set to Multi-value then make all of them "fill container" vertically
                     thisHeaderCell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
+                    thisHeaderCell.primaryAxisSizingMode = cellFillContainerY ? 'FIXED' : 'AUTO';
                     
                     
                     tableRow.appendChild(thisHeaderCell)
@@ -72,11 +75,18 @@ figma.ui.onmessage = async (msg) => {
                     colMultiValue = colMultiValue.toString()
                     colMultiValue = colMultiValue[0].toUpperCase() + colMultiValue.substring(1)
 
+                    cell.name === 'Header' ? cell.name = 'Cell' : null;
                     cell.setProperties({'Type': 'Body'})
                     cell.children[0].children[0].setProperties({
                         "Type": colCellType,
                         "Multi-value": colMultiValue,
                     })
+
+                    // Because cells can be reset here as they're replaced with another 
+                    // component (variants), we again set the fill container setting if
+                    // any of the columns is set to "multi value"
+                    cell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
+                    cell.primaryAxisSizingMode = cellFillContainerY ? 'FIXED' : 'AUTO';
                 })
 
                 tableFrame.appendChild(thisTableRow)
