@@ -64,7 +64,6 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     const renderConfigurationBody = () => {
         const multiValueDisabled = () => {
             const currentCellType = columnConfiguration[activeColConfigurationScreen]['cellType']
-            console.log(currentCellType);
             if (
                 currentCellType === 'Text' ||
                 currentCellType === 'text' || 

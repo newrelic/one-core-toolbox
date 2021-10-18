@@ -78,7 +78,7 @@ table td {
 }
 
 .dimensions-selection-container {
-  padding: 16px;
+  padding: 23px;
 }
 
 .input__radio input {
@@ -126,6 +126,10 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   margin: 1px 0;
   box-sizing: border-box;
   border-radius: 2px;
+}
+
+.column-configuration-body .input-container {
+  padding-right: 0;
 }
 
 .table-dimensions-config .input-container {
@@ -196,6 +200,12 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   flex-grow: 1;
 }
 
+.table-dimensions-config .input-container input:focus {
+  outline: none;
+  border: 1px solid transparent;
+  box-shadow: none;
+}
+
 .number-of-cols,
 .number-of-rows {
   border: none;
@@ -207,13 +217,13 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 }
 
 .cta-container {
-  bottom: 16px;
   width: 100%;
   display: flex;
   gap: 8px;
   position: absolute;
   box-sizing: border-box;
-  right: 16px;
+  right: 23px;
+  bottom: 23px;
   padding-top: 8px;
   justify-content: flex-end;
 }
@@ -316,7 +326,7 @@ button[disabled] {
 }
 
 .column-configuration-body {
-  padding: 14px 16px;
+  padding: 20px 23px;
 }
 
 .configuration-body {
