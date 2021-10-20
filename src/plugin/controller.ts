@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 300, height: 412 });
+figma.showUI(__html__, { width: 300, height: 448 });
 
 figma.ui.onmessage = async (msg) => {
   if (msg.type === "create-table") {

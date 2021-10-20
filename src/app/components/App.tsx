@@ -126,7 +126,19 @@ const App = ({}) => {
     //     };
     // }, []);
 
-    return handleRouting()
+    return (
+        <>
+            {
+                <nav className="tab-navigation">
+                    <ul className="tab-navigation-tabs">
+                        <li className="tab-navigation-tab active">Table creator</li>
+                        <li className="tab-navigation-tab">More coming soon...</li>
+                    </ul>
+                </nav>
+            }  
+            {handleRouting()}
+        </>
+    )
 };
 
 export default App;

@@ -80,6 +80,8 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
         
         return (
             <section className="configuration-body">
+                {renderColumnNavigation()}
+
                 <div className="configuration-body-headings">
                     <h4>Cell formatting</h4>
                     <h6>Choose the properties for the cells in this column</h6>
@@ -161,8 +163,6 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     
     return (
         <> 
-            {renderColumnNavigation()}
-
             <main className="column-configuration-body">
                 {renderConfigurationBody()}
                 {renderCallsToAction()}
