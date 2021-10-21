@@ -112,10 +112,17 @@ figma.ui.onmessage = async (msg) => {
 
         tableFrame.appendChild(thisTableRow);
       }
-    });
 
-    let userData = figma.currentUser;
-    figma.ui.postMessage({ type: "current-user", message: userData });
+    });
+    
+    let tableData = {
+      userData: figma.currentUser, 
+      columnConfiguration: msg.columnConfiguration,
+      columnCount: msg.columnConfiguration.length,
+      rowCount: msg.rows
+    };
+
+    figma.ui.postMessage({ type: "table-created", message: tableData });
 
     figma.notify("Table created ✅");
 

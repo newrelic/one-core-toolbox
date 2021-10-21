@@ -116,15 +116,25 @@ const App = ({}) => {
     }
 
     // Send user data to monitoring tool
-    // React.useEffect(() => {
-    //     // This is how we read messages sent from the plugin controller
-    //     window.onmessage = (event) => {
-    //         const {type, message} = event.data.pluginMessage;
-    //         if (type === 'current-user') {
-    //             console.log(`Figma Says: ${JSON.stringify(message)}`);
-    //         }
-    //     };
-    // }, []);
+    React.useEffect(() => {
+        // This is how we read messages sent from the plugin controller
+        window.onmessage = (event) => {
+            const {type, message} = event.data.pluginMessage;
+            if (type === 'table-created') {
+                newrelic.addPageAction(
+                    'tableCreated', {
+                        'User ID': message.userData.id,
+                        'User Name': message.userData.name,
+                        'User Avatar': message.userData.photoUrl,
+                        'Session ID': message.userData.sessionId,
+                        'Column count': message.columnCount,
+                        'Row count': message.rowCount,
+                        'Column Configuration': message.columnConfiguration
+                    } 
+                );
+            }
+        };
+    }, []);
 
     return (
         <>
