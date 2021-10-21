@@ -83,7 +83,8 @@ const DimensionsSelection = (
                         id="number-of-cols" 
                         className="number-of-cols" 
                         onChange={() => handeGridSelectionInputs('col')}
-                        value={activeCol === 0 && activeRow === 0 ? '' : activeCol} 
+                        value={activeCol === 0 && activeRow === 0 ? '' : activeCol}
+                        placeholder={tableHovered ? hoveredCol + 1 : ''} 
                     />
                 </div>
                 <div className="input-container">
@@ -96,7 +97,8 @@ const DimensionsSelection = (
                         id="number-of-rows" 
                         className="number-of-rows" 
                         onChange={() => handeGridSelectionInputs('row')}
-                        value={activeRow === 0 && activeCol === 0 ? '' : activeRow} 
+                        value={activeRow === 0 && activeCol === 0 ? '' : activeRow}
+                        placeholder={tableHovered ? hoveredRow + 1 : ''} 
                     />
                 </div>
             </div>
