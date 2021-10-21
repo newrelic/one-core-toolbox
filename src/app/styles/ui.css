@@ -138,13 +138,13 @@ table.hovered input[type="radio"] ~ label.hovered {
 }
 
 table input[type="radio"] ~ label.active {
-  background-color: #f0fbfc;
-  box-shadow: 0 0 0 2px #019caa;
+  background-color: #fff;
+  box-shadow: 0 0 0 2px #27bac8;
 }
 
 table.hovered input[type="radio"] ~ label.active.hovered {
-  background-color: #c6f2f6;
-  box-shadow: 0 0 0 2px #019caa;
+  background-color: #f0fbfc;
+  box-shadow: 0 0 0 2px #27bac8;
 }
 
 .input-container {
