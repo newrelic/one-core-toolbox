@@ -248,15 +248,24 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 }
 
 .cta-container {
-  width: 100%;
+  width: 84%;
   display: flex;
   gap: 8px;
   position: absolute;
   box-sizing: border-box;
   right: 23px;
   bottom: 23px;
-  padding-top: 8px;
   justify-content: flex-end;
+}
+
+.dimensions-cta-container {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dimensions-cta-container h6 {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.4);
 }
 
 .btn {

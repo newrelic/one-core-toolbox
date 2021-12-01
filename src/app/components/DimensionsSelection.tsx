@@ -105,11 +105,10 @@ const DimensionsSelection = (
 
             {renderTable()}
 
-            <hr />
 
-            <div className="cta-container">
-                <button className={`btn`} disabled={activeCol < 1} onClick={goToColumnConfiguration}>Format cells</button>
-                <button className="btn btn-primary btn-create-table" onClick={createTable}>Create table</button>
+            <div className="cta-container dimensions-cta-container">
+                <h6>(Max: 24 columns and 100 rows)</h6>
+                <button disabled={activeCol < 1} className="btn btn-primary btn-create-table" onClick={goToColumnConfiguration}>Continue</button>
             </div>
         </div>
     );

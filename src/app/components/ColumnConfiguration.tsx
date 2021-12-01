@@ -155,7 +155,7 @@ const ColumnConfiguration = ({ createTable, goToDimensionsSelection, activeCol, 
     const renderCallsToAction = () => {
         return (
             <div className="cta-container">
-                <button className="btn" onClick={goToDimensionsSelection}>Set dimensions</button>
+                <button className="btn" onClick={goToDimensionsSelection}>Back</button>
                 <button className="btn btn-primary btn-create-table" onClick={createTable}>Create table</button>
             </div>
         )
