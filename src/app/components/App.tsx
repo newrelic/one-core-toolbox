@@ -6,14 +6,45 @@ import "../styles/ui.css";
 declare function require(path: string): any;
 
 const App = ({}) => {
+  const [activePlugin, setActivePlugin] = useState("table-creator");
+
+  // Render the nav tabs in the plug UI
+  const renderNavigationTabs = () => {
+    const tabs: string[] = ["table-creator", "language-linter"];
+
+    // for each tab in the above array
+    return tabs.map((tab, index) => {
+      let tabClasses: string[] = ["tab-navigation-tab"];
+      let tabClassesOutput = tabClasses.join(" ");
+      // create the label from the value of `tab`
+      let tabLabel =
+        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
+
+      // If it's the active tab, apply the class "active" to it
+      if (activePlugin === tab) {
+        tabClasses.push("active");
+        tabClassesOutput = tabClasses.join(" ");
+      }
+
+      return (
+        <li
+          className={tabClassesOutput}
+          onClick={() => handleNavigationTabClick(tab)}
+        >
+          {tabLabel}
+        </li>
+      );
+    });
+  };
+
+  const handleNavigationTabClick = (clickedTab: string) => {
+    setActivePlugin(clickedTab);
+  };
+
   return (
     <>
       <nav className="tab-navigation">
-        <ul className="tab-navigation-tabs">
-          <li className="tab-navigation-tab active">Table creator</li>
-          <li className="tab-navigation-tab">Language linter</li>
-          <li className="tab-navigation-tab">More soon...</li>
-        </ul>
+        <ul className="tab-navigation-tabs">{renderNavigationTabs()}</ul>
       </nav>
       <TableCreator />
     </>
