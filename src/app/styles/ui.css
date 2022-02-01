@@ -97,6 +97,7 @@ table td {
   border-radius: 3px 3px 0 0;
   position: relative;
   top: 1px;
+  pointer-events: none;
 }
 
 .tab-navigation-tab:not(.active) {
