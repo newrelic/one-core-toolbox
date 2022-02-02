@@ -11,7 +11,7 @@ const App = ({}) => {
 
   // Render the nav tabs in the plug UI
   const renderNavigationTabs = () => {
-    const tabs: string[] = ["table-creator", "more-coming-soon..."];
+    const tabs: string[] = ["table-creator", "language-linter"];
 
     // for each tab in the above array
     return tabs.map((tab, index) => {
