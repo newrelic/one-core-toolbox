@@ -40,6 +40,16 @@ const App = ({}) => {
 
   const handleNavigationTabClick = (clickedTab: string) => {
     setActivePlugin(clickedTab);
+
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "navigate-to-tab",
+          tabClicked: clickedTab,
+        },
+      },
+      "*"
+    );
   };
 
   const renderPluginBody = () => {

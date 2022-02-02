@@ -128,4 +128,15 @@ figma.ui.onmessage = async (msg) => {
 
     figma.closePlugin();
   }
+
+  if (msg.type === "navigate-to-tab") {
+    switch (msg.tabClicked) {
+      case "table-creator":
+        figma.ui.resize(300, 448)
+        break;
+      case "language-linter":
+        figma.ui.resize(475, 500)
+        break;
+    }
+  }
 };
