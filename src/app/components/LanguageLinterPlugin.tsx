@@ -22,18 +22,8 @@ const LanguageLinterPlugin = () => {
   }, []);
 
   React.useEffect(() => {
-    // // for every layer returned
-    // selectedLayers.forEach((selectedLayer) => {
-    //   let textLayers = []
-    //   // If the layer has children
-    //   if (!!selectedLayer?.children) {
-    //     // Add any children that are text layers to the output array
-    //     textLayers.push(selectedLayer.findAll(n => n.type === 'TEXT'))
-    //   } else if (selectedLayer.type === 'TEXT') {
-    //     textLayers.push(selectedLayer)
-    //   }
-    // })
-
+    // when `selectedLayers` is updated
+    // update the sample text
     if (selectedLayers.length > 0) {
       setSampleText(selectedLayers[0].characters)
       setMaxTextIndex(selectedLayers.length)
@@ -42,6 +32,20 @@ const LanguageLinterPlugin = () => {
       setMaxTextIndex(0)
     }
   }, [selectedLayers]);
+
+  React.useEffect(() => {
+    if (sampleText !== '') {
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: "sample-text-changed",
+            activeNodeId: selectedLayers[sampleTextIndex].id,
+          },
+        },
+        "*"
+      );  
+    }
+  }, [sampleText])
 
   const handleTextLayerNavigation = (direction) => {
     // Which direction does the user want to navigate?
@@ -60,12 +64,12 @@ const LanguageLinterPlugin = () => {
   };
   
   return(
-    <>
+    <div className="language-linter-container">
       <nav className="text-layer-nav">
         <button
           className={"nav-arrow left-nav-arrow"}
           onClick={() => handleTextLayerNavigation("previous")}
-          disabled={sampleTextIndex - 1 <= 0}
+          disabled={sampleTextIndex - 1 < 0}
         ></button>
 
         {/*<div className="select-input-container">
@@ -95,7 +99,7 @@ const LanguageLinterPlugin = () => {
         sampleText={sampleText}
         setSampleText={setSampleText}
       />
-    </>
+    </div>
   );
 };
 

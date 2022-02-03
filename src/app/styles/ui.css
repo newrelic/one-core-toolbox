@@ -112,7 +112,8 @@ table td {
   cursor: default;
 }
 
-.dimensions-selection-container {
+.dimensions-selection-container,
+.language-linter-container {
   padding: 23px;
 }
 
@@ -492,6 +493,10 @@ input:checked + .slider:before {
 }
 
 /*-- Language linter --*/
+
+.language-linter-container {
+  padding:  ;
+}
 
 .text-layer-nav {
   height:  47px;

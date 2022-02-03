@@ -17,11 +17,15 @@ const sendCurrentSelection = () => {
   // get the selected layers
   let selection = figma.currentPage.selection
 
-
+  // initialize an variable that we'll store our output in
+  // as we loop over the selected layers
   let textLayers = []
+
+  // for each selected layer
   selection.forEach((selectedLayer) => {
     // If the layer has children
     if (!!selectedLayer?.children) {
+      // get all of the children of the layer that are text layers
       const selectedTextLayers = selectedLayer.findAll(n => n.type === 'TEXT')
       
       // Add any children that are text layers to the output array
@@ -182,6 +186,12 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === 'get-sample-text') {
     const sampleText: object[] = figma.currentPage.selection
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
+  }
+
+  if (msg.type === 'sample-text-changed') {
+    // scroll and zoom the active layer into the center of the screen
+    const activeTextLayer = figma.getNodeById(msg.activeNodeId)
+    figma.viewport.scrollAndZoomIntoView([activeTextLayer])
   }
 
   figma.on("selectionchange", () => {
