@@ -194,6 +194,17 @@ figma.ui.onmessage = async (msg) => {
     figma.viewport.scrollAndZoomIntoView([activeTextLayer])
   }
 
+  if (msg.type === 'update-source-text') {
+    const activeTextLayer = figma.getNodeById(msg.layerId)
+    const fontName = activeTextLayer.fontName
+    await figma.loadFontAsync(fontName);
+
+    activeTextLayer.deleteCharacters(0, activeTextLayer.characters.length)
+    activeTextLayer.insertCharacters(0, msg.updatedText)
+
+    figma.ui.postMessage({ type: "source-text-updated", message: msg.updatedText });
+  }
+
   figma.on("selectionchange", () => {
     sendCurrentSelection()
   })

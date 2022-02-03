@@ -47,6 +47,21 @@ const LanguageLinterPlugin = () => {
     }
   }, [sampleText])
 
+  const updateSourceText = (updatedText) => {
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "update-source-text",
+          layerId: selectedLayers[sampleTextIndex].id,
+          updatedText: updatedText,
+        },
+      },
+      "*"
+    );
+
+    setSampleText(updatedText)
+  }
+
   const handleTextLayerNavigation = (direction) => {
     // Which direction does the user want to navigate?
     if (direction === "previous") {
@@ -57,7 +72,6 @@ const LanguageLinterPlugin = () => {
       setSampleTextIndex(sampleTextIndex + 1)
     }
   }
-
 
   const handleTextAreaOnChange = (event) => {
     setSampleText(event.target.value);
@@ -97,7 +111,7 @@ const LanguageLinterPlugin = () => {
       </nav>
       <LanguageLinter 
         sampleText={sampleText}
-        setSampleText={setSampleText}
+        setSampleText={updateSourceText}
       />
     </div>
   );
