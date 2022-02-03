@@ -1,6 +1,39 @@
 figma.showUI(__html__, { width: 300, height: 448 });
 
+const sendCurrentSelection = () => {
+  // get the selected layers
+  let selection = figma.currentPage.selection
+  
+  // If the layer has a "characters" property, include it
+  // in the new `selection` array.
+  selection = selection.filter(layer => !!layer?.characters).map(layer => {
+    return({
+      id: layer.id,
+      name: layer.name,
+      visible: layer.visible,
+      x: layer.x,
+      y: layer.y,
+      characters: layer?.characters
+    })
+  })
+
+  // send the selection array to the UI
+  return figma.ui.postMessage({ type: "selection-change", message: selection });
+}
+
 figma.ui.onmessage = async (msg) => {
+  if (msg.type === "navigate-to-tab") {
+    switch (msg.tabClicked) {
+      case "table-creator":
+        figma.ui.resize(300, 448)
+        break;
+      case "language-linter":
+        sendCurrentSelection()
+        figma.ui.resize(475, 500)
+        break;
+    }
+  }
+
   if (msg.type === "create-table") {
     const tableFrame = figma.createFrame();
     let headerCell = await figma.importComponentByKeyAsync(
@@ -129,14 +162,12 @@ figma.ui.onmessage = async (msg) => {
     figma.closePlugin();
   }
 
-  if (msg.type === "navigate-to-tab") {
-    switch (msg.tabClicked) {
-      case "table-creator":
-        figma.ui.resize(300, 448)
-        break;
-      case "language-linter":
-        figma.ui.resize(475, 500)
-        break;
-    }
+  if (msg.type === 'get-sample-text') {
+    const sampleText: object[] = figma.currentPage.selection
+    figma.ui.postMessage({ type: "sample-text", message: sampleText });
   }
+
+  figma.on("selectionchange", () => {
+    sendCurrentSelection()
+  })
 };

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import TableCreator from "./TableCreator";
 import "../styles/ui.css";
-import LanguageLinter from "./LanguageLinter";
+import LanguageLinterPlugin from "./LanguageLinterPlugin";
 
 declare function require(path: string): any;
 
@@ -57,7 +57,7 @@ const App = ({}) => {
       case "table-creator":
         return <TableCreator />;
       case "language-linter":
-        return <LanguageLinter />;
+        return <LanguageLinterPlugin />;
     }
   };
 

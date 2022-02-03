@@ -333,6 +333,7 @@ button[disabled] {
 
 .nav-arrow[disabled]:hover {
   background-color: transparent;
+  cursor: not-allowed;
 }
 
 .nav-arrow[disabled]:after,
@@ -342,6 +343,7 @@ button[disabled] {
 
 .nav-arrow:hover {
   background-color: rgba(0, 0, 0, 0.045);
+  cursor: pointer;
 }
 
 .nav-arrow:after {
@@ -487,4 +489,16 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/*-- Language linter --*/
+
+.text-layer-nav {
+  height:  47px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 10px 6px;
+  border-radius: 3px;
+  background-color: rgba(0, 0, 0, 0.035);
 }
