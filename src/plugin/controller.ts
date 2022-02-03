@@ -1,24 +1,41 @@
 figma.showUI(__html__, { width: 300, height: 448 });
 
+const pushTextLayerToArray = (layer, array) => {
+  array.push({
+    id: layer.id,
+    name: layer.name,
+    visible: layer.visible,
+    x: layer.x,
+    y: layer.y,
+    type: layer.type,
+    characters: layer?.characters,
+    children: layer?.children,
+  })
+}
+
 const sendCurrentSelection = () => {
   // get the selected layers
   let selection = figma.currentPage.selection
-  
-  // If the layer has a "characters" property, include it
-  // in the new `selection` array.
-  selection = selection.filter(layer => !!layer?.characters).map(layer => {
-    return({
-      id: layer.id,
-      name: layer.name,
-      visible: layer.visible,
-      x: layer.x,
-      y: layer.y,
-      characters: layer?.characters
-    })
+
+
+  let textLayers = []
+  selection.forEach((selectedLayer) => {
+    // If the layer has children
+    if (!!selectedLayer?.children) {
+      const selectedTextLayers = selectedLayer.findAll(n => n.type === 'TEXT')
+      
+      // Add any children that are text layers to the output array
+      selectedTextLayers.forEach((layer) => {
+        pushTextLayerToArray(layer, textLayers)
+      })
+      
+    } else if (selectedLayer.type === 'TEXT') {
+      pushTextLayerToArray(selectedLayer, textLayers)
+    }
   })
 
   // send the selection array to the UI
-  return figma.ui.postMessage({ type: "selection-change", message: selection });
+  return figma.ui.postMessage({ type: "selection-change", message: textLayers });
 }
 
 figma.ui.onmessage = async (msg) => {

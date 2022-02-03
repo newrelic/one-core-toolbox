@@ -6,7 +6,7 @@ import "../styles/ui.css";
 declare function require(path: string): any;
 
 const LanguageLinterPlugin = () => {
-  const [selectedTextLayers, setSelectedTextLayers] = useState([]);
+  const [selectedLayers, setSelectedLayers] = useState([]);
   const [sampleText, setSampleText] = useState('');
   const [sampleTextIndex, setSampleTextIndex] = useState(0);
   const [maxTextIndex, setMaxTextIndex] = useState(0);
@@ -16,24 +16,40 @@ const LanguageLinterPlugin = () => {
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
       if (type === "selection-change") {
-        setSelectedTextLayers(message)
+        setSelectedLayers(message)
       }
     };
   }, []);
 
   React.useEffect(() => {
-    if (selectedTextLayers.length > 0) {
-      setSampleText(selectedTextLayers[0].characters)
-      setMaxTextIndex(selectedTextLayers.length)
+    // // for every layer returned
+    // selectedLayers.forEach((selectedLayer) => {
+    //   let textLayers = []
+    //   // If the layer has children
+    //   if (!!selectedLayer?.children) {
+    //     // Add any children that are text layers to the output array
+    //     textLayers.push(selectedLayer.findAll(n => n.type === 'TEXT'))
+    //   } else if (selectedLayer.type === 'TEXT') {
+    //     textLayers.push(selectedLayer)
+    //   }
+    // })
+
+    if (selectedLayers.length > 0) {
+      setSampleText(selectedLayers[0].characters)
+      setMaxTextIndex(selectedLayers.length)
+    } else {
+      setSampleText('')
+      setMaxTextIndex(0)
     }
-  }, [selectedTextLayers]);
+  }, [selectedLayers]);
 
   const handleTextLayerNavigation = (direction) => {
+    // Which direction does the user want to navigate?
     if (direction === "previous") {
-      setSampleText(selectedTextLayers[sampleTextIndex - 1].characters);
+      setSampleText(selectedLayers[sampleTextIndex - 1].characters);
       setSampleTextIndex(sampleTextIndex - 1)
     } else if (direction === "next") {
-      setSampleText(selectedTextLayers[sampleTextIndex + 1].characters);
+      setSampleText(selectedLayers[sampleTextIndex + 1].characters);
       setSampleTextIndex(sampleTextIndex + 1)
     }
   }
