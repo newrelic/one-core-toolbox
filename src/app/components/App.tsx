@@ -8,6 +8,34 @@ declare function require(path: string): any;
 
 const App = ({}) => {
   const [activePlugin, setActivePlugin] = useState("table-creator");
+  const [latestFigmaCommand, setLatestFigmaCommand] = useState("");
+
+  // Handle submenu navigation: Part 1
+  // When a figma command is sent, store it's contents in state
+  useEffect(() => {
+    window.onmessage = (event) => {
+      const { type, message } = event.data.pluginMessage;
+
+      if (type === "figma-command") {
+        setLatestFigmaCommand(message)
+      }
+    }; 
+  }, [])
+
+  // Handle submenu navigation: Part 2
+  // Every time `latestFigmaCommand` is updated, handle subnavigation
+  useEffect(() => {
+    if (latestFigmaCommand.length > 0) {
+      switch (latestFigmaCommand) {
+        case "open-table-creator":
+          setActivePlugin('table-creator')
+          break;
+        case "open-language-linter":
+          setActivePlugin('language-linter')
+          break;
+      }
+    }
+  }, [latestFigmaCommand])
 
   // Render the nav tabs in the plug UI
   const renderNavigationTabs = () => {

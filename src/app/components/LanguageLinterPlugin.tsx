@@ -11,8 +11,11 @@ const LanguageLinterPlugin = () => {
   const [sampleTextIndex, setSampleTextIndex] = useState(0);
   const [maxTextIndex, setMaxTextIndex] = useState(0);
 
-  React.useEffect(() => {
+  // Get the selected layer when the plugin loads
+  useEffect(() => {
     // This is how we read messages sent from the plugin controller
+    parent.postMessage({ pluginMessage: { type: "request-selection" }, },"*");
+
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
       if (type === "selection-change") {
@@ -21,9 +24,8 @@ const LanguageLinterPlugin = () => {
     };
   }, []);
 
-  React.useEffect(() => {
-    // when `selectedLayers` is updated
-    // update the sample text
+  // when `selectedLayers` is updated update the sample text
+  useEffect(() => {
     if (selectedLayers.length > 0) {
       setSampleText(selectedLayers[0].characters)
       setMaxTextIndex(selectedLayers.length)
@@ -33,7 +35,9 @@ const LanguageLinterPlugin = () => {
     }
   }, [selectedLayers]);
 
-  React.useEffect(() => {
+  // Every time the `sampleText` gets updated so that we can
+  // scroll and zoom the active layer into the center of the screen
+  useEffect(() => {
     if (sampleText !== '') {
       parent.postMessage(
         {

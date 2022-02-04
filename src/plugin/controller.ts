@@ -38,6 +38,11 @@ const sendCurrentSelection = () => {
     }
   })
 
+  // TODO!: 
+  // - [ ] If there are multiple layers selected. Discard the layers without errors.
+  // - [ ] If a layer is updated while it's open, check it for errors and add it 
+  //       to the navigable layers if necessary
+
   // send the selection array to the UI
   return figma.ui.postMessage({ type: "selection-change", message: textLayers });
 }
@@ -183,6 +188,10 @@ figma.ui.onmessage = async (msg) => {
     figma.closePlugin();
   }
 
+  if (msg.type === 'request-selection') {
+    sendCurrentSelection();
+  }
+
   if (msg.type === 'get-sample-text') {
     const sampleText: object[] = figma.currentPage.selection
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
@@ -209,3 +218,14 @@ figma.ui.onmessage = async (msg) => {
     sendCurrentSelection()
   })
 };
+
+// handle submenu navigation
+switch (figma.command) {
+  case "table":
+    figma.ui.postMessage({ type: "figma-command", message: "open-table-creator" });
+    break;
+  case "language":
+    figma.ui.postMessage({ type: "figma-command", message: "open-language-linter" });
+    figma.ui.resize(475, 500)
+    break;
+}
