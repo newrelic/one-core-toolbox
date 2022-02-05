@@ -51,14 +51,14 @@ const TableCreator = () => {
   useEffect(handleColumnConfiguration, [activeCol]);
 
   const handeGridSelectionInputs = (type) => {
-    let { value, min, max } = event.target;
-
-    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    const element = event.target as HTMLInputElement
+    let { value, min, max } = element;
+    const calculatedValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
 
     if (type === "col") {
-      setActiveCol(parseInt(value));
+      setActiveCol(calculatedValue);
     } else if (type === "row") {
-      setActiveRow(parseInt(value));
+      setActiveRow(calculatedValue);
     }
   };
 
@@ -98,7 +98,6 @@ const TableCreator = () => {
           handleGridSquareClick={handleGridSquareClick}
           activeCol={activeCol}
           activeRow={activeRow}
-          createTable={createTable}
           handeGridSelectionInputs={handeGridSelectionInputs}
           goToColumnConfiguration={goToColumnConfiguration}
         />
@@ -122,6 +121,9 @@ const TableCreator = () => {
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
       if (type === "table-created") {
+        // newrelic is included at the top of ui.html in a
+        // a script tag. Typescript will complain. So...
+        // @ts-ignore
         newrelic.addPageAction("tableCreated", {
           "User ID": message.userData.id,
           "User Name": message.userData.name,

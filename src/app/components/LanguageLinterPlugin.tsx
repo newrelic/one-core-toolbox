@@ -76,11 +76,7 @@ const LanguageLinterPlugin = () => {
       setSampleTextIndex(sampleTextIndex + 1)
     }
   }
-
-  const handleTextAreaOnChange = (event) => {
-    setSampleText(event.target.value);
-  };
-  
+    
   return(
     <div className="language-linter-container">
       <nav className="text-layer-nav">

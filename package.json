@@ -9,6 +9,7 @@
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' "
 	},
 	"dependencies": {
+		"@types/newrelic": "^7.0.3",
 		"dictionary-en": "^3.1.0",
 		"new-relic-language-linter": "^1.1.6",
 		"prop-types": "^15.8.1",
@@ -16,7 +17,7 @@
 		"react-dom": "^17.0.2"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.24.0",
+		"@figma/plugin-typings": "^1.42.1",
 		"@types/react": "^17.0.11",
 		"@types/react-dom": "^17.0.7",
 		"css-loader": "^5.0.1",

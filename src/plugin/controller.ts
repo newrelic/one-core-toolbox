@@ -24,9 +24,9 @@ const sendCurrentSelection = () => {
   // for each selected layer
   selection.forEach((selectedLayer) => {
     // If the layer has children
-    if (!!selectedLayer?.children) {
+    if (!!(selectedLayer as FrameNode)?.children) {
       // get all of the children of the layer that are text layers
-      const selectedTextLayers = selectedLayer.findAll(n => n.type === 'TEXT')
+      const selectedTextLayers = (selectedLayer as FrameNode).findAll(n => n.type === 'TEXT')
       
       // Add any children that are text layers to the output array
       selectedTextLayers.forEach((layer) => {
@@ -76,7 +76,7 @@ figma.ui.onmessage = async (msg) => {
     tableFrame.x = figma.viewport.center.x;
     tableFrame.y = figma.viewport.center.y;
 
-    headerCell.variantProperties.Type = "Body";
+    // headerCell.variantProperties.Type = "Body";
 
     // if any cell is set to Multi-value, set a variable we'll use later
     msg.columnConfiguration.find(
@@ -90,7 +90,7 @@ figma.ui.onmessage = async (msg) => {
       // tableRow.layoutAlign = 'STRETCH'
       // tableRow.primaryAxisSizingMode = 'FIXED';
 
-      msg.columnConfiguration.map(async (col, i, arr) => {
+      msg.columnConfiguration.map(async (col) => {
         let {
           name: colName,
           alignment: colAlignment,
@@ -107,18 +107,19 @@ figma.ui.onmessage = async (msg) => {
 
         if (rowIndex === 0) {
           let thisHeaderCell = headerCell.createInstance();
-          let textNodeOfHeaderCell = thisHeaderCell.children[0].children[0];
+          let textNodeOfHeaderCell = (thisHeaderCell.children[0] as InstanceNode).children[0];
 
           thisHeaderCell.name = colName.length > 0 ? colName : "Header";
 
-          textNodeOfHeaderCell.deleteCharacters(
+          (textNodeOfHeaderCell as TextNode).deleteCharacters(
             0,
-            textNodeOfHeaderCell.characters.length
+            (textNodeOfHeaderCell as TextNode).characters.length
           );
-          textNodeOfHeaderCell.insertCharacters(
+          (textNodeOfHeaderCell as TextNode).insertCharacters(
             0,
             colName.length > 0 ? colName : "Header"
           );
+          
           thisHeaderCell.setProperties({ Alignment: colAlignment });
 
           thisHeaderCell.resize(
@@ -126,10 +127,9 @@ figma.ui.onmessage = async (msg) => {
             thisHeaderCell.height
           );
 
-          // thisHeaderCell.layoutGrow = 1;
 
           // if any cell is set to Multi-value then make all of them "fill container" vertically
-          thisHeaderCell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
+          (thisHeaderCell.children[0] as FrameNode).layoutGrow = cellFillContainerY ? 1 : 0;
           thisHeaderCell.primaryAxisSizingMode = cellFillContainerY
             ? "FIXED"
             : "AUTO";
@@ -156,8 +156,8 @@ figma.ui.onmessage = async (msg) => {
             colMultiValue[0].toUpperCase() + colMultiValue.substring(1);
 
           cell.name === "Header" ? (cell.name = "Cell") : null;
-          cell.setProperties({ Type: "Body" });
-          cell.children[0].children[0].setProperties({
+          (cell as InstanceNode).setProperties({ Type: "Body" });
+          (((cell as InstanceNode).children[0] as FrameNode).children[0] as InstanceNode).setProperties({
             Type: colCellType,
             "Multi-value": colMultiValue,
           });
@@ -165,8 +165,8 @@ figma.ui.onmessage = async (msg) => {
           // Because cells can be reset here as they're replaced with another
           // component (variants), we again set the fill container setting if
           // any of the columns is set to "multi value"
-          cell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
-          cell.primaryAxisSizingMode = cellFillContainerY ? "FIXED" : "AUTO";
+          ((cell as FrameNode).children[0] as FrameNode).layoutGrow = cellFillContainerY ? 1 : 0;
+          (cell as FrameNode).primaryAxisSizingMode = cellFillContainerY ? "FIXED" : "AUTO";
         });
 
         tableFrame.appendChild(thisTableRow);
@@ -193,7 +193,7 @@ figma.ui.onmessage = async (msg) => {
   }
 
   if (msg.type === 'get-sample-text') {
-    const sampleText: object[] = figma.currentPage.selection
+    const sampleText = figma.currentPage.selection
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
   }
 
@@ -204,9 +204,16 @@ figma.ui.onmessage = async (msg) => {
   }
 
   if (msg.type === 'update-source-text') {
-    const activeTextLayer = figma.getNodeById(msg.layerId)
-    const fontName = activeTextLayer.fontName
-    await figma.loadFontAsync(fontName);
+    const activeTextLayer = figma.getNodeById(msg.layerId) as TextNode
+    let fontName = activeTextLayer.fontName
+
+    if (fontName === figma.mixed) {
+      // process each character individually 
+      // or simply get the color of the first character
+      await Promise.all(activeTextLayer.getRangeAllFontNames(0, activeTextLayer.characters.length).map(figma.loadFontAsync))
+    } else {
+      await figma.loadFontAsync(fontName);
+    }
 
     activeTextLayer.deleteCharacters(0, activeTextLayer.characters.length)
     activeTextLayer.insertCharacters(0, msg.updatedText)

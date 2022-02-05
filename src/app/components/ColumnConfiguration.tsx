@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "../styles/ui.css";
 
 declare function require(path: string): any;
@@ -12,17 +12,13 @@ const ColumnConfiguration = ({
   setColumnConfiguration,
 }) => {
   const [activeColConfigurationScreen, setActiveColConfigurationScreen] = useState(0);
-  // const [localColumnConfiguration, setLocalColumnConfiguration] = useState(column)
-
-  // const handleActiveColScreenChange = () => {
-  //     debugger
-  // }
 
   const handleColumnConfigurationUpdate = (attr) => {
     let columnConfigurationArray = [...columnConfiguration];
-
+    const element = event.target as HTMLInputElement
+    
     columnConfigurationArray[activeColConfigurationScreen][attr] =
-      attr !== "multiValue" ? event.target.value : event.target.checked;
+      attr !== "multiValue" ? element.value : element.checked;
 
     setColumnConfiguration(columnConfigurationArray);
   };
@@ -36,6 +32,8 @@ const ColumnConfiguration = ({
   };
 
   const renderColumnNavigation = () => {
+    const element = event.target as HTMLInputElement
+    
     return (
       <nav className="column-nav">
         <button
@@ -48,7 +46,7 @@ const ColumnConfiguration = ({
           <select
             name="column-selection"
             className="column-selection-dropdown"
-            onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}
+            onChange={() => setActiveColConfigurationScreen(parseInt(element.value) - 1)}
             value={activeColConfigurationScreen + 1}
           >
             {[...Array(activeCol).keys()].map((index) => {

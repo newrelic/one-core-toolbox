@@ -8,7 +8,6 @@ const DimensionsSelection = ({
   handleGridSquareClick,
   activeCol,
   activeRow,
-  createTable,
   handeGridSelectionInputs,
   goToColumnConfiguration,
 }) => {
@@ -79,7 +78,7 @@ const DimensionsSelection = ({
             className="number-of-cols"
             onChange={() => handeGridSelectionInputs("col")}
             value={activeCol === 0 && activeRow === 0 ? "" : activeCol}
-            placeholder={tableHovered ? hoveredCol + 1 : ""}
+            placeholder={tableHovered ? (hoveredCol + 1).toString() : ""}
           />
         </div>
         <div className="input-container">
@@ -93,7 +92,7 @@ const DimensionsSelection = ({
             className="number-of-rows"
             onChange={() => handeGridSelectionInputs("row")}
             value={activeRow === 0 && activeCol === 0 ? "" : activeRow}
-            placeholder={tableHovered ? hoveredRow + 1 : ""}
+            placeholder={tableHovered ? (hoveredRow + 1).toString() : ""}
           />
         </div>
       </div>
