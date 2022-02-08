@@ -8,9 +8,5 @@
     "figma",
     "figjam"
   ],
-  "permissions": ["currentuser"],
-  "menu": [
-    {"name": "Table creator", "command": "table"},
-    {"name": "Language linter", "command": "language"}
-  ]
+  "permissions": ["currentuser"]
 }
