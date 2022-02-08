@@ -10,6 +10,7 @@ figma.ui.onmessage = async (msg) => {
     let cellFillContainerY = false;
 
     await figma.loadFontAsync({ family: "Open Sans", style: "Regular" });
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
     tableFrame.name = "Table";
     tableFrame.counterAxisSizingMode = "AUTO";
