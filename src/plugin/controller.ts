@@ -44,7 +44,13 @@ const sendCurrentSelection = () => {
   //       to the navigable layers if necessary
 
   // send the selection array to the UI
-  return figma.ui.postMessage({ type: "selection-change", message: textLayers });
+  return figma.ui.postMessage({ 
+    type: "selection-change", 
+    message: {
+      textLayers, 
+      selectedLayer: selection
+    } 
+  });
 }
 
 figma.ui.onmessage = async (msg) => {
@@ -197,8 +203,8 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
   }
 
+  // scroll and zoom the active layer into the center of the screen
   if (msg.type === 'sample-text-changed') {
-    // scroll and zoom the active layer into the center of the screen
     const activeTextLayer = figma.getNodeById(msg.activeNodeId)
     figma.viewport.scrollAndZoomIntoView([activeTextLayer])
   }
@@ -221,7 +227,14 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: "source-text-updated", message: msg.updatedText });
   }
 
+
   figma.on("selectionchange", () => {
+    console.log('selectionchange was fired');
+
+    // figma.ui.postMessage({ 
+    //   type: "selection-change", 
+    //   message: figma.currentPage.selection 
+    // });
     sendCurrentSelection()
   })
 };

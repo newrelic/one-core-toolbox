@@ -42,7 +42,7 @@ const App = ({}) => {
     const tabs: string[] = ["table-creator", "language-linter"];
 
     // for each tab in the above array
-    return tabs.map((tab) => {
+    return tabs.map((tab, index) => {
       let tabClasses: string[] = ["tab-navigation-tab"];
       let tabClassesOutput = tabClasses.join(" ");
       // create the label from the value of `tab`
@@ -59,6 +59,7 @@ const App = ({}) => {
         <li
           className={tabClassesOutput}
           onClick={() => handleNavigationTabClick(tab)}
+          key={index}
         >
           {tabLabel}
         </li>
