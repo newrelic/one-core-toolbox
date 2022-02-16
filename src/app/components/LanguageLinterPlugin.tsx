@@ -102,7 +102,7 @@ const LanguageLinterPlugin = () => {
   const getTextLayersWithSuggestions = async () => {
     const layersWithSuggestions = await asyncFilter(selectedTextLayers, async item => {
       let report: any = ''
-      await Promise.resolve(lintMyText(item.characters)).then(result => report = result)
+      await Promise.resolve(lintMyText(item.characters, [])).then(result => report = result)
       return !!report.messages[0]?.message
     })
 
@@ -145,6 +145,7 @@ const LanguageLinterPlugin = () => {
         sampleText={sampleText}
         setSampleText={updateSourceText}
         updateTimer={100}
+        customDictionary={[]}
       />
     </div>
   );
