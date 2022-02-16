@@ -198,6 +198,25 @@ figma.ui.onmessage = async (msg) => {
     sendCurrentSelection();
   }
 
+  if (msg.type === 'request-local-custom-dictionary') {
+    figma.clientStorage.getAsync("languageLinterCustomDictionary").then(result => {
+      figma.ui.postMessage({ 
+        type: "local-custom-dictionary-retrieved", 
+        message: result ? result : [] 
+      });
+    })
+  }
+
+  if (msg.type === 'add-to-dictionary') {
+    figma.clientStorage.getAsync("languageLinterCustomDictionary").then(result => {
+      let newCustomDictionary = result ? result : []
+
+      newCustomDictionary.push(msg.wordToAdd)
+
+      figma.clientStorage.setAsync("languageLinterCustomDictionary", newCustomDictionary)
+    })
+  }
+
   if (msg.type === 'get-sample-text') {
     const sampleText = figma.currentPage.selection
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
@@ -230,11 +249,6 @@ figma.ui.onmessage = async (msg) => {
 
   figma.on("selectionchange", () => {
     console.log('selectionchange was fired');
-
-    // figma.ui.postMessage({ 
-    //   type: "selection-change", 
-    //   message: figma.currentPage.selection 
-    // });
     sendCurrentSelection()
   })
 };
@@ -247,5 +261,6 @@ switch (figma.command) {
   case "language":
     figma.ui.postMessage({ type: "figma-command", message: "open-language-linter" });
     figma.ui.resize(475, 500)
+
     break;
 }

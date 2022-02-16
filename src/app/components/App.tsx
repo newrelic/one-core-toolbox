@@ -91,12 +91,12 @@ const App = ({}) => {
   };
 
   return (
-    <>
+    <div className="app">
       <nav className="tab-navigation">
         <ul className="tab-navigation-tabs">{renderNavigationTabs()}</ul>
       </nav>
       {renderPluginBody()}
-    </>
+    </div>
   );
 };
 

@@ -5,6 +5,12 @@ body {
     Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 ::-webkit-input-placeholder {
   /* Chrome/Opera/Safari */
   color: #b3b3b3;
@@ -115,6 +121,7 @@ table td {
 .dimensions-selection-container,
 .language-linter-container {
   padding: 23px;
+  flex-grow: 1;
 }
 
 .input__radio input {
@@ -495,12 +502,20 @@ input:checked + .slider:before {
 /*-- Language linter --*/
 
 .language-linter-container {
-  padding:  ;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+
+.suggestions-empty-state,
+.suggestion-list {
+  flex-grow: 1;
 }
 
 .text-layer-nav {
-  height:  47px;
   display: flex;
+  height:  47px;
+  flex-shrink: 0;
   justify-content: space-between;
   margin-bottom: 8px;
   padding: 10px 6px;

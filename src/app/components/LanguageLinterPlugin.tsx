@@ -12,24 +12,28 @@ const LanguageLinterPlugin = () => {
   const [sampleText, setSampleText] = useState('');
   const [sampleTextIndex, setSampleTextIndex] = useState(0);
   const [maxTextIndex, setMaxTextIndex] = useState(0);
+  const [localCustomDictionary, setLocalCustomDictionary] = useState([]);
+  const [localCustomDictionaryInitialized, setLocalCustomDictionaryInitialized] = useState(false);
 
   // Get the selected layer when the plugin loads
   // This is how we read messages sent from the plugin controller
   useEffect(() => {
+    parent.postMessage({ pluginMessage: { type: "request-local-custom-dictionary" }, },"*");
     parent.postMessage({ pluginMessage: { type: "request-selection" }, },"*");
 
     window.onmessage = async (event) => {
       const { type, message } = event.data.pluginMessage;
 
-      console.log('selection-change was received');
-
-      if (type === "selection-change" && message.selectedLayer.length > 0) {
-        
+      if (type === "selection-change") {
         // reset the index of the sample text to 0
         setSampleTextIndex(0)
 
         // Filter out text layers that have no suggestions
         setSelectedTextLayers(message.textLayers)
+      } else if (type === 'local-custom-dictionary-retrieved') {
+        console.log(`client storage is: ${JSON.stringify(message)}`)
+        setLocalCustomDictionaryInitialized(true)
+        setLocalCustomDictionary(message)
       }
     };
 
@@ -63,10 +67,14 @@ const LanguageLinterPlugin = () => {
   }, [sampleText])
 
   useEffect(() => {
-    if (selectedTextLayers.length > 0) {
+    if (localCustomDictionaryInitialized && selectedTextLayers.length > 0) {
       getTextLayersWithSuggestions()
+    } else if (localCustomDictionaryInitialized && selectedTextLayers.length === 0 ) {
+      setSampleText('')
+    } else {
+      parent.postMessage({ pluginMessage: { type: "request-local-custom-dictionary" }, },"*");
     }
-  }, [selectedTextLayers])
+  }, [selectedTextLayers, localCustomDictionary])
 
   const updateSourceText = (updatedText) => {
     parent.postMessage(
@@ -102,11 +110,39 @@ const LanguageLinterPlugin = () => {
   const getTextLayersWithSuggestions = async () => {
     const layersWithSuggestions = await asyncFilter(selectedTextLayers, async item => {
       let report: any = ''
-      await Promise.resolve(lintMyText(item.characters, [])).then(result => report = result)
+
+      await Promise.resolve(lintMyText(item.characters, localCustomDictionary)).then(result => report = result)
       return !!report.messages[0]?.message
     })
 
     setTextLayersWithSuggestions(layersWithSuggestions)
+  }
+
+  const addToDictionary = (wordToAdd, suggestionId) => {
+    debugger
+    parent.postMessage({ 
+      pluginMessage: { 
+        type: "add-to-dictionary",
+        wordToAdd: wordToAdd
+      }, 
+    },"*");
+  }
+
+  const provideSampleText = () => {
+    const layerIsSelected = selectedTextLayers.length > 0
+    const suggestionsAvailable = textLayersWithSuggestions.length > 0
+
+    if (!layerIsSelected) {
+      return ''
+    } else if (layerIsSelected && !suggestionsAvailable) {
+        // LanguageLinter will show a "no issue found" empty state
+        // if their sampleText provided to it has no issues. Since
+        // None of our layers have issues, we'll trigger that
+        // empty state.
+      return 'Hello, World'
+    } else {
+      return sampleText
+    }
   }
 
   return(
@@ -142,10 +178,15 @@ const LanguageLinterPlugin = () => {
         ></button>
       </nav>
       <LanguageLinter 
-        sampleText={sampleText}
+        // LanguageLinter will show a "no issue found" empty state
+        // if their sampleText provided to it has no issues. Since
+        // None of our layers have issues, we'll trigger that
+        // empty state.
+        sampleText={provideSampleText()}
         setSampleText={updateSourceText}
         updateTimer={100}
-        customDictionary={[]}
+        customDictionary={localCustomDictionary}
+        addToDictionary={addToDictionary}
       />
     </div>
   );
