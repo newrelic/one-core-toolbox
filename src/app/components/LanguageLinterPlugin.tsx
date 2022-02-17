@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter"
 require("babel-polyfill");
 import "../styles/ui.css";
+import IconChevronLeft from '../assets/icon-chevron-left.svg';
 
 declare function require(path: string): any;
 
-const LanguageLinterPlugin = () => {
+const LanguageLinterPlugin = (props) => {
+  const { setActivePlugin } = props;
+
+  const [activeTab] = useState('language');
   const [selectedTextLayers, setSelectedTextLayers] = useState([]);
   const [textLayersWithSuggestions, setTextLayersWithSuggestions] = useState([]);
   const [sampleText, setSampleText] = useState('');
@@ -118,6 +122,7 @@ const LanguageLinterPlugin = () => {
     setTextLayersWithSuggestions(layersWithSuggestions)
   }
 
+  // @ts-ignore
   const addToDictionary = (wordToAdd, suggestionId) => {
     debugger
     parent.postMessage({ 
@@ -145,50 +150,91 @@ const LanguageLinterPlugin = () => {
     }
   }
 
+  // Render the nav tabs in the plug UI
+  const renderNavigationTabs = () => {
+    const tabs: string[] = ["language", "color"];
+
+    // for each tab in the above array
+    return tabs.map((tab, index) => {
+      let tabClasses: string[] = ["tab-navigation-tab"];
+      let tabClassesOutput = tabClasses.join(" ");
+      // create the label from the value of `tab`
+      let tabLabel =
+        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
+
+      // If it's the active tab, apply the class "active" to it
+      if (activeTab === tab) {
+        tabClasses.push("active");
+        tabClassesOutput = tabClasses.join(" ");
+      }
+
+      return (
+        <li
+          className={tabClassesOutput}
+          // onClick={() => handleNavigationTabClick(tab)}
+          key={index}
+        >
+          {tabLabel}
+        </li>
+      );
+    });
+  };
+
   return(
-    <div className="language-linter-container">
-      <nav className="text-layer-nav">
-        <button
-          className={"nav-arrow left-nav-arrow"}
-          onClick={() => handleTextLayerNavigation("previous")}
-          disabled={sampleTextIndex - 1 < 0}
-        ></button>
+    <>
+      <ul className="tab-navigation">
+        <li 
+          className="tab-navigation-tab back-tab" 
+          onClick={() => setActivePlugin('home')}
+        >
+          <img src={IconChevronLeft} alt="back button" />
+        </li>
+        {renderNavigationTabs()}
+      </ul>
+      <div className="language-linter-container">
+        <nav className="text-layer-nav">
+          <button
+            className={"nav-arrow left-nav-arrow"}
+            onClick={() => handleTextLayerNavigation("previous")}
+            disabled={sampleTextIndex - 1 < 0}
+          ></button>
 
-        {/*<div className="select-input-container">
-          <select
-            name="column-selection"
-            className="column-selection-dropdown"
-            onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}
-            value={activeColConfigurationScreen + 1}
-          >
-            {[...Array(activeCol).keys()].map((index) => {
-              return (
-                <option key={index} value={index + 1} className="column-selection-dropdown-option">{`Column ${
-                  index + 1
-                }`}</option>
-              );
-            })}
-          </select>
-        </div>*/}
+          {/*<div className="select-input-container">
+            <select
+              name="column-selection"
+              className="column-selection-dropdown"
+              onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}
+              value={activeColConfigurationScreen + 1}
+            >
+              {[...Array(activeCol).keys()].map((index) => {
+                return (
+                  <option key={index} value={index + 1} className="column-selection-dropdown-option">{`Column ${
+                    index + 1
+                  }`}</option>
+                );
+              })}
+            </select>
+          </div>*/}
 
-        <button
-          className={"nav-arrow right-nav-arrow"}
-          onClick={() => handleTextLayerNavigation("next")}
-          disabled={sampleTextIndex + 1 >= maxTextIndex}
-        ></button>
-      </nav>
-      <LanguageLinter 
-        // LanguageLinter will show a "no issue found" empty state
-        // if their sampleText provided to it has no issues. Since
-        // None of our layers have issues, we'll trigger that
-        // empty state.
-        sampleText={provideSampleText()}
-        setSampleText={updateSourceText}
-        updateTimer={100}
-        customDictionary={localCustomDictionary}
-        addToDictionary={addToDictionary}
-      />
-    </div>
+          <button
+            className={"nav-arrow right-nav-arrow"}
+            onClick={() => handleTextLayerNavigation("next")}
+            disabled={sampleTextIndex + 1 >= maxTextIndex}
+          ></button>
+        </nav>
+        <LanguageLinter 
+          // LanguageLinter will show a "no issue found" empty state
+          // if their sampleText provided to it has no issues. Since
+          // None of our layers have issues, we'll trigger that
+          // empty state.
+          sampleText={provideSampleText()}
+          setSampleText={updateSourceText}
+          updateTimer={100}
+          customDictionary={localCustomDictionary}
+          addToDictionary={addToDictionary}
+        />
+      </div>
+    </>
   );
 };
 

@@ -56,6 +56,7 @@ const sendCurrentSelection = () => {
 figma.ui.onmessage = async (msg) => {
   if (msg.type === "navigate-to-tab") {
     switch (msg.tabClicked) {
+      case "home":
       case "table-creator":
         figma.ui.resize(300, 448)
         break;
@@ -75,6 +76,7 @@ figma.ui.onmessage = async (msg) => {
     let cellFillContainerY = false;
 
     await figma.loadFontAsync({ family: "Open Sans", style: "Regular" });
+    await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
     tableFrame.name = "Table";
     tableFrame.counterAxisSizingMode = "AUTO";

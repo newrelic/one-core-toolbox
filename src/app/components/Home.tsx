@@ -1,12 +1,10 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
 import "../styles/ui.css";
 import IconTableCreator from '../assets/icon-table-creator.svg';
 import IconDesignLinter from '../assets/icon-design-linter.svg';
 
 const Home = (props) => {
   const { setActivePlugin } = props
-  const [latestFigmaCommand, setLatestFigmaCommand] = useState("");
 
   const PluginTile = (props) => {
     const { heading, description, onClick, icon } = props

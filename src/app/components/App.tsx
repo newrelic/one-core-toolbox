@@ -41,66 +41,33 @@ const App = ({}) => {
     }
   }, [latestFigmaCommand])
 
-  // Render the nav tabs in the plug UI
-  const renderNavigationTabs = () => {
-    const tabs: string[] = ["table-creator", "language-linter"];
-
-    // for each tab in the above array
-    return tabs.map((tab, index) => {
-      let tabClasses: string[] = ["tab-navigation-tab"];
-      let tabClassesOutput = tabClasses.join(" ");
-      // create the label from the value of `tab`
-      let tabLabel =
-        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
-
-      // If it's the active tab, apply the class "active" to it
-      if (activePlugin === tab) {
-        tabClasses.push("active");
-        tabClassesOutput = tabClasses.join(" ");
-      }
-
-      return (
-        <li
-          className={tabClassesOutput}
-          onClick={() => handleNavigationTabClick(tab)}
-          key={index}
-        >
-          {tabLabel}
-        </li>
-      );
-    });
-  };
-
-  const handleNavigationTabClick = (clickedTab: string) => {
-    setActivePlugin(clickedTab);
+  const handlePluginNavigation = (destination) => {
+    setActivePlugin(destination);
 
     parent.postMessage(
       {
         pluginMessage: {
           type: "navigate-to-tab",
-          tabClicked: clickedTab,
+          tabClicked: destination,
         },
       },
       "*"
     );
-  };
-
+  }
+  
   const renderPluginBody = () => {
     switch (activePlugin) {
       case "home":
-        return <Home setActivePlugin={setActivePlugin} />;
+        return <Home setActivePlugin={handlePluginNavigation} />;
       case "table-creator":
-        return <TableCreator />;
+        return <TableCreator setActivePlugin={handlePluginNavigation} />;
       case "language-linter":
-        return <LanguageLinterPlugin />;
+        return <LanguageLinterPlugin setActivePlugin={handlePluginNavigation} />;
     }
   };
 
   return (
     <div className="app">
-      {/*<nav className="tab-navigation">
-        <ul className="tab-navigation-tabs">{renderNavigationTabs()}</ul>
-      </nav>*/}
       {renderPluginBody()}
     </div>
   );
