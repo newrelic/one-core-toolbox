@@ -255,12 +255,14 @@ figma.ui.onmessage = async (msg) => {
 
 // handle submenu navigation
 switch (figma.command) {
+  case "home":
+    figma.ui.postMessage({ type: "figma-command", message: "open-home" });
+    break;
   case "table":
     figma.ui.postMessage({ type: "figma-command", message: "open-table-creator" });
     break;
   case "language":
     figma.ui.postMessage({ type: "figma-command", message: "open-language-linter" });
     figma.ui.resize(475, 500)
-
     break;
 }

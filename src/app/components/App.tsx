@@ -1,8 +1,9 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import TableCreator from "./TableCreator";
-import "../styles/ui.css";
 import LanguageLinterPlugin from "./LanguageLinterPlugin";
+import Home from "./Home";
+import "../styles/ui.css";
 
 declare function require(path: string): any;
 
@@ -27,6 +28,9 @@ const App = ({}) => {
   useEffect(() => {
     if (latestFigmaCommand.length > 0) {
       switch (latestFigmaCommand) {
+        case "open-home":
+          setActivePlugin('home')
+          break;
         case "open-table-creator":
           setActivePlugin('table-creator')
           break;
@@ -83,6 +87,8 @@ const App = ({}) => {
 
   const renderPluginBody = () => {
     switch (activePlugin) {
+      case "home":
+        return <Home setActivePlugin={setActivePlugin} />;
       case "table-creator":
         return <TableCreator />;
       case "language-linter":
@@ -92,9 +98,9 @@ const App = ({}) => {
 
   return (
     <div className="app">
-      <nav className="tab-navigation">
+      {/*<nav className="tab-navigation">
         <ul className="tab-navigation-tabs">{renderNavigationTabs()}</ul>
-      </nav>
+      </nav>*/}
       {renderPluginBody()}
     </div>
   );

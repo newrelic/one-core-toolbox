@@ -522,3 +522,116 @@ input:checked + .slider:before {
   border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.035);
 }
+
+/*-- Home --*/
+
+.home-container {
+  display: flex;  
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
+  padding: 24px;
+  position: relative;
+}
+
+.plugin-tile-container {
+  display: flex;
+  gap: 14px;
+  flex-direction: row;
+  align-items: center;
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border: 1px solid #D1D4D4;
+  box-sizing: border-box;
+  border-radius: 3px;
+  transition: all .075s ease-out;
+}
+
+.plugin-tile-container:hover {
+  transform: translateY(-1px);
+  cursor: pointer;
+  border-color: rgba(0 0 0 / 30%);
+}
+
+.plugin-tile-container:active {
+  transform: translateY(1px);
+}
+
+.plugin-tile-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.plugin-tile-heading {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(40, 54, 54, 1);
+}
+
+.plugin-tile-description {
+  margin: 0;
+  font-size: 11px;
+  line-height: 140%;
+  color: #707b7b;
+}
+
+.home-support {
+  position: absolute;
+  bottom: 24px;
+  margin: 0;
+  font-size: 11px;
+  line-height: 140%;
+  color: #707b7b;
+  text-align: center;
+  width: calc(100% - 48px);
+}
+
+.home-support a {
+  color: #3481c9;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
