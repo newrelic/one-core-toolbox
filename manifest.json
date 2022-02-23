@@ -15,4 +15,3 @@
     {"name": "Table creator", "command": "table"},
     {"name": "Language linter", "command": "language"}
   ]
-}
