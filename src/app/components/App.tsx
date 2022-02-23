@@ -1,63 +1,75 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import TableCreator from "./TableCreator";
+import LanguageLinterPlugin from "./LanguageLinterPlugin";
+import Home from "./Home";
 import "../styles/ui.css";
-import LanguageLinter from "./LanguageLinter";
 
 declare function require(path: string): any;
 
 const App = ({}) => {
   const [activePlugin, setActivePlugin] = useState("table-creator");
+  const [latestFigmaCommand, setLatestFigmaCommand] = useState("");
 
-  // Render the nav tabs in the plug UI
-  const renderNavigationTabs = () => {
-    const tabs: string[] = ["table-creator", "more-coming-soon..."];
+  // Handle submenu navigation: Part 1
+  // When a figma command is sent, store it's contents in state
+  useEffect(() => {
+    window.onmessage = (event) => {
+      const { type, message } = event.data.pluginMessage;
 
-    // for each tab in the above array
-    return tabs.map((tab, index) => {
-      let tabClasses: string[] = ["tab-navigation-tab"];
-      let tabClassesOutput = tabClasses.join(" ");
-      // create the label from the value of `tab`
-      let tabLabel =
-        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
-
-      // If it's the active tab, apply the class "active" to it
-      if (activePlugin === tab) {
-        tabClasses.push("active");
-        tabClassesOutput = tabClasses.join(" ");
+      if (type === "figma-command") {
+        setLatestFigmaCommand(message)
       }
+    }; 
+  }, [])
 
-      return (
-        <li
-          className={tabClassesOutput}
-          onClick={() => handleNavigationTabClick(tab)}
-        >
-          {tabLabel}
-        </li>
-      );
-    });
-  };
+  // Handle submenu navigation: Part 2
+  // Every time `latestFigmaCommand` is updated, handle subnavigation
+  useEffect(() => {
+    if (latestFigmaCommand.length > 0) {
+      switch (latestFigmaCommand) {
+        case "open-home":
+          setActivePlugin('home')
+          break;
+        case "open-table-creator":
+          setActivePlugin('table-creator')
+          break;
+        case "open-language-linter":
+          setActivePlugin('language-linter')
+          break;
+      }
+    }
+  }, [latestFigmaCommand])
 
-  const handleNavigationTabClick = (clickedTab: string) => {
-    setActivePlugin(clickedTab);
-  };
+  const handlePluginNavigation = (destination) => {
+    setActivePlugin(destination);
 
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "navigate-to-tab",
+          tabClicked: destination,
+        },
+      },
+      "*"
+    );
+  }
+  
   const renderPluginBody = () => {
     switch (activePlugin) {
+      case "home":
+        return <Home setActivePlugin={handlePluginNavigation} />;
       case "table-creator":
-        return <TableCreator />;
+        return <TableCreator setActivePlugin={handlePluginNavigation} />;
       case "language-linter":
-        return <LanguageLinter />;
+        return <LanguageLinterPlugin setActivePlugin={handlePluginNavigation} />;
     }
   };
 
   return (
-    <>
-      <nav className="tab-navigation">
-        <ul className="tab-navigation-tabs">{renderNavigationTabs()}</ul>
-      </nav>
+    <div className="app">
       {renderPluginBody()}
-    </>
+    </div>
   );
 };
 

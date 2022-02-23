@@ -3,10 +3,14 @@ import { useState, useEffect } from "react";
 import "../styles/ui.css";
 import ColumnConfiguration from "./ColumnConfiguration";
 import DimensionsSelection from "./DimensionsSelection";
+import IconChevronLeft from '../assets/icon-chevron-left.svg';
 
 declare function require(path: string): any;
 
-const TableCreator = () => {
+const TableCreator = (props) => {
+  const { setActivePlugin } = props;
+
+  const [activeTab] = useState('table-creator');
   const [activeScreen, setActiveScreen] = useState("DimensionsSelection");
   const [activeCol, setActiveCol] = useState(0);
   const [activeRow, setActiveRow] = useState(0);
@@ -51,14 +55,14 @@ const TableCreator = () => {
   useEffect(handleColumnConfiguration, [activeCol]);
 
   const handeGridSelectionInputs = (type) => {
-    let { value, min, max } = event.target;
-
-    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    const element = event.target as HTMLInputElement
+    let { value, min, max } = element;
+    const calculatedValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
 
     if (type === "col") {
-      setActiveCol(parseInt(value));
+      setActiveCol(calculatedValue);
     } else if (type === "row") {
-      setActiveRow(parseInt(value));
+      setActiveRow(calculatedValue);
     }
   };
 
@@ -98,7 +102,6 @@ const TableCreator = () => {
           handleGridSquareClick={handleGridSquareClick}
           activeCol={activeCol}
           activeRow={activeRow}
-          createTable={createTable}
           handeGridSelectionInputs={handeGridSelectionInputs}
           goToColumnConfiguration={goToColumnConfiguration}
         />
@@ -122,6 +125,9 @@ const TableCreator = () => {
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
       if (type === "table-created") {
+        // newrelic is included at the top of ui.html in a
+        // a script tag. Typescript will complain. So...
+        // @ts-ignore
         newrelic.addPageAction("tableCreated", {
           "User ID": message.userData.id,
           "User Name": message.userData.name,
@@ -135,7 +141,50 @@ const TableCreator = () => {
     };
   }, []);
 
-  return renderTableCreator();
+  // Render the nav tabs in the plug UI
+  const renderNavigationTabs = () => {
+    const tabs: string[] = ["table-creator"];
+
+    // for each tab in the above array
+    return tabs.map((tab, index) => {
+      let tabClasses: string[] = ["tab-navigation-tab"];
+      let tabClassesOutput = tabClasses.join(" ");
+      // create the label from the value of `tab`
+      let tabLabel =
+        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
+
+      // If it's the active tab, apply the class "active" to it
+      if (activeTab === tab) {
+        tabClasses.push("active");
+        tabClassesOutput = tabClasses.join(" ");
+      }
+
+      return (
+        <li
+          className={tabClassesOutput}
+          // onClick={() => handleNavigationTabClick(tab)}
+          key={index}
+        >
+          {tabLabel}
+        </li>
+      );
+    });
+  };
+
+  return (
+    <>
+      <ul className="tab-navigation">
+        <li 
+          className="tab-navigation-tab back-tab" 
+          onClick={() => setActivePlugin('home')}
+        >
+          <img src={IconChevronLeft} alt="back button" />
+        </li>
+        {renderNavigationTabs()}
+      </ul>
+      {renderTableCreator()}
+    </>
+  )
 };
 
 export default TableCreator;

@@ -6,14 +6,20 @@
 	"scripts": {
 		"build": "webpack --mode=production",
 		"build:watch": "webpack --mode=development --watch",
-		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' "
+		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
+		"client-build": "cd src/app/components/LanguageLinter && npm install"
 	},
 	"dependencies": {
+		"@types/newrelic": "^7.0.3",
+		"babel-polyfill": "^6.26.0",
+		"dictionary-en": "^3.1.0",
+		"new-relic-language-linter": "^1.2.19",
+		"prop-types": "^15.8.1",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2"
 	},
 	"devDependencies": {
-		"@figma/plugin-typings": "^1.24.0",
+		"@figma/plugin-typings": "^1.42.1",
 		"@types/react": "^17.0.11",
 		"@types/react-dom": "^17.0.7",
 		"css-loader": "^5.0.1",

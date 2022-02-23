@@ -1,6 +1,72 @@
 figma.showUI(__html__, { width: 300, height: 448 });
 
+const pushTextLayerToArray = (layer, array) => {
+  array.push({
+    id: layer.id,
+    name: layer.name,
+    visible: layer.visible,
+    x: layer.x,
+    y: layer.y,
+    type: layer.type,
+    characters: layer?.characters,
+    children: layer?.children,
+  })
+}
+
+const sendCurrentSelection = () => {
+  // get the selected layers
+  let selection = figma.currentPage.selection
+
+  // initialize an variable that we'll store our output in
+  // as we loop over the selected layers
+  let textLayers = []
+
+  // for each selected layer
+  selection.forEach((selectedLayer) => {
+    // If the layer has children
+    if (!!(selectedLayer as FrameNode)?.children) {
+      // get all of the children of the layer that are text layers
+      const selectedTextLayers = (selectedLayer as FrameNode).findAll(n => n.type === 'TEXT')
+      
+      // Add any children that are text layers to the output array
+      selectedTextLayers.forEach((layer) => {
+        pushTextLayerToArray(layer, textLayers)
+      })
+      
+    } else if (selectedLayer.type === 'TEXT') {
+      pushTextLayerToArray(selectedLayer, textLayers)
+    }
+  })
+
+  // TODO!: 
+  // - [ ] If there are multiple layers selected. Discard the layers without errors.
+  // - [ ] If a layer is updated while it's open, check it for errors and add it 
+  //       to the navigable layers if necessary
+
+  // send the selection array to the UI
+  return figma.ui.postMessage({ 
+    type: "selection-change", 
+    message: {
+      textLayers, 
+      selectedLayer: selection
+    } 
+  });
+}
+
 figma.ui.onmessage = async (msg) => {
+  if (msg.type === "navigate-to-tab") {
+    switch (msg.tabClicked) {
+      case "home":
+      case "table-creator":
+        figma.ui.resize(300, 448)
+        break;
+      case "language-linter":
+        sendCurrentSelection()
+        figma.ui.resize(475, 500)
+        break;
+    }
+  }
+
   if (msg.type === "create-table") {
     const tableFrame = figma.createFrame();
     let headerCell = await figma.importComponentByKeyAsync(
@@ -18,7 +84,7 @@ figma.ui.onmessage = async (msg) => {
     tableFrame.x = figma.viewport.center.x;
     tableFrame.y = figma.viewport.center.y;
 
-    headerCell.variantProperties.Type = "Body";
+    // headerCell.variantProperties.Type = "Body";
 
     // if any cell is set to Multi-value, set a variable we'll use later
     msg.columnConfiguration.find(
@@ -32,7 +98,7 @@ figma.ui.onmessage = async (msg) => {
       // tableRow.layoutAlign = 'STRETCH'
       // tableRow.primaryAxisSizingMode = 'FIXED';
 
-      msg.columnConfiguration.map(async (col, i, arr) => {
+      msg.columnConfiguration.map(async (col) => {
         let {
           name: colName,
           alignment: colAlignment,
@@ -49,18 +115,19 @@ figma.ui.onmessage = async (msg) => {
 
         if (rowIndex === 0) {
           let thisHeaderCell = headerCell.createInstance();
-          let textNodeOfHeaderCell = thisHeaderCell.children[0].children[0];
+          let textNodeOfHeaderCell = (thisHeaderCell.children[0] as InstanceNode).children[0];
 
           thisHeaderCell.name = colName.length > 0 ? colName : "Header";
 
-          textNodeOfHeaderCell.deleteCharacters(
+          (textNodeOfHeaderCell as TextNode).deleteCharacters(
             0,
-            textNodeOfHeaderCell.characters.length
+            (textNodeOfHeaderCell as TextNode).characters.length
           );
-          textNodeOfHeaderCell.insertCharacters(
+          (textNodeOfHeaderCell as TextNode).insertCharacters(
             0,
             colName.length > 0 ? colName : "Header"
           );
+          
           thisHeaderCell.setProperties({ Alignment: colAlignment });
 
           thisHeaderCell.resize(
@@ -68,10 +135,9 @@ figma.ui.onmessage = async (msg) => {
             thisHeaderCell.height
           );
 
-          // thisHeaderCell.layoutGrow = 1;
 
           // if any cell is set to Multi-value then make all of them "fill container" vertically
-          thisHeaderCell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
+          (thisHeaderCell.children[0] as FrameNode).layoutGrow = cellFillContainerY ? 1 : 0;
           thisHeaderCell.primaryAxisSizingMode = cellFillContainerY
             ? "FIXED"
             : "AUTO";
@@ -98,8 +164,8 @@ figma.ui.onmessage = async (msg) => {
             colMultiValue[0].toUpperCase() + colMultiValue.substring(1);
 
           cell.name === "Header" ? (cell.name = "Cell") : null;
-          cell.setProperties({ Type: "Body" });
-          cell.children[0].children[0].setProperties({
+          (cell as InstanceNode).setProperties({ Type: "Body" });
+          (((cell as InstanceNode).children[0] as FrameNode).children[0] as InstanceNode).setProperties({
             Type: colCellType,
             "Multi-value": colMultiValue,
           });
@@ -107,8 +173,8 @@ figma.ui.onmessage = async (msg) => {
           // Because cells can be reset here as they're replaced with another
           // component (variants), we again set the fill container setting if
           // any of the columns is set to "multi value"
-          cell.children[0].layoutGrow = cellFillContainerY ? 1 : 0;
-          cell.primaryAxisSizingMode = cellFillContainerY ? "FIXED" : "AUTO";
+          ((cell as FrameNode).children[0] as FrameNode).layoutGrow = cellFillContainerY ? 1 : 0;
+          (cell as FrameNode).primaryAxisSizingMode = cellFillContainerY ? "FIXED" : "AUTO";
         });
 
         tableFrame.appendChild(thisTableRow);
@@ -129,4 +195,76 @@ figma.ui.onmessage = async (msg) => {
 
     figma.closePlugin();
   }
+
+  if (msg.type === 'request-selection') {
+    sendCurrentSelection();
+  }
+
+  if (msg.type === 'request-local-custom-dictionary') {
+    figma.clientStorage.getAsync("languageLinterCustomDictionary").then(result => {
+      figma.ui.postMessage({ 
+        type: "local-custom-dictionary-retrieved", 
+        message: result ? result : [] 
+      });
+    })
+  }
+
+  if (msg.type === 'add-to-dictionary') {
+    figma.clientStorage.getAsync("languageLinterCustomDictionary").then(result => {
+      let newCustomDictionary = result ? result : []
+
+      newCustomDictionary.push(msg.wordToAdd)
+
+      figma.clientStorage.setAsync("languageLinterCustomDictionary", newCustomDictionary)
+    })
+  }
+
+  if (msg.type === 'get-sample-text') {
+    const sampleText = figma.currentPage.selection
+    figma.ui.postMessage({ type: "sample-text", message: sampleText });
+  }
+
+  // scroll and zoom the active layer into the center of the screen
+  if (msg.type === 'sample-text-changed') {
+    const activeTextLayer = figma.getNodeById(msg.activeNodeId)
+    figma.viewport.scrollAndZoomIntoView([activeTextLayer])
+  }
+
+  if (msg.type === 'update-source-text') {
+    const activeTextLayer = figma.getNodeById(msg.layerId) as TextNode
+    let fontName = activeTextLayer.fontName
+
+    if (fontName === figma.mixed) {
+      // process each character individually 
+      // or simply get the color of the first character
+      await Promise.all(activeTextLayer.getRangeAllFontNames(0, activeTextLayer.characters.length).map(figma.loadFontAsync))
+    } else {
+      await figma.loadFontAsync(fontName);
+    }
+
+    activeTextLayer.deleteCharacters(0, activeTextLayer.characters.length)
+    activeTextLayer.insertCharacters(0, msg.updatedText)
+
+    figma.ui.postMessage({ type: "source-text-updated", message: msg.updatedText });
+  }
+
+
+  figma.on("selectionchange", () => {
+    console.log('selectionchange was fired');
+    sendCurrentSelection()
+  })
 };
+
+// handle submenu navigation
+switch (figma.command) {
+  case "home":
+    figma.ui.postMessage({ type: "figma-command", message: "open-home" });
+    break;
+  case "table":
+    figma.ui.postMessage({ type: "figma-command", message: "open-table-creator" });
+    break;
+  case "language":
+    figma.ui.postMessage({ type: "figma-command", message: "open-language-linter" });
+    figma.ui.resize(475, 500)
+    break;
+}
