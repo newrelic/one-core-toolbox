@@ -13,6 +13,9 @@
     {"name": "Home", "command": "home"},
     {"separator": true},
     {"name": "Table creator", "command": "table"},
-    {"name": "Language linter", "command": "language"}
+    {"name": "Design linter", "menu": [
+      {"name": "Language", "command": "language"},
+      {"name": "Color", "command": "color"}
+    ]}
   ]
 }

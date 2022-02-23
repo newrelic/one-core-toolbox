@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import TableCreator from "./TableCreator";
-import LanguageLinterPlugin from "./LanguageLinterPlugin";
+import TableCreator from "./TableCreator/TableCreator";
+import DesignLinter from "./DesignLinter/DesignLinter";
 import Home from "./Home";
 import "../styles/ui.css";
 
@@ -37,6 +37,9 @@ const App = ({}) => {
         case "open-language-linter":
           setActivePlugin('language-linter')
           break;
+        case "open-color-linter":
+          setActivePlugin('color-linter')
+          break;
       }
     }
   }, [latestFigmaCommand])
@@ -60,9 +63,23 @@ const App = ({}) => {
       case "home":
         return <Home setActivePlugin={handlePluginNavigation} />;
       case "table-creator":
-        return <TableCreator setActivePlugin={handlePluginNavigation} />;
+        return (
+          <TableCreator setActivePlugin={handlePluginNavigation} />
+        );
       case "language-linter":
-        return <LanguageLinterPlugin setActivePlugin={handlePluginNavigation} />;
+        return (
+          <DesignLinter 
+            setActivePlugin={handlePluginNavigation}
+            openTo={"language"}
+          />
+        );
+      case "color-linter":
+        return (
+          <DesignLinter 
+            setActivePlugin={handlePluginNavigation}
+            openTo={"color"}
+          />
+        );
     }
   };
 
