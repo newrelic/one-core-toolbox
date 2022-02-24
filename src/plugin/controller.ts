@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import uuid from 'uuid-random';
 import { isVisibleNode } from "@figma-plugin/helpers";
-
 import oneCorePaintStyles from './oneCorePaintStyles.js';
 
 figma.showUI(__html__, { width: 300, height: 448 });

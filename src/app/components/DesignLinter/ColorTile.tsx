@@ -1,6 +1,9 @@
 import * as React from "react";
 import { useState } from "react";
+import chroma from "chroma-js"
+import oneCorePaintStyles from '../../../plugin/oneCorePaintStyles.js';
 require("babel-polyfill");
+
 import "../../styles/ui.css";
 
 declare function require(path: string): any;
@@ -46,7 +49,6 @@ const ColorTile = (props: props) => {
     );
   };
 
-
   const truncateLayerName = (layerName: string): string => {
     if (layerName.length > 30) {
       return layerName.substring(0, 27) + '...';
@@ -54,6 +56,39 @@ const ColorTile = (props: props) => {
 
     return layerName;
   };
+
+  const renderTokenSuggestions = () => {
+    const stylesWithSimilarity = oneCorePaintStyles.map((oneCoreColorStyle) => {
+      const oneCoreColor = oneCoreColorStyle.color.color.hex
+      const similarity: number = 100 - chroma.distance(oneCoreColor, colorInHex)
+      
+      return {
+        ...oneCoreColorStyle,
+        similarity
+      }
+    })
+
+    const stylesSortedBySimilarity = stylesWithSimilarity.sort((a, b) => {
+      return b.similarity - a.similarity
+    })
+
+    const closestColorStyles = stylesSortedBySimilarity.slice(0, 4)
+
+
+    return closestColorStyles.map(colorStyle => {
+      return (
+        <li className="suggested-color-style-list-item">
+          <span 
+            className="suggested-color-style-sample"
+            style={{backgroundColor: colorStyle.color.color.hex}}
+          ></span>
+          {colorStyle.name}
+        </li>
+      )
+    })
+  }
+
+  renderTokenSuggestions()
 
   return (
     <li 
@@ -86,34 +121,7 @@ const ColorTile = (props: props) => {
         </div>
 
         <ul className="suggested-color-style-list">
-          <li className="suggested-color-style-list-item">
-            <span 
-              className="suggested-color-style-sample"
-              style={{backgroundColor: `#f9f9f9`}}
-            ></span>
-            Text / Color / Token / Name
-          </li>
-          <li className="suggested-color-style-list-item">
-            <span 
-              className="suggested-color-style-sample"
-              style={{backgroundColor: `#f9f9f9`}}
-            ></span>
-            Text / Color / Token / Name
-          </li>
-          <li className="suggested-color-style-list-item">
-            <span 
-              className="suggested-color-style-sample"
-              style={{backgroundColor: `#f9f9f9`}}
-            ></span>
-            Text / Color / Token / Name
-          </li>
-          <li className="suggested-color-style-list-item">
-            <span 
-              className="suggested-color-style-sample"
-              style={{backgroundColor: `#f9f9f9`}}
-            ></span>
-            Text / Color / Token / Name
-          </li>
+          {renderTokenSuggestions()}
         </ul>
       </article>
     </li>
