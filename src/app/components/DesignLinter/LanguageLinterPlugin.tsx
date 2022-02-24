@@ -6,7 +6,7 @@ import "../../styles/ui.css";
 
 declare function require(path: string): any;
 
-const LanguageLinterPlugin = (props) => {
+const LanguageLinterPlugin = () => {
   const [selectedTextLayers, setSelectedTextLayers] = useState([]);
   const [textLayersWithSuggestions, setTextLayersWithSuggestions] = useState([]);
   const [sampleText, setSampleText] = useState('');

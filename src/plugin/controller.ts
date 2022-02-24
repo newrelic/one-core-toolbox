@@ -291,14 +291,6 @@ const getRawLayersWithColor = () => {
     return output.flat();
 };
 
-const sendCurrentSelection = () => {
-    // send the selection array to the UI
-    return figma.ui.postMessage({
-        type: 'selection-change',
-        message: getRawLayersWithColor(),
-    });
-};
-
 
 /*-------------------------*/
 /*-- Meat and potatoes --*/
@@ -312,7 +304,7 @@ const rawLayersWithColor = getRawLayersWithColor();
 
 // Pull out the data taht we care about and make it accessible
 // without needing to access prototype properties.
-const layersWithColor = rawLayersWithColor.map((layer, index) => {
+const layersWithColor = rawLayersWithColor.map((_, index) => {
     const hasFill = rawLayersWithColor[index].fills.length > 0;
     const hasStroke = rawLayersWithColor[index].strokes.length > 0;
     const hasFillAndStroke = hasFill && hasStroke;
@@ -408,11 +400,6 @@ const colorsUsingOneCoreStyle = (() => {
     return colors;
 })();
 
-// If it's *doesn't* color matches a One Core color add it an array
-const colorsWithStyleNotUsingOneCoreStyle = colorsWithColorStyle.filter((color) => {
-    const {r, g, b} = color.color[0].color;
-    const colorInHex = rgbToHex(r, g, b);
-});
 
 // Every color that isn't using a one core color style
 // loop through all colors...
@@ -421,22 +408,6 @@ const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
         return color.colorId === oneCoreColor.colorId;
     });
 });
-
-const addOneCoreStyleNameToColor = () => {
-    colorsUsingOneCoreStyle.map((color, index) => {
-        oneCorePaintStyles.map((style) => {
-            if (color.colorStyleId.includes(style.key)) {
-                debugger;
-
-                colorsUsingOneCoreStyle[index] = {
-                    ...color,
-                    styleName: style.name,
-                };
-            }
-            return;
-        });
-    });
-};
 
 const oneCoreColorStyleCoverage = `${((colorsUsingOneCoreStyle.length / allInstancesOfColor.length) * 100).toFixed(
     2
@@ -450,7 +421,6 @@ const colorStats = {
     allInstancesOfColor: allInstancesOfColor,
     colorsWithColorStyle: colorsWithColorStyle,
     colorsUsingOneCoreStyle: colorsUsingOneCoreStyle,
-    colorsWithStyleNotUsingOneCoreStyle: colorsWithStyleNotUsingOneCoreStyle,
     colorsNotUsingOneCoreColorStyle: colorsNotUsingOneCoreColorStyle,
     oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
     almostAllColors: almostAllColors,
