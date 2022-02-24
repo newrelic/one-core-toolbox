@@ -10,6 +10,7 @@
 		"client-build": "cd src/app/components/LanguageLinter && npm install"
 	},
 	"dependencies": {
+		"@figma-plugin/helpers": "^0.15.2",
 		"@types/newrelic": "^7.0.3",
 		"@types/node": "^17.0.20",
 		"babel-polyfill": "^6.26.0",

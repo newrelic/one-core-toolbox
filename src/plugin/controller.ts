@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import uuid from 'uuid-random';
+import { isVisibleNode } from "@figma-plugin/helpers";
 
 import oneCorePaintStyles from './oneCorePaintStyles.js';
 
@@ -233,13 +234,14 @@ const rgbToHex = (r, g, b) => {
 const pushColorToArray = (layer, colorType: string, array: any[]) => {
     const styleIdType = colorType === 'fills' ? 'fillStyleId' : 'strokeStyleId';
     const isSolidColor = layer?.fills[0]?.type === 'SOLID';
-    const fillIsImage = layer?.fills[0]?.type === 'IMAGE';
+    const colorIsImage = colorType === 'fill' && layer?.fills[0]?.type === 'IMAGE';
+    const colorIsVisible = layer[colorType][0].visible
 
     const colorInHex = (colorInRGB) => {
         return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
     };
 
-    if (!fillIsImage && layer.visible) {
+    if (!colorIsImage && colorIsVisible) {
         array.push({
             colorId: uuid(), // generat a Unique ID to keep track of colors,
             layerId: layer.layerId,
@@ -261,7 +263,7 @@ const getRawLayersWithColor = () => {
     // get the selected layers
     let selection = figma.currentPage.selection;
 
-    const output = selection.map((selectedLayer) => {
+    let output = selection.map((selectedLayer) => {
         // Get all styles in selection that have a color
         // (the output will have a lot of data stored in prototype properites)
         let tempOutput = selectedLayer.findAll((n) => {
@@ -280,15 +282,19 @@ const getRawLayersWithColor = () => {
                 // 'VECTOR'
             ];
 
+            const hasFillOrStroke = n?.fills?.length > 0 || n?.strokes?.length > 0
             const nodeIsValidNodeType = acceptableNodetypes.some((nodeType) => n.type === nodeType);
 
-            return nodeIsValidNodeType && (n?.fills?.length > 0 || n?.strokes?.length > 0);
+            return nodeIsValidNodeType && hasFillOrStroke
         });
 
         return [...tempOutput];
     });
 
-    return output.flat();
+    output = output.flat();
+    output = output.filter(layer => isVisibleNode(layer))
+
+    return output
 };
 
 
@@ -354,6 +360,7 @@ const allInstancesOfColor = layersWithColor
 
 const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
     // for every One Core color style...
+
     return oneCorePaintStyles.some((style) => {
         // if the argument color matches the current style color
         // return true
@@ -404,8 +411,8 @@ const colorsUsingOneCoreStyle = (() => {
 // Every color that isn't using a one core color style
 // loop through all colors...
 const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
-    return !colorsUsingOneCoreStyle.some((oneCoreColor) => {
-        return color.colorId === oneCoreColor.colorId;
+    return !oneCorePaintStyles.some((oneCoreColor) => {
+        return color.colorStyleId.includes(oneCoreColor.key)
     });
 });
 
@@ -518,8 +525,6 @@ figma.ui.onmessage = async (msg) => {
 
   /*-- Color linter messages --*/
   if (msg.type === 'select-layer') {
-    console.log(msg.type);
-    console.log(msg.layerId);
     selectAndZoomToLayer(msg.layerId);
   }
 };
