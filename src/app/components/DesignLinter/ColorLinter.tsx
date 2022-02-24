@@ -7,7 +7,7 @@ import "../../styles/ui.css";
 declare function require(path: string): any;
 
 const ColorLinter = () => {
-  const [selectionColorStats, setSelectionColorStats] = useState({});
+  const [colorsWithIssues, setColorsWithIssues] = useState({});
 
   React.useEffect(() => {
     parent.postMessage({pluginMessage: {type: 'request-selection'}}, '*');
@@ -17,15 +17,17 @@ const ColorLinter = () => {
       const {type, message} = event.data.pluginMessage;
 
       if (type === 'color-stats') {
-        setSelectionColorStats(message);
+        setColorsWithIssues(message?.colorsNotUsingOneCoreColorStyle)
       }
     };
+
+
+
+
   }, []);
 
   const renderColorIssues = () => {
-    const colorsWithIssues = selectionColorStats?.colorsNotUsingOneCoreColorStyle;
-
-    if (colorsWithIssues) {
+    if (colorsWithIssues?.length > 0) {
       return colorsWithIssues.map((color, index) => {
         return <ColorTile colorData={color} key={index} />
       });
@@ -34,9 +36,21 @@ const ColorLinter = () => {
 
   return (
     <>
-      <ul className="color-tiles-container">
-        {renderColorIssues()}
-      </ul>
+      <div className="color-linter-container">
+        <div className="color-linting-summary">
+          <h3 className="color-linting-summary-heading">
+            {colorsWithIssues.length} color issues found
+          </h3>
+          <p className="color-linting-summary-description">
+            To fix these issues, replace each of the colors listed below 
+            with a One Core color style. Not sure what that means?{` `}
+            <a href="#">See how</a>.
+          </p>
+        </div> 
+        <ul className="color-tiles-container">
+          {renderColorIssues()}
+        </ul>
+      </div>      
     </>
   );
 };

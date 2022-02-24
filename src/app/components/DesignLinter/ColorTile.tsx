@@ -50,8 +50,8 @@ const ColorTile = (props: props) => {
   };
 
   const truncateLayerName = (layerName: string): string => {
-    if (layerName.length > 30) {
-      return layerName.substring(0, 27) + '...';
+    if (layerName.length > 25) {
+      return layerName.substring(0, 25) + '...';
     }
 
     return layerName;
@@ -76,6 +76,7 @@ const ColorTile = (props: props) => {
 
 
     return closestColorStyles.map(colorStyle => {
+      console.log(JSON.stringify(colorStyle, 2, null));
       return (
         <li className="suggested-color-style-list-item">
           <span 

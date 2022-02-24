@@ -85,12 +85,15 @@ table td {
 
 .tab-navigation {
   height: 40px;
-  border-bottom: 1px solid #e5e5e5;
-
   display: flex;
   padding:  0;
   margin: 0;
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  background-color: #fff;
   list-style-type: none;
+  border-bottom: 1px solid #e5e5e5;
   font-size: 11px;
   color: #9fa5a5;
   gap: 0px;
@@ -597,12 +600,33 @@ input:checked + .slider:before {
 
 /*-- Color linter --*/
 
+.color-linter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+.color-linting-summary-heading {
+  margin: 0 0 8px;
+  font-size:  18px;
+  color: #283636;
+  font-weight: 600;
+}
+
+.color-linting-summary-description {
+  margin: 0;
+  line-height: 145%;
+  font-size: 13px;
+  color: #6E7575;
+}
+
 .color-tiles-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin: 0;
-  padding: 24px;
+  padding: 0;
   list-style-type: none;
 }
 
