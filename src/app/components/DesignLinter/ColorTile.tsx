@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
-import chroma from "chroma-js"
-import oneCorePaintStyles from '../../../plugin/oneCorePaintStyles.js';
+import chroma from "chroma-js";
+import oneCorePaintStyles from "../../../plugin/oneCorePaintStyles.js";
 require("babel-polyfill");
 
 import "../../styles/ui.css";
@@ -9,19 +9,19 @@ import "../../styles/ui.css";
 declare function require(path: string): any;
 
 interface colorData {
-  layerId: string,
-  layerName: string,
-  colorType: string,
-  colorInHex: string
+  layerId: string;
+  layerName: string;
+  colorType: string;
+  colorInHex: string;
 }
 
 interface props {
-  colorData: colorData
-  key: number,
+  colorData: colorData;
+  key: number;
 }
 
 const ColorTile = (props: props) => {
-	const {
+  const {
     // colorId,
     layerId,
     layerName,
@@ -36,22 +36,22 @@ const ColorTile = (props: props) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleColorTileClick = (layerId: string) => {
-    setIsExpanded(!isExpanded)
-  	// Tell the controller to select and zoom into it
+    setIsExpanded(!isExpanded);
+    // Tell the controller to select and zoom into it
     parent.postMessage(
       {
         pluginMessage: {
-          type: 'select-layer',
+          type: "select-layer",
           layerId: layerId,
         },
       },
-      '*'
+      "*"
     );
   };
 
   const truncateLayerName = (layerName: string): string => {
     if (layerName.length > 25) {
-      return layerName.substring(0, 25) + '...';
+      return layerName.substring(0, 25) + "...";
     }
 
     return layerName;
@@ -59,43 +59,41 @@ const ColorTile = (props: props) => {
 
   const renderTokenSuggestions = () => {
     const stylesWithSimilarity = oneCorePaintStyles.map((oneCoreColorStyle) => {
-      const oneCoreColor = oneCoreColorStyle.color.color.hex
-      const similarity: number = 100 - chroma.distance(oneCoreColor, colorInHex)
-      
+      const oneCoreColor = oneCoreColorStyle.color.color.hex;
+      const similarity: number =
+        100 - chroma.distance(oneCoreColor, colorInHex);
+
       return {
         ...oneCoreColorStyle,
-        similarity
-      }
-    })
+        similarity,
+      };
+    });
 
     const stylesSortedBySimilarity = stylesWithSimilarity.sort((a, b) => {
-      return b.similarity - a.similarity
-    })
+      return b.similarity - a.similarity;
+    });
 
-    const closestColorStyles = stylesSortedBySimilarity.slice(0, 4)
+    const closestColorStyles = stylesSortedBySimilarity.slice(0, 4);
 
-
-    return closestColorStyles.map(colorStyle => {
+    return closestColorStyles.map((colorStyle) => {
       console.log(JSON.stringify(colorStyle, 2, null));
       return (
         <li className="suggested-color-style-list-item">
-          <span 
+          <span
             className="suggested-color-style-sample"
-            style={{backgroundColor: colorStyle.color.color.hex}}
+            style={{ backgroundColor: colorStyle.color.color.hex }}
           ></span>
           {colorStyle.name}
         </li>
-      )
-    })
-  }
-
-  renderTokenSuggestions()
+      );
+    });
+  };
 
   return (
-    <li 
-    	className={`color-tile-container ${isExpanded ? 'expanded' : ''}`}
-    	key={props.key} 
-    	onClick={() => handleColorTileClick(layerId)}
+    <li
+      className={`color-tile-container ${isExpanded ? "expanded" : ""}`}
+      key={props.key}
+      onClick={() => handleColorTileClick(layerId)}
     >
       <div className="color-tile-header">
         <div className="color-tile-title-section">
@@ -105,7 +103,10 @@ const ColorTile = (props: props) => {
 
         <ul className="color-tile-meta-list">
           <li className="color-tile-meta-list-item color-tile-meta-color">
-            <span style={{backgroundColor: colorInHex}} className="color-tile-color-sample"></span>
+            <span
+              style={{ backgroundColor: colorInHex }}
+              className="color-tile-color-sample"
+            ></span>
             {colorInHex}
           </li>
           <li className="color-tile-meta-list-item color-tile-meta-layer-name">
@@ -117,7 +118,9 @@ const ColorTile = (props: props) => {
 
       <article className="suggested-color-styles-container">
         <div className="suggested-color-style-header">
-          <h5 className="suggested-color-style-heading">Suggested color styles</h5>
+          <h5 className="suggested-color-style-heading">
+            Suggested color styles
+          </h5>
           <button className="btn-suggested-color-style-help">Help</button>
         </div>
 
