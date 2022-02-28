@@ -10,10 +10,6 @@
     "removeComments": true,
     "noImplicitAny": false,
     "moduleResolution": "node",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./node_modules/@figma"
-    ]
-  },
-  "include": ["src/app/assets", "src/app/custom.d.ts"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
+  }
 }

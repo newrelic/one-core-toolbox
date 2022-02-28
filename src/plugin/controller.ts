@@ -258,190 +258,205 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
     }
 };
 
-const getRawLayersWithColor = () => {
-    // get the selected layers
-    let selection = figma.currentPage.selection;
+const getColorStats = () => {
+    const getRawLayersWithColor = () => {
+      // get the selected layers
+      let selection = figma.currentPage.selection;
 
-    let output = selection.map((selectedLayer) => {
-        // Get all styles in selection that have a color
-        // (the output will have a lot of data stored in prototype properites)
-        let tempOutput = selectedLayer.findAll((n) => {
-            const acceptableNodetypes = [
-                'ELLIPSE',
-                'FRAME',
-                'GROUP',
-                'COMPONENT',
-                'INSTANCE', // GUILTY!!
-                'LINE', // GUILTY!!
-                'POLYGON',
-                'RECTANGLE', // GUILTY!!
-                'SHAPE_WITH_TEXT',
-                'STAR',
-                'TEXT',
-                // 'VECTOR'
-            ];
+      function isFrameOrGroup(node: SceneNode):
+      node is FrameNode | GroupNode {
+        return node.type === 'FRAME' || node.type === 'GROUP'
+      }
 
-            const hasFillOrStroke = n?.fills?.length > 0 || n?.strokes?.length > 0
-            const nodeIsValidNodeType = acceptableNodetypes.some((nodeType) => n.type === nodeType);
+      const relevantLayers = selection.map((selectedLayer) => {
+          // Get all styles in selection that have a color
+          // (the output will have a lot of data stored in prototype properites)
 
-            return nodeIsValidNodeType && hasFillOrStroke
-        });
+          if (!isFrameOrGroup(selectedLayer)) {
+            console.error(`Expected selectedLayer to be frame or group. Got ${selectedLayer.type} `);
+          }
 
-        return [...tempOutput];
-    });
+          let tempOutput = (selectedLayer as FrameNode | GroupNode).findAll((n) => {
+              const acceptableNodetypes = [
+                  'ELLIPSE',
+                  'FRAME',
+                  'GROUP',
+                  'COMPONENT',
+                  'INSTANCE', // GUILTY!!
+                  'LINE', // GUILTY!!
+                  'POLYGON',
+                  'RECTANGLE', // GUILTY!!
+                  'SHAPE_WITH_TEXT',
+                  'STAR',
+                  'TEXT',
+                  // 'VECTOR'
+              ];
+              
+              let hasFill = "fills" in n && n?.fills[0] !== undefined
+              let hasStroke = "strokes" in n && n?.strokes[0] !== undefined
+              
+              const hasFillOrStroke = hasFill || hasStroke
+              const nodeIsValidNodeType = acceptableNodetypes.some((nodeType) => n.type === nodeType);
 
-    output = output.flat();
-    output = output.filter(layer => isVisibleNode(layer))
+              return nodeIsValidNodeType && hasFillOrStroke
+          });
 
-    return output
-};
+          return [...tempOutput];
+      });
 
+      let output = relevantLayers.flat()
+      output = output.filter(layer => isVisibleNode(layer))
 
-/*-------------------------*/
-/*-- Meat and potatoes --*/
-/*-------------------------*/
-
-// Get all styles in figma doc that have a color
-// (the output will have a lot of data stored in prototype properites)
-// (To check colors for entire file, swap `figma.currentPage.selection`
-// `for figma.root`)
-const rawLayersWithColor = getRawLayersWithColor();
-
-// Pull out the data taht we care about and make it accessible
-// without needing to access prototype properties.
-const layersWithColor = rawLayersWithColor.map((_, index) => {
-    const hasFill = rawLayersWithColor[index].fills.length > 0;
-    const hasStroke = rawLayersWithColor[index].strokes.length > 0;
-    const hasFillAndStroke = hasFill && hasStroke;
-
-    return {
-        layerId: rawLayersWithColor[index].id,
-        name: rawLayersWithColor[index].name,
-        fills: rawLayersWithColor[index].fills,
-        strokes: rawLayersWithColor[index].strokes,
-        fillStyleId: rawLayersWithColor[index].fillStyleId,
-        strokeStyleId: rawLayersWithColor[index].strokeStyleId,
-        visible: rawLayersWithColor[index].visible,
-        type: rawLayersWithColor[index].type,
-        hasFill: hasFill,
-        hasStroke: hasStroke,
-        hasFillAndStroke: hasFillAndStroke,
-    };
-});
-
-const allInstancesOfColor = layersWithColor
-    .map((layer) => {
-        let tempColors = [];
-
-        // get all each fill and stroke that isn't empty and add it
-        // as an item in a new flat array containing all color instances
-        if (layer.hasFillAndStroke) {
-            pushColorToArray(layer, 'fills', tempColors);
-            pushColorToArray(layer, 'strokes', tempColors);
-        } else if (layer.hasFill) {
-            pushColorToArray(layer, 'fills', tempColors);
-        } else if (layer.hasStroke) {
-            pushColorToArray(layer, 'strokes', tempColors);
-        }
-
-        return tempColors;
-    })
-    .flat();
-
-// Checklist for verifying that a layers uses a One Core color style
-// 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
-// 2. The key extracted from it's (fill/stroke)styleId matches a key from the `oneCorePaintStyles` array
-
-// This will give you the total number of colors that use a color style
-// const amountOfColorsUsingColorStyle = allInstancesOfColor.reduce((prev, color, index) => {
-//   return color.hasColorStyle ? prev + 1 : prev
-// }, 0)
-
-const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
-    // for every One Core color style...
-
-    return oneCorePaintStyles.some((style) => {
-        // if the argument color matches the current style color
-        // return true
-        return colorInHex === style.color.color.hex;
-    }, false);
-};
-
-const doesKeyMatchAnyOneCoreColorStyleKey = (key) => {
-    // for every One Core color style...
-    return oneCorePaintStyles.some((style) => {
-        // if the argument color matches the current style color
-        // return true
-        return key.includes(style.key);
-    }, false);
-};
-
-// for each color that has a color style
-const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
-    return color.hasColorStyle;
-});
-
-// If it's color matches a One Core color add it an array
-const colorsUsingOneCoreStyle = (() => {
-    let colors = colorsWithColorStyle.filter((color) => {
-        const {r, g, b} = color.color[0].color;
-        const colorInHex = rgbToHex(r, g, b);
-
-        return doesColorMatchAnyOneCoreStyle(colorInHex) && doesKeyMatchAnyOneCoreColorStyleKey(color.colorStyleId);
-    });
-
-    // add the style name to the colors
-    colors.map((color, index) => {
-        oneCorePaintStyles.map((style) => {
-            if (color.colorStyleId.includes(style.key)) {
-                colors[index] = {
-                    ...color,
-                    styleName: style.name,
-                };
-            }
-            return;
-        });
-    });
-
-    return colors;
-})();
+      return output
+  };
 
 
-// Every color that isn't using a one core color style
-// loop through all colors...
-const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
-    return !oneCorePaintStyles.some((oneCoreColor) => {
-        return color.colorStyleId.includes(oneCoreColor.key)
-    });
-});
+  /*-------------------------*/
+  /*-- Meat and potatoes --*/
+  /*-------------------------*/
 
-const oneCoreColorStyleCoverage = `${((colorsUsingOneCoreStyle.length / allInstancesOfColor.length) * 100).toFixed(
-    2
-)}%`;
+  // Get all styles in figma doc that have a color
+  // (the output will have a lot of data stored in prototype properites)
+  // (To check colors for entire file, swap `figma.currentPage.selection`
+  // `for figma.root`)
+  const rawLayersWithColor = getRawLayersWithColor();
 
-const almostAllColors = [...colorsUsingOneCoreStyle, ...colorsNotUsingOneCoreColorStyle];
-const idsOfAllInstancesOfColor = allInstancesOfColor.map((color) => color.colorId);
-const idsOfAlmostAllColors = almostAllColors.map((color) => color.colorId);
+  // Pull out the data taht we care about and make it accessible
+  // without needing to access prototype properties.
+  const layersWithColor = rawLayersWithColor.map((layer) => {
+      const hasFill = "fills" in layer && layer.fills[0] !== undefined
+      const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
+      const hasFillAndStroke = hasFill && hasStroke;
 
-const colorStats = {
-    allInstancesOfColor: allInstancesOfColor,
-    colorsWithColorStyle: colorsWithColorStyle,
-    colorsUsingOneCoreStyle: colorsUsingOneCoreStyle,
-    colorsNotUsingOneCoreColorStyle: colorsNotUsingOneCoreColorStyle,
-    oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
-    almostAllColors: almostAllColors,
-    idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
-    idsOfAlmostAllColors: idsOfAlmostAllColors,
-};
+      return {
+          layerId: layer.id,
+          name: layer.name,
+          fills: "fills" in layer && layer.fills,
+          strokes: "strokes" in layer && layer.strokes,
+          fillStyleId: "fillStyleId" in layer && layer.fillStyleId,
+          strokeStyleId: "strokeStyleId" in layer && layer.strokeStyleId,
+          visible: layer.visible,
+          type: layer.type,
+          hasFill: hasFill,
+          hasStroke: hasStroke,
+          hasFillAndStroke: hasFillAndStroke,
+      };
+  });
+
+  const allInstancesOfColor = layersWithColor
+      .map((layer) => {
+          let tempColors = [];
+
+          // get all each fill and stroke that isn't empty and add it
+          // as an item in a new flat array containing all color instances
+          if (layer.hasFillAndStroke) {
+              pushColorToArray(layer, 'fills', tempColors);
+              pushColorToArray(layer, 'strokes', tempColors);
+          } else if (layer.hasFill) {
+              pushColorToArray(layer, 'fills', tempColors);
+          } else if (layer.hasStroke) {
+              pushColorToArray(layer, 'strokes', tempColors);
+          }
+
+          return tempColors;
+      })
+      .flat();
+
+  // Checklist for verifying that a layers uses a One Core color style
+  // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
+  // 2. The key extracted from it's (fill/stroke)styleId matches a key from the `oneCorePaintStyles` array
+
+  // This will give you the total number of colors that use a color style
+  // const amountOfColorsUsingColorStyle = allInstancesOfColor.reduce((prev, color, index) => {
+  //   return color.hasColorStyle ? prev + 1 : prev
+  // }, 0)
+
+  const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
+      // for every One Core color style...
+
+      return oneCorePaintStyles.some((style) => {
+          // if the argument color matches the current style color
+          // return true
+          return colorInHex === style.color.color.hex;
+      }, false);
+  };
+
+  const doesKeyMatchAnyOneCoreColorStyleKey = (key) => {
+      // for every One Core color style...
+      return oneCorePaintStyles.some((style) => {
+          // if the argument color matches the current style color
+          // return true
+          return key.includes(style.key);
+      }, false);
+  };
+
+  // for each color that has a color style
+  const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
+      return color.hasColorStyle;
+  });
+
+  // If it's color matches a One Core color add it an array
+  const colorsUsingOneCoreStyle = (() => {
+      let colors = colorsWithColorStyle.filter((color) => {
+          const {r, g, b} = color.color[0].color;
+          const colorInHex = rgbToHex(r, g, b);
+
+          return doesColorMatchAnyOneCoreStyle(colorInHex) && doesKeyMatchAnyOneCoreColorStyleKey(color.colorStyleId);
+      });
+
+      // add the style name to the colors
+      colors.map((color, index) => {
+          oneCorePaintStyles.map((style) => {
+              if (color.colorStyleId.includes(style.key)) {
+                  colors[index] = {
+                      ...color,
+                      styleName: style.name,
+                  };
+              }
+              return;
+          });
+      });
+
+      return colors;
+  })();
+
+
+  // Every color that isn't using a one core color style
+  // loop through all colors...
+  const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
+      return !oneCorePaintStyles.some((oneCoreColor) => {
+          return color.colorStyleId.includes(oneCoreColor.key)
+      });
+  });
+
+  const oneCoreColorStyleCoverage = `${((colorsUsingOneCoreStyle.length / allInstancesOfColor.length) * 100).toFixed(
+      2
+  )}%`;
+
+  const almostAllColors = [...colorsUsingOneCoreStyle, ...colorsNotUsingOneCoreColorStyle];
+  const idsOfAllInstancesOfColor = allInstancesOfColor.map((color) => color.colorId);
+  const idsOfAlmostAllColors = almostAllColors.map((color) => color.colorId);
+
+  const colorStats = {
+      allInstancesOfColor: allInstancesOfColor,
+      colorsWithColorStyle: colorsWithColorStyle,
+      colorsUsingOneCoreStyle: colorsUsingOneCoreStyle,
+      colorsNotUsingOneCoreColorStyle: colorsNotUsingOneCoreColorStyle,
+      oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
+      almostAllColors: almostAllColors,
+      idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
+      idsOfAlmostAllColors: idsOfAlmostAllColors,
+  };
+
+  return colorStats
+}
 
 const selectAndZoomToLayer = (layerId: string) => {
-    const layer = figma.getNodeById(layerId);
+    const layer: SceneNode = (figma.getNodeById(layerId) as SceneNode);
 
     figma.currentPage.selection = [layer];
     figma.viewport.scrollAndZoomIntoView([layer]);
 };
-
-console.log(colorStats);
 
 // ==============================================================
 // Receiving messages sent from the UI
@@ -470,7 +485,7 @@ figma.ui.onmessage = async (msg) => {
     sendCurrentTextSelection();
     figma.ui.postMessage({
         type: 'color-stats',
-        message: colorStats,
+        message: getColorStats(),
     });
   }
 

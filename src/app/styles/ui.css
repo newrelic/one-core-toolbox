@@ -86,7 +86,7 @@ table td {
 .tab-navigation {
   height: 40px;
   display: flex;
-  padding:  0;
+  padding: 0;
   margin: 0;
   position: sticky;
   z-index: 100;
@@ -104,15 +104,15 @@ table td {
   place-items: center;
   padding: 10px;
   min-width: 35px;
-  transition: opacity .75 ease-out ;
+  transition: opacity 0.75 ease-out;
 }
 
 .back-tab {
-  opacity:  .55;
+  opacity: 0.55;
 }
 
 .back-tab:hover {
-  opacity:  1;
+  opacity: 1;
 }
 
 .tab-navigation-tab:not(.active) {
@@ -520,7 +520,7 @@ input:checked + .slider:before {
 
 .text-layer-nav {
   display: flex;
-  height:  47px;
+  height: 47px;
   flex-shrink: 0;
   justify-content: space-between;
   margin-bottom: 8px;
@@ -532,7 +532,7 @@ input:checked + .slider:before {
 /*-- Home --*/
 
 .home-container {
-  display: flex;  
+  display: flex;
   flex-direction: column;
   height: 100%;
   gap: 12px;
@@ -546,11 +546,11 @@ input:checked + .slider:before {
   flex-direction: row;
   align-items: center;
   padding: 14px 16px;
-  background: #FFFFFF;
-  border: 1px solid #D1D4D4;
+  background: #ffffff;
+  border: 1px solid #d1d4d4;
   box-sizing: border-box;
   border-radius: 3px;
-  transition: all .075s ease-out;
+  transition: all 0.075s ease-out;
 }
 
 .plugin-tile-container:hover {
@@ -605,11 +605,13 @@ input:checked + .slider:before {
   flex-direction: column;
   gap: 24px;
   padding: 24px;
+  overflow: auto;
+  max-height: calc(100% - 105px);
 }
 
 .color-linting-summary-heading {
   margin: 0 0 8px;
-  font-size:  18px;
+  font-size: 18px;
   color: #283636;
   font-weight: 600;
 }
@@ -618,7 +620,7 @@ input:checked + .slider:before {
   margin: 0;
   line-height: 145%;
   font-size: 13px;
-  color: #6E7575;
+  color: #6e7575;
 }
 
 .color-tiles-container {
@@ -633,16 +635,14 @@ input:checked + .slider:before {
 .color-tile-container {
   border: 1px solid rgba(0 0 0 / 18%);
   border-radius: 4px;
-  transition: all .095s ease-out;
+  transition: all 0.095s ease-out;
 }
 
 .color-tile-container:hover {
   border-color: rgba(0 0 0 / 28%);
   transform: translateY(-1px);
   cursor: pointer;
-  box-shadow: 
-    0 2px 0 rgb(0 0 0 / 3%), 
-    0 1px 3px rgba(0 0 0 / 1%), 
+  box-shadow: 0 2px 0 rgb(0 0 0 / 3%), 0 1px 3px rgba(0 0 0 / 1%),
     0 8px 7px rgba(0 0 0 / 2%);
 }
 
@@ -676,7 +676,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: row;
   gap: 14px;
-  list-style-type: none; 
+  list-style-type: none;
 }
 
 .color-tile-meta-list-item {
@@ -711,7 +711,9 @@ input:checked + .slider:before {
   display: block;
   width: 23px;
   height: 16px;
-  background-image: url('../assets/icon-more.svg');
+  position: relative;
+  left: 6px;
+  background-image: url("../assets/icon-more.svg");
   background-color: transparent;
   background-position: center;
   background-repeat: no-repeat;
@@ -732,14 +734,14 @@ input:checked + .slider:before {
   display: none;
   flex-direction: column;
   gap: 12px;
-  background-color: #F3F4F4;
+  background-color: #f3f4f4;
   padding: 12px 16px;
   overflow: hidden;
   border-radius: 0 0 3px 3px;
 }
 
 .expanded .suggested-color-styles-container {
-  display: flex
+  display: flex;
 }
 
 .suggested-color-style-header {
@@ -759,12 +761,12 @@ input:checked + .slider:before {
 .btn-suggested-color-style-help {
   width: 18px;
   height: 18px;
-  background-image: url('../assets/icon-help.svg');
+  background-image: url("../assets/icon-help.svg");
   background-color: transparent;
   background-position: center;
   background-repeat: no-repeat;
   border: none;
-  opacity: .9;
+  opacity: 0.9;
 
   text-indent: 200%;
   white-space: nowrap;
@@ -793,7 +795,7 @@ input:checked + .slider:before {
   padding: 8px 12px;
   font-size: 12px;
   color: #556060;
-  border-bottom: 1px solid #E7E9E9;
+  border-bottom: 1px solid #e7e9e9;
 }
 
 .suggested-color-style-list-item:last-child {
@@ -807,40 +809,16 @@ input:checked + .slider:before {
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 15%);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.color-linting-footer {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  flex-direction: row;
+  justify-content: flex-end;
+  border-top: 1px solid #e5e5e5;
+  padding: 16px 24px;
+  gap: 8px;
+}

@@ -76,7 +76,6 @@ const ColorTile = (props: props) => {
     const closestColorStyles = stylesSortedBySimilarity.slice(0, 4);
 
     return closestColorStyles.map((colorStyle) => {
-      console.log(JSON.stringify(colorStyle, 2, null));
       return (
         <li className="suggested-color-style-list-item">
           <span
