@@ -36,8 +36,6 @@ const ColorLinter = () => {
     []
   );
 
-  console.log(colorsWithIssues);
-
   React.useEffect(() => {
     parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
 

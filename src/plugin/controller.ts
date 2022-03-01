@@ -236,7 +236,7 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
     const colorIsImage = colorType === 'fills' && layer?.fills[0]?.type === 'IMAGE';
     const colorIsVisible = layer[colorType][0].visible
 
-    if (!colorIsImage && colorIsVisible) {
+    if (!colorIsImage && colorIsVisible && !layer.isChildOfIconWithFill) {
         const colorInHex = (colorInRGB) => {
             return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
         };
@@ -289,6 +289,7 @@ const getColorStats = () => {
                   'SHAPE_WITH_TEXT',
                   'STAR',
                   'TEXT',
+                  'BOOLEAN_OPERATION'
                   // 'VECTOR'
               ];
               
@@ -327,6 +328,9 @@ const getColorStats = () => {
       const hasFill = "fills" in layer && layer.fills[0] !== undefined
       const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
       const hasFillAndStroke = hasFill && hasStroke;
+      const isChildOfIcon = layer.parent.type === 'BOOLEAN_OPERATION'
+      const parentIconHasFill = layer.parent?.fills?.length > 0
+      const isChildOfIconWithFill = isChildOfIcon && parentIconHasFill
 
       return {
           layerId: layer.id,
@@ -340,6 +344,7 @@ const getColorStats = () => {
           hasFill: hasFill,
           hasStroke: hasStroke,
           hasFillAndStroke: hasFillAndStroke,
+          isChildOfIconWithFill: isChildOfIconWithFill
       };
   });
 
