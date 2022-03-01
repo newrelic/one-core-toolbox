@@ -154,7 +154,7 @@ const TableCreator = (props) => {
 
   return (
     <>
-      <ul className="tab-navigation">
+      {/* <ul className="tab-navigation">
         <li
           className="tab-navigation-tab back-tab"
           onClick={() => setActivePlugin("home")}
@@ -162,7 +162,7 @@ const TableCreator = (props) => {
           <img src={IconChevronLeft} alt="back button" />
         </li>
         {renderNavigationTabs()}
-      </ul>
+      </ul> */}
       {renderTableCreator()}
     </>
   );

@@ -1,4 +1,4 @@
-figma.showUI(__html__, { width: 300, height: 448 });
+figma.showUI(__html__, { width: 300, height: 408 });
 
 const pushTextLayerToArray = (layer, array) => {
   array.push({
