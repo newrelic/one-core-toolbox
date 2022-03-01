@@ -151,8 +151,6 @@ const createTable = async (msg) => {
   figma.ui.postMessage({ type: "table-created", message: tableData });
 
   figma.notify("Table created ✅");
-
-  figma.closePlugin();
 }
 
 // ==============================================================
