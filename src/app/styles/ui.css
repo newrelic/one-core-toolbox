@@ -609,6 +609,13 @@ input:checked + .slider:before {
   max-height: calc(100% - 105px);
 }
 
+.summary-is-loading,
+.no-selection-made {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
 .color-linting-summary-heading {
   margin: 0 0 8px;
   font-size: 18px;
@@ -878,4 +885,47 @@ input:checked + .slider:before {
   height: 1px;
   border: none;
   margin: 0;
+}
+
+.color-empty-state-container {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  max-width: 90%;
+}
+
+.color-empty-state-heading {
+  font-weight: 600;
+  font-size: 14px;
+  color: #151d1d;
+}
+
+.color-empty-state-description {
+  margin: 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+  color: #556060;
+}
+
+.color-empty-state-container .btn {
+  margin-top: 10px;
+}
+
+.color-loader {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid;
+  border-color: #dfdfdf;
+  border-right-color: #656565;
+  animation: spin 1s infinite linear;
+
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
 }

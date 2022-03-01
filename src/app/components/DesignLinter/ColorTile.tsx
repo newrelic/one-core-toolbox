@@ -146,6 +146,7 @@ const ColorTile = (props: props) => {
   const colorTileContainerClasses = classNames("color-tile-container", {
     "menu-active": menuActive,
     "color-tile-hover-state-disabled": menuButtonHovered || menuHovered,
+    expanded: isExpanded,
   });
 
   return (

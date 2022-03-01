@@ -263,21 +263,14 @@ const getColorStats = () => {
       // get the selected layers
       let selection = figma.currentPage.selection;
 
-      function isFrameOrGroup(node: SceneNode):
-      node is FrameNode | GroupNode {
-        return node.type === 'FRAME' || node.type === 'GROUP'
-      }
-
       const relevantLayers: SceneNode[][] = selection.map((selectedLayer) => {
           // Get all styles in selection that have a color
           // (the output will have a lot of data stored in prototype properites)
+          
+          let outputForLayersWithChildren: SceneNode[] = []
 
-          if (!isFrameOrGroup(selectedLayer)) {
-            console.error(`Expected selectedLayer to be frame or group. Got ${selectedLayer.type} `);
-          }
-
-          let tempOutput = (selectedLayer as FrameNode | GroupNode).findAll((n) => {
-              const acceptableNodetypes = [
+          const isRelevantLayer = (n) => {
+            const acceptableNodetypes = [
                   'ELLIPSE',
                   'FRAME',
                   'GROUP',
@@ -300,10 +293,22 @@ const getColorStats = () => {
               const nodeIsValidNodeType = acceptableNodetypes.some((nodeType) => n.type === nodeType);
 
               return nodeIsValidNodeType && hasFillOrStroke
-          });
+          }
 
-          return [...tempOutput];
+          // return the layer if it fit's the criteria of isRelevantLayer()
+          if ('findAll' in selectedLayer) {
+            // if it has children
+            outputForLayersWithChildren = selectedLayer.findAll((n) => isRelevantLayer(n));
+            return [...outputForLayersWithChildren];
+          } else if (isRelevantLayer(selectedLayer)) {
+            // if it's a single layer
+            return [selectedLayer]
+          } else {
+            return []
+          }
       });
+
+      console.log(`relevantLayers is `, relevantLayers);
 
       let output = relevantLayers.flat()
       output = output.filter(layer => isVisibleNode(layer))
@@ -490,7 +495,10 @@ figma.ui.onmessage = async (msg) => {
     sendCurrentTextSelection();
     figma.ui.postMessage({
         type: 'color-stats',
-        message: getColorStats(),
+        message: {
+          colorStats: getColorStats(),
+          selectionMade: figma.currentPage.selection.length > 0
+        },
     });
   }
 

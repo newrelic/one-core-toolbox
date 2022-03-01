@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import ColorTile from "./ColorTile";
+import classNames from "classnames";
 require("babel-polyfill");
 import "../../styles/ui.css";
 
@@ -35,8 +36,11 @@ const ColorLinter = () => {
   const [colorsWithIssues, setColorsWithIssues] = useState<Array<colorList>>(
     []
   );
+  const [loadingColorData, setLoadingColorData] = useState<Boolean>(false);
+  const [selectionMade, setSelectionMade] = useState<Boolean>(false);
 
   React.useEffect(() => {
+    setLoadingColorData(true);
     parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
 
     // This is how we read messages sent from the plugin controller
@@ -44,7 +48,11 @@ const ColorLinter = () => {
       const { type, message } = event.data.pluginMessage;
 
       if (type === "color-stats") {
-        setColorsWithIssues(message?.colorsNotUsingOneCoreColorStyle);
+        setLoadingColorData(false);
+        setColorsWithIssues(
+          message?.colorStats?.colorsNotUsingOneCoreColorStyle
+        );
+        setSelectionMade(message?.selectionMade);
       }
     };
   }, []);
@@ -77,13 +85,39 @@ const ColorLinter = () => {
   };
 
   const handleRescanLayersClick = () => {
+    setLoadingColorData(true);
     parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
   };
 
-  return (
-    <>
-      <section className="color-linter-container">
-        <div className="color-linting-summary">
+  const renderEmptyState = () => {
+    const headingText = !loadingColorData
+      ? "Select a layer(s) to get started"
+      : "Loading color data...";
+    const descriptionText = !loadingColorData
+      ? "To check your colors select any layer, frame, or group of layers and then lint colors."
+      : "This may take a moment";
+
+    return (
+      <section className="color-empty-state-container">
+        {loadingColorData && <div className="color-loader"></div>}
+        <h4 className="color-empty-state-heading">{headingText}</h4>
+        <p className="color-empty-state-description">{descriptionText}</p>
+        {!loadingColorData && (
+          <button
+            className="btn btn-primary"
+            onClick={() => handleRescanLayersClick()}
+          >
+            Check colors
+          </button>
+        )}
+      </section>
+    );
+  };
+
+  const renderColorLintingSummary = () => {
+    if (!loadingColorData && selectionMade) {
+      return (
+        <div className={"color-linting-sumary"}>
           <h3 className="color-linting-summary-heading">
             {colorsWithIssues.length} color issues found
           </h3>
@@ -103,16 +137,38 @@ const ColorLinter = () => {
             )}
           </p>
         </div>
-        <ul className="color-tiles-container">{renderColorIssues()}</ul>
+      );
+    } else {
+      return renderEmptyState();
+    }
+  };
+
+  const noColorIssues = colorsWithIssues?.length === 0;
+
+  const colorLinterContainerClasses = classNames("color-linter-container", {
+    "summary-is-loading": loadingColorData,
+    "summary-is-empty": noColorIssues,
+    "no-selection-made": !selectionMade,
+  });
+
+  return (
+    <>
+      <section className={colorLinterContainerClasses}>
+        {renderColorLintingSummary()}
+        {!loadingColorData && !noColorIssues && (
+          <ul className="color-tiles-container">{renderColorIssues()}</ul>
+        )}
       </section>
-      <footer className="color-linting-footer">
-        <button
-          className="btn btn-primary"
-          onClick={() => handleRescanLayersClick()}
-        >
-          Re-scan colors
-        </button>
-      </footer>
+      {!loadingColorData && selectionMade && (
+        <footer className="color-linting-footer">
+          <button
+            className="btn btn-primary"
+            onClick={() => handleRescanLayersClick()}
+          >
+            Check current selection
+          </button>
+        </footer>
+      )}
     </>
   );
 };
