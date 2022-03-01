@@ -146,7 +146,7 @@ table input[type="radio"] ~ label {
   position: absolute;
 }
 
-table input[type="radio"] ~ label:hovered {
+table input[type="radio"] ~ label:hover {
   cursor: pointer;
 }
 
@@ -644,6 +644,15 @@ input:checked + .slider:before {
   cursor: pointer;
   box-shadow: 0 2px 0 rgb(0 0 0 / 3%), 0 1px 3px rgba(0 0 0 / 1%),
     0 8px 7px rgba(0 0 0 / 2%);
+  position: relative;
+  z-index: 10;
+}
+
+.color-tile-hover-state-disabled.color-tile-container:hover {
+  border: 1px solid rgba(0 0 0 / 18%);
+  transform: translateY(0px);
+  cursor: pointer;
+  box-shadow: none;
 }
 
 .color-tile-container:active {
@@ -662,6 +671,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  position: relative;
 }
 
 .color-tile-heading {
@@ -723,6 +733,11 @@ input:checked + .slider:before {
   text-indent: 200%;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.menu-active .btn-color-tile-menu {
+  background-color: rgba(0 0 0 / 5%);
+  cursor: pointer;
 }
 
 .btn-color-tile-menu:hover {
@@ -821,4 +836,46 @@ input:checked + .slider:before {
   border-top: 1px solid #e5e5e5;
   padding: 16px 24px;
   gap: 8px;
+}
+
+.color-tile-menu {
+  display: none;
+  min-width: 125px;
+  flex-direction: column;
+  position: absolute;
+  top: 20px;
+  right: -7px;
+  z-index: 1000;
+  padding: 8px 0;
+  background-color: #242323;
+  color: #fff;
+  gap: 8px;
+  border-radius: 2px;
+}
+
+.menu-active .color-tile-menu {
+  display: flex;
+}
+
+.color-tile-menu-items {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  list-style-type: none;
+}
+
+.color-tile-menu-item {
+  font-size: 12px;
+  padding: 5px 14px;
+}
+
+.color-tile-menu-item:hover {
+  background-color: #18a0fb;
+}
+
+.color-tile-menu hr {
+  background-color: #414646;
+  height: 1px;
+  border: none;
+  margin: 0;
 }

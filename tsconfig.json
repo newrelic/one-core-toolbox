@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": [],
     "target": "es6",
     "outDir": "dist",
     "jsx": "react",

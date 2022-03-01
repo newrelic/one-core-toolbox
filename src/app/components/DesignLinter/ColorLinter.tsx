@@ -51,10 +51,29 @@ const ColorLinter = () => {
     };
   }, []);
 
+  const ignoreColorIssue: (colorId: string) => void = (colorId) => {
+    const colorToBeRemoved = colorsWithIssues.find((color) => {
+      return color.colorId === colorId;
+    });
+
+    const indexOfColorToBeRemoved = colorsWithIssues.indexOf(colorToBeRemoved);
+    const newColorsWithIssues = [...colorsWithIssues];
+
+    newColorsWithIssues.splice(indexOfColorToBeRemoved, 1);
+
+    setColorsWithIssues(newColorsWithIssues);
+  };
+
   const renderColorIssues = () => {
     if (colorsWithIssues?.length > 0) {
       return colorsWithIssues.map((color, index) => {
-        return <ColorTile colorData={color} key={index} />;
+        return (
+          <ColorTile
+            colorData={color}
+            key={index}
+            ignoreColorIssue={ignoreColorIssue}
+          />
+        );
       });
     }
   };
@@ -71,9 +90,19 @@ const ColorLinter = () => {
             {colorsWithIssues.length} color issues found
           </h3>
           <p className="color-linting-summary-description">
-            To fix these issues, replace each of the colors listed below with a
-            One Core color style. Not sure what that means?{` `}
-            <a href="#">See how</a>.
+            {colorsWithIssues.length ? (
+              <>
+                To fix these issues, replace each of the colors listed below
+                with a One Core color style. Not sure what that means?{` `}
+                <a href="#">See how</a>.
+              </>
+            ) : (
+              <>
+                There are no color issues with the selected layers :). To check
+                for issues in other layers select another layer(s) and click
+                "Re-scan colors".
+              </>
+            )}
           </p>
         </div>
         <ul className="color-tiles-container">{renderColorIssues()}</ul>

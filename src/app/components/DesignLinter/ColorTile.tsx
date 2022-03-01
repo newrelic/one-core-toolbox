@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import chroma from "chroma-js";
+import classNames from "classnames";
 import oneCorePaintStyles from "../../../plugin/oneCorePaintStyles.js";
 require("babel-polyfill");
 
@@ -9,6 +10,7 @@ import "../../styles/ui.css";
 declare function require(path: string): any;
 
 interface colorData {
+  colorId: string;
   layerId: string;
   layerName: string;
   colorType: string;
@@ -17,12 +19,12 @@ interface colorData {
 
 interface props {
   colorData: colorData;
-  key: number;
+  ignoreColorIssue: (colorId) => void;
 }
 
 const ColorTile = (props: props) => {
   const {
-    // colorId,
+    colorId,
     layerId,
     layerName,
     // layerType,
@@ -33,7 +35,13 @@ const ColorTile = (props: props) => {
     colorInHex,
   } = props.colorData;
 
+  const { ignoreColorIssue } = props;
+
   const [isExpanded, setIsExpanded] = useState(false);
+  const [menuActive, setMenuActive] = useState(false);
+  const [menuButtonHovered, setMenuButtonHovered] = useState(false);
+  const [menuHovered, setMenuHovered] = useState(false);
+  const [menuTimer, setMenuTimer] = useState(null);
 
   const handleColorTileClick = (layerId: string) => {
     setIsExpanded(!isExpanded);
@@ -47,6 +55,8 @@ const ColorTile = (props: props) => {
       },
       "*"
     );
+
+    setMenuActive(false);
   };
 
   const truncateLayerName = (layerName: string): string => {
@@ -75,9 +85,9 @@ const ColorTile = (props: props) => {
 
     const closestColorStyles = stylesSortedBySimilarity.slice(0, 4);
 
-    return closestColorStyles.map((colorStyle) => {
+    return closestColorStyles.map((colorStyle, index) => {
       return (
-        <li className="suggested-color-style-list-item">
+        <li className="suggested-color-style-list-item" key={index}>
           <span
             className="suggested-color-style-sample"
             style={{ backgroundColor: colorStyle.color.color.hex }}
@@ -88,16 +98,96 @@ const ColorTile = (props: props) => {
     });
   };
 
+  const handleMenuClick = (e) => {
+    e.stopPropagation();
+    setMenuActive(!menuActive);
+  };
+
+  const handleBtnMenuMouseEnter = () => {
+    setMenuButtonHovered(true);
+    clearTimeout(menuTimer);
+  };
+
+  const handleBtnMenuMouseLeave = () => {
+    setMenuButtonHovered(false);
+
+    setMenuTimer(
+      setTimeout(() => {
+        setMenuActive(false);
+      }, 200)
+    );
+
+    return () => clearTimeout(menuTimer);
+  };
+
+  const handleMenuMouseEnter = () => {
+    setMenuHovered(true);
+    clearTimeout(menuTimer);
+  };
+
+  const handleMenuMouseLeave = () => {
+    setMenuHovered(false);
+
+    setMenuTimer(
+      setTimeout(() => {
+        setMenuActive(false);
+      }, 200)
+    );
+
+    return () => clearTimeout(menuTimer);
+  };
+
+  const handleIgnoreIssueClick = (e) => {
+    e.stopPropagation();
+    ignoreColorIssue(colorId);
+    setMenuActive(false);
+  };
+
+  const colorTileContainerClasses = classNames("color-tile-container", {
+    "menu-active": menuActive,
+    "color-tile-hover-state-disabled": menuButtonHovered || menuHovered,
+  });
+
   return (
     <li
-      className={`color-tile-container ${isExpanded ? "expanded" : ""}`}
-      key={props.key}
+      className={colorTileContainerClasses}
       onClick={() => handleColorTileClick(layerId)}
     >
       <div className="color-tile-header">
         <div className="color-tile-title-section">
           <h4 className="color-tile-heading">Missing One Core Color style</h4>
-          <button className="btn-color-tile-menu">Options</button>
+          <button
+            className="btn-color-tile-menu"
+            onClick={(e) => handleMenuClick(e)}
+            onMouseEnter={() => handleBtnMenuMouseEnter()}
+            onMouseLeave={() => handleBtnMenuMouseLeave()}
+          >
+            Options
+          </button>
+          <div
+            className="color-tile-menu"
+            onMouseEnter={() => handleMenuMouseEnter()}
+            onMouseLeave={() => handleMenuMouseLeave()}
+          >
+            <ul className="color-tile-menu-items">
+              <li
+                className="color-tile-menu-item"
+                onClick={() => handleColorTileClick(layerId)}
+              >
+                Select layer
+              </li>
+              <li
+                className="color-tile-menu-item"
+                onClick={(e) => handleIgnoreIssueClick(e)}
+              >
+                Ignore issue
+              </li>
+            </ul>
+            <hr />
+            <ul className="color-tile-menu-items">
+              <li className="color-tile-menu-item">How to fix?</li>
+            </ul>
+          </div>
         </div>
 
         <ul className="color-tile-meta-list">

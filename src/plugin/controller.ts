@@ -233,14 +233,14 @@ const rgbToHex = (r, g, b) => {
 const pushColorToArray = (layer, colorType: string, array: any[]) => {
     const styleIdType = colorType === 'fills' ? 'fillStyleId' : 'strokeStyleId';
     const isSolidColor = layer?.fills[0]?.type === 'SOLID';
-    const colorIsImage = colorType === 'fill' && layer?.fills[0]?.type === 'IMAGE';
+    const colorIsImage = colorType === 'fills' && layer?.fills[0]?.type === 'IMAGE';
     const colorIsVisible = layer[colorType][0].visible
 
-    const colorInHex = (colorInRGB) => {
-        return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
-    };
-
     if (!colorIsImage && colorIsVisible) {
+        const colorInHex = (colorInRGB) => {
+            return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
+        };
+
         array.push({
             colorId: uuid(), // generat a Unique ID to keep track of colors,
             layerId: layer.layerId,
@@ -268,7 +268,7 @@ const getColorStats = () => {
         return node.type === 'FRAME' || node.type === 'GROUP'
       }
 
-      const relevantLayers = selection.map((selectedLayer) => {
+      const relevantLayers: SceneNode[][] = selection.map((selectedLayer) => {
           // Get all styles in selection that have a color
           // (the output will have a lot of data stored in prototype properites)
 
