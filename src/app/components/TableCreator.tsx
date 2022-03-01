@@ -3,14 +3,14 @@ import { useState, useEffect } from "react";
 import "../styles/ui.css";
 import ColumnConfiguration from "./ColumnConfiguration";
 import DimensionsSelection from "./DimensionsSelection";
-import IconChevronLeft from '../assets/icon-chevron-left.svg';
+import IconChevronLeft from "../assets/icon-chevron-left.svg";
 
 declare function require(path: string): any;
 
 const TableCreator = (props) => {
   const { setActivePlugin } = props;
 
-  const [activeTab] = useState('table-creator');
+  const [activeTab] = useState("table-creator");
   const [activeScreen, setActiveScreen] = useState("DimensionsSelection");
   const [activeCol, setActiveCol] = useState(0);
   const [activeRow, setActiveRow] = useState(0);
@@ -55,9 +55,12 @@ const TableCreator = (props) => {
   useEffect(handleColumnConfiguration, [activeCol]);
 
   const handeGridSelectionInputs = (type) => {
-    const element = event.target as HTMLInputElement
+    const element = event.target as HTMLInputElement;
     let { value, min, max } = element;
-    const calculatedValue = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    const calculatedValue = Math.max(
+      Number(min),
+      Math.min(Number(max), Number(value))
+    );
 
     if (type === "col") {
       setActiveCol(calculatedValue);
@@ -119,28 +122,6 @@ const TableCreator = (props) => {
     }
   };
 
-  // Send user data to monitoring tool
-  React.useEffect(() => {
-    // This is how we read messages sent from the plugin controller
-    window.onmessage = (event) => {
-      const { type, message } = event.data.pluginMessage;
-      if (type === "table-created") {
-        // newrelic is included at the top of ui.html in a
-        // a script tag. Typescript will complain. So...
-        // @ts-ignore
-        newrelic.addPageAction("tableCreated", {
-          "User ID": message.userData.id,
-          "User Name": message.userData.name,
-          "User Avatar": message.userData.photoUrl,
-          "Session ID": message.userData.sessionId,
-          "Column count": message.columnCount,
-          "Row count": message.rowCount,
-          "Column Configuration": message.columnConfiguration,
-        });
-      }
-    };
-  }, []);
-
   // Render the nav tabs in the plug UI
   const renderNavigationTabs = () => {
     const tabs: string[] = ["table-creator"];
@@ -174,9 +155,9 @@ const TableCreator = (props) => {
   return (
     <>
       <ul className="tab-navigation">
-        <li 
-          className="tab-navigation-tab back-tab" 
-          onClick={() => setActivePlugin('home')}
+        <li
+          className="tab-navigation-tab back-tab"
+          onClick={() => setActivePlugin("home")}
         >
           <img src={IconChevronLeft} alt="back button" />
         </li>
@@ -184,7 +165,7 @@ const TableCreator = (props) => {
       </ul>
       {renderTableCreator()}
     </>
-  )
+  );
 };
 
 export default TableCreator;

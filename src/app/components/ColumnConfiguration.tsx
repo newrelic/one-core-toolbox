@@ -11,12 +11,37 @@ const ColumnConfiguration = ({
   columnConfiguration,
   setColumnConfiguration,
 }) => {
-  const [activeColConfigurationScreen, setActiveColConfigurationScreen] = useState(0);
+  const [activeColConfigurationScreen, setActiveColConfigurationScreen] =
+    useState(0);
+
+  // Send user data to monitoring tool
+  React.useEffect(() => {
+    // This is how we read messages sent from the plugin controller
+    window.onmessage = (event) => {
+      const { type, message } = event.data.pluginMessage;
+      if (type === "table-created") {
+        // newrelic is included at the top of ui.html in a
+        // a script tag. Typescript will complain. So...
+        // @ts-ignore
+        newrelic.addPageAction("tableCreated", {
+          "User ID": message.userData.id,
+          "User Name": message.userData.name,
+          "User Avatar": message.userData.photoUrl,
+          "Session ID": message.userData.sessionId,
+          "Column count": message.columnCount,
+          "Row count": message.rowCount,
+          "Column Configuration": message.columnConfiguration,
+        });
+
+        parent.postMessage({ pluginMessage: { type: "close-plugin" } }, "*");
+      }
+    };
+  }, []);
 
   const handleColumnConfigurationUpdate = (attr) => {
     let columnConfigurationArray = [...columnConfiguration];
-    const element = event.target as HTMLInputElement
-    
+    const element = event.target as HTMLInputElement;
+
     columnConfigurationArray[activeColConfigurationScreen][attr] =
       attr !== "multiValue" ? element.value : element.checked;
 
@@ -26,18 +51,21 @@ const ColumnConfiguration = ({
   const handleNavButtonClick = (direction) => {
     if (direction === "previous" && activeColConfigurationScreen !== 0) {
       setActiveColConfigurationScreen(activeColConfigurationScreen - 1);
-    } else if (direction === "next" && activeColConfigurationScreen !== columnConfiguration.length - 1) {
+    } else if (
+      direction === "next" &&
+      activeColConfigurationScreen !== columnConfiguration.length - 1
+    ) {
       setActiveColConfigurationScreen(activeColConfigurationScreen + 1);
     }
   };
 
   const renderColumnNavigation = () => {
     const handleColumnOptionSelection = (e) => {
-      const selectedOption = e.target.options[e.target.options.selectedIndex]
+      const selectedOption = e.target.options[e.target.options.selectedIndex];
 
-      setActiveColConfigurationScreen(parseInt(selectedOption.value) - 1)
-    }
-    
+      setActiveColConfigurationScreen(parseInt(selectedOption.value) - 1);
+    };
+
     return (
       <nav className="column-nav">
         <button
@@ -55,9 +83,9 @@ const ColumnConfiguration = ({
           >
             {[...Array(activeCol).keys()].map((index) => {
               return (
-                <option 
-                  key={index} 
-                  value={index + 1} 
+                <option
+                  key={index}
+                  value={index + 1}
                   className="column-selection-dropdown-option"
                 >
                   {`Column ${index + 1}`}
@@ -70,7 +98,9 @@ const ColumnConfiguration = ({
         <button
           className={"nav-arrow right-nav-arrow"}
           onClick={() => handleNavButtonClick("next")}
-          disabled={activeColConfigurationScreen === columnConfiguration.length - 1}
+          disabled={
+            activeColConfigurationScreen === columnConfiguration.length - 1
+          }
         ></button>
       </nav>
     );
@@ -78,7 +108,8 @@ const ColumnConfiguration = ({
 
   const renderConfigurationBody = () => {
     const multiValueDisabled = () => {
-      const currentCellType = columnConfiguration[activeColConfigurationScreen]["cellType"];
+      const currentCellType =
+        columnConfiguration[activeColConfigurationScreen]["cellType"];
       if (
         currentCellType === "Text" ||
         currentCellType === "text" ||
@@ -120,12 +151,20 @@ const ColumnConfiguration = ({
               className="column-configuration-alignment-input"
               id="column-alignment"
               onChange={() => handleColumnConfigurationUpdate("alignment")}
-              value={columnConfiguration[activeColConfigurationScreen]["alignment"]}
+              value={
+                columnConfiguration[activeColConfigurationScreen]["alignment"]
+              }
             >
-              <option value="left" className="column-configuration-alignment-input-option">
+              <option
+                value="left"
+                className="column-configuration-alignment-input-option"
+              >
                 Left
               </option>
-              <option value="right" className="column-configuration-alignment-input-option">
+              <option
+                value="right"
+                className="column-configuration-alignment-input-option"
+              >
                 Right
               </option>
             </select>
@@ -139,30 +178,56 @@ const ColumnConfiguration = ({
               className="column-configuration-alignment-input"
               id="column-cell-type"
               onChange={() => handleColumnConfigurationUpdate("cellType")}
-              value={columnConfiguration[activeColConfigurationScreen]["cellType"]}
+              value={
+                columnConfiguration[activeColConfigurationScreen]["cellType"]
+              }
             >
-              <option value="text" className="column-configuration-alignment-input-option">
+              <option
+                value="text"
+                className="column-configuration-alignment-input-option"
+              >
                 Text
               </option>
-              <option value="link" className="column-configuration-alignment-input-option">
+              <option
+                value="link"
+                className="column-configuration-alignment-input-option"
+              >
                 Link
               </option>
-              <option value="metric" className="column-configuration-alignment-input-option">
+              <option
+                value="metric"
+                className="column-configuration-alignment-input-option"
+              >
                 Metric
               </option>
-              <option value="entity" className="column-configuration-alignment-input-option">
+              <option
+                value="entity"
+                className="column-configuration-alignment-input-option"
+              >
                 Entity
               </option>
-              <option value="favorite" className="column-configuration-alignment-input-option">
+              <option
+                value="favorite"
+                className="column-configuration-alignment-input-option"
+              >
                 Favorite
               </option>
-              <option value="user" className="column-configuration-alignment-input-option">
+              <option
+                value="user"
+                className="column-configuration-alignment-input-option"
+              >
                 User
               </option>
-              <option value="checkbox" className="column-configuration-alignment-input-option">
+              <option
+                value="checkbox"
+                className="column-configuration-alignment-input-option"
+              >
                 Checkbox
               </option>
-              <option value="actions" className="column-configuration-alignment-input-option">
+              <option
+                value="actions"
+                className="column-configuration-alignment-input-option"
+              >
                 Actions
               </option>
             </select>
@@ -175,7 +240,13 @@ const ColumnConfiguration = ({
               type="checkbox"
               id="column-multi-value"
               onChange={() => handleColumnConfigurationUpdate("multiValue")}
-              checked={!multiValueDisabled() ? columnConfiguration[activeColConfigurationScreen]["multiValue"] : false}
+              checked={
+                !multiValueDisabled()
+                  ? columnConfiguration[activeColConfigurationScreen][
+                      "multiValue"
+                    ]
+                  : false
+              }
               disabled={multiValueDisabled()}
             />
             <span className="slider round"></span>
@@ -191,7 +262,10 @@ const ColumnConfiguration = ({
         <button className="btn" onClick={goToDimensionsSelection}>
           Back
         </button>
-        <button className="btn btn-primary btn-create-table" onClick={createTable}>
+        <button
+          className="btn btn-primary btn-create-table"
+          onClick={createTable}
+        >
           Create table
         </button>
       </div>

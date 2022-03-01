@@ -192,7 +192,9 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: "table-created", message: tableData });
 
     figma.notify("Table created ✅");
+  }
 
+  if (msg.type === 'close-plugin') {
     figma.closePlugin();
   }
 
