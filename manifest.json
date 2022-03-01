@@ -8,6 +8,5 @@
     "figma",
     "figjam"
   ],
-  "permissions": ["currentuser"],
-  "menu": [{"name": "Table creator", "command": "table"}]
+  "permissions": ["currentuser"]
 }
