@@ -234,9 +234,10 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
     const styleIdType = colorType === 'fills' ? 'fillStyleId' : 'strokeStyleId';
     const isSolidColor = layer?.fills[0]?.type === 'SOLID';
     const colorIsImage = colorType === 'fills' && layer?.fills[0]?.type === 'IMAGE';
+    const colorIsGradient = colorType === 'fills' && layer?.fills[0]?.type.includes('GRADIENT')
     const colorIsVisible = layer[colorType][0].visible
 
-    if (!colorIsImage && colorIsVisible && !layer.isChildOfIconWithFill) {
+    if (!colorIsImage && !colorIsGradient && colorIsVisible && !layer.isChildOfIconWithFill) {
         const colorInHex = (colorInRGB) => {
             return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
         };
