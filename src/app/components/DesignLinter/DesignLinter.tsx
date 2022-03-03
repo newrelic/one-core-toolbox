@@ -1,8 +1,7 @@
 import * as React from "react";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import "../../styles/ui.css";
 import ColorLinter from "./ColorLinter";
-import { PluginContext } from "../PluginContext";
 import LanguageLinterPlugin from "./LanguageLinterPlugin";
 import IconChevronLeft from "../../assets/icon-chevron-left.svg";
 

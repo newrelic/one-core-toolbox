@@ -55,7 +55,10 @@ const ColorLinter = () => {
 
   const handleRescanLayersClick = () => {
     setLoadingColorData(true);
-    parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
+    parent.postMessage(
+      { pluginMessage: { type: "request-selection", message: "colors" } },
+      "*"
+    );
   };
 
   const renderEmptyState = () => {

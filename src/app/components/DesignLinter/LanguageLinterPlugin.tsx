@@ -14,16 +14,14 @@ const LanguageLinterPlugin = () => {
   const [sampleText, setSampleText] = useState("");
   const [maxTextIndex, setMaxTextIndex] = useState(0);
 
-  const { state, functions } = useContext(PluginContext);
+  const { state } = useContext(PluginContext);
   const {
     selectedTextLayers,
     sampleTextIndex,
     setSampleTextIndex,
     localCustomDictionary,
     localCustomDictionaryInitialized,
-    setLanguageLintingReport,
   } = state;
-  const { triggerNewRelicCustomEvent } = functions;
 
   // Get the selected layer when the plugin loads
   // This is how we read messages sent from the plugin controller

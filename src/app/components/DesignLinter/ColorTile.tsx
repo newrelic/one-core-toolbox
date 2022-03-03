@@ -1,8 +1,7 @@
 import * as React from "react";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import chroma from "chroma-js";
 import classNames from "classnames";
-import { PluginContext } from "../PluginContext";
 import oneCorePaintStyles from "../../../plugin/oneCorePaintStyles.js";
 require("babel-polyfill");
 
@@ -35,8 +34,6 @@ const ColorTile = (props: props) => {
     colorType,
     colorInHex,
   } = props.colorData;
-
-  const message = useContext(PluginContext);
 
   const { ignoreColorIssue } = props;
 
