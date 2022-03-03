@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useState } from "react";
+import { useContext } from "react";
+import { PluginContext } from "../PluginContext";
 import ColorTile from "./ColorTile";
 import classNames from "classnames";
 require("babel-polyfill");
@@ -7,54 +8,22 @@ import "../../styles/ui.css";
 
 declare function require(path: string): any;
 
-interface rgbFloat {
-  r: number;
-  g: number;
-  b: number;
-}
-interface color {
-  blendMode: string;
-  color: rgbFloat;
-  opacity: number;
-  type: string;
-  visible: boolean;
-}
-interface colorList {
-  color: color[];
-  colorId: string;
-  colorInHex: string;
-  colorStyleId: string;
-  colorType: string;
-  hasColorStyle: boolean;
-  layerId: string;
-  layerName: string;
-  layerType: string;
-  visible: boolean;
-}
-
 const ColorLinter = () => {
-  const [colorsWithIssues, setColorsWithIssues] = useState<Array<colorList>>(
-    []
-  );
-  const [loadingColorData, setLoadingColorData] = useState<Boolean>(false);
-  const [selectionMade, setSelectionMade] = useState<Boolean>(false);
+  const { state } = useContext(PluginContext);
+  const {
+    colorsWithIssues,
+    setColorsWithIssues,
+    loadingColorData,
+    setLoadingColorData,
+    selectionMade,
+  } = state;
 
   React.useEffect(() => {
     setLoadingColorData(true);
-    parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
-
-    // This is how we read messages sent from the plugin controller
-    window.onmessage = (event) => {
-      const { type, message } = event.data.pluginMessage;
-
-      if (type === "color-stats") {
-        setLoadingColorData(false);
-        setColorsWithIssues(
-          message?.colorStats?.colorsNotUsingOneCoreColorStyle
-        );
-        setSelectionMade(message?.selectionMade);
-      }
-    };
+    parent.postMessage(
+      { pluginMessage: { type: "request-selection", message: "colors" } },
+      "*"
+    );
   }, []);
 
   const ignoreColorIssue: (colorId: string) => void = (colorId) => {

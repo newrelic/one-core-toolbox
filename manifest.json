@@ -7,14 +7,15 @@
   "editorType": [
     "figma"
   ],
+  "enablePrivatePluginApi": true,
   "permissions": ["currentuser"],
   "menu": [
-    {"name": "Home", "command": "home"},
+    {"name": "Home", "command": "open-home"},
     {"separator": true},
-    {"name": "Table creator", "command": "table"},
+    {"name": "Table creator", "command": "open-table-creator"},
     {"name": "Design linter", "menu": [
-      {"name": "Language", "command": "language"},
-      {"name": "Color", "command": "color"}
+      {"name": "Language", "command": "open-language-linter"},
+      {"name": "Color", "command": "open-color-linter"}
     ]}
   ]
 }

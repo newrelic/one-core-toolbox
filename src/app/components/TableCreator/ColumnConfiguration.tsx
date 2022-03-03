@@ -14,31 +14,6 @@ const ColumnConfiguration = ({
   const [activeColConfigurationScreen, setActiveColConfigurationScreen] =
     useState(0);
 
-  // Send user data to monitoring tool
-  React.useEffect(() => {
-    // This is how we read messages sent from the plugin controller
-    window.onmessage = (event) => {
-      const { type, message } = event.data.pluginMessage;
-      debugger;
-      if (type === "table-created") {
-        debugger;
-        console.log(newrelic);
-        // newrelic is included at the top of ui.html in a
-        // a script tag. Typescript will complain. So...
-        // @ts-ignore
-        newrelic.addPageAction("tableCreated", {
-          "User ID": message.userData.id,
-          "User Name": message.userData.name,
-          "User Avatar": message.userData.photoUrl,
-          "Session ID": message.userData.sessionId,
-          "Column count": message.columnCount,
-          "Row count": message.rowCount,
-          "Column Configuration": message.columnConfiguration,
-        });
-      }
-    };
-  }, []);
-
   const handleColumnConfigurationUpdate = (attr) => {
     let columnConfigurationArray = [...columnConfiguration];
     const element = event.target as HTMLInputElement;

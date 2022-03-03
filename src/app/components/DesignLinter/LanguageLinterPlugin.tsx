@@ -1,59 +1,55 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
-import LanguageLinter, { lintMyText } from "new-relic-language-linter"
+import { useState, useEffect, useContext } from "react";
+import LanguageLinter, { lintMyText } from "new-relic-language-linter";
+import { PluginContext } from "../PluginContext";
 require("babel-polyfill");
 import "../../styles/ui.css";
 
 declare function require(path: string): any;
 
 const LanguageLinterPlugin = () => {
-  const [selectedTextLayers, setSelectedTextLayers] = useState([]);
-  const [textLayersWithSuggestions, setTextLayersWithSuggestions] = useState([]);
-  const [sampleText, setSampleText] = useState('');
-  const [sampleTextIndex, setSampleTextIndex] = useState(0);
+  const [textLayersWithSuggestions, setTextLayersWithSuggestions] = useState(
+    []
+  );
+  const [sampleText, setSampleText] = useState("");
   const [maxTextIndex, setMaxTextIndex] = useState(0);
-  const [localCustomDictionary, setLocalCustomDictionary] = useState([]);
-  const [localCustomDictionaryInitialized, setLocalCustomDictionaryInitialized] = useState(false);
+
+  const { state, functions } = useContext(PluginContext);
+  const {
+    selectedTextLayers,
+    sampleTextIndex,
+    setSampleTextIndex,
+    localCustomDictionary,
+    localCustomDictionaryInitialized,
+    setLanguageLintingReport,
+  } = state;
+  const { triggerNewRelicCustomEvent } = functions;
 
   // Get the selected layer when the plugin loads
   // This is how we read messages sent from the plugin controller
   useEffect(() => {
-    parent.postMessage({ pluginMessage: { type: "request-local-custom-dictionary" }, },"*");
-    parent.postMessage({ pluginMessage: { type: "request-selection" }, },"*");
-
-    window.onmessage = async (event) => {
-      const { type, message } = event.data.pluginMessage;
-
-      if (type === "selection-change") {
-        // reset the index of the sample text to 0
-        setSampleTextIndex(0)
-
-        // Filter out text layers that have no suggestions
-        setSelectedTextLayers(message.textLayers)
-      } else if (type === 'local-custom-dictionary-retrieved') {
-        console.log(`client storage is: ${JSON.stringify(message)}`)
-        setLocalCustomDictionaryInitialized(true)
-        setLocalCustomDictionary(message)
-      }
-    };
-
+    parent.postMessage(
+      { pluginMessage: { type: "request-local-custom-dictionary" } },
+      "*"
+    );
+    parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
   }, []);
 
   // when `selectedTextLayers` is updated update the sample text
   useEffect(() => {
     if (textLayersWithSuggestions.length > 0) {
-      setSampleText(textLayersWithSuggestions[0].characters)
-      setMaxTextIndex(textLayersWithSuggestions.length)
+      setSampleText(textLayersWithSuggestions[0].characters);
+      setMaxTextIndex(textLayersWithSuggestions.length);
     } else {
-      setSampleText('')
-      setMaxTextIndex(0)
+      setSampleText("");
+      setMaxTextIndex(0);
     }
   }, [textLayersWithSuggestions]);
 
   // Every time the `sampleText` gets updated so that we can
   // scroll and zoom the active layer into the center of the screen
   useEffect(() => {
-    if (sampleText !== '') {
+    if (sampleText !== "") {
       parent.postMessage(
         {
           pluginMessage: {
@@ -62,19 +58,25 @@ const LanguageLinterPlugin = () => {
           },
         },
         "*"
-      );  
+      );
     }
-  }, [sampleText])
+  }, [sampleText]);
 
   useEffect(() => {
     if (localCustomDictionaryInitialized && selectedTextLayers.length > 0) {
-      getTextLayersWithSuggestions()
-    } else if (localCustomDictionaryInitialized && selectedTextLayers.length === 0 ) {
-      setSampleText('')
+      getTextLayersWithSuggestions();
+    } else if (
+      localCustomDictionaryInitialized &&
+      selectedTextLayers.length === 0
+    ) {
+      setSampleText("");
     } else {
-      parent.postMessage({ pluginMessage: { type: "request-local-custom-dictionary" }, },"*");
+      parent.postMessage(
+        { pluginMessage: { type: "request-local-custom-dictionary" } },
+        "*"
+      );
     }
-  }, [selectedTextLayers, localCustomDictionary])
+  }, [selectedTextLayers, localCustomDictionary]);
 
   const updateSourceText = (updatedText) => {
     parent.postMessage(
@@ -88,65 +90,99 @@ const LanguageLinterPlugin = () => {
       "*"
     );
 
-    setSampleText(updatedText)
-  }
+    setSampleText(updatedText);
+  };
 
   const handleTextLayerNavigation = (direction) => {
     // Which direction does the user want to navigate?
     if (direction === "previous") {
       setSampleText(textLayersWithSuggestions[sampleTextIndex - 1].characters);
-      setSampleTextIndex(sampleTextIndex - 1)
+      setSampleTextIndex(sampleTextIndex - 1);
     } else if (direction === "next") {
       setSampleText(textLayersWithSuggestions[sampleTextIndex + 1].characters);
-      setSampleTextIndex(sampleTextIndex + 1)
+      setSampleTextIndex(sampleTextIndex + 1);
     }
-  }
+  };
 
   const asyncFilter = async (arr, callback) => {
-    const fail = Symbol()
-    return (await Promise.all(arr.map(async item => (await callback(item)) ? item : fail))).filter(i=>i!==fail)
-  }
+    const fail = Symbol();
+    return (
+      await Promise.all(
+        arr.map(async (item) => ((await callback(item)) ? item : fail))
+      )
+    ).filter((i) => i !== fail);
+  };
 
   const getTextLayersWithSuggestions = async () => {
-    const layersWithSuggestions = await asyncFilter(selectedTextLayers, async item => {
-      let report: any = ''
+    const layersWithSuggestions = await asyncFilter(
+      selectedTextLayers,
+      async (item) => {
+        let report: any = "";
 
-      await Promise.resolve(lintMyText(item.characters, localCustomDictionary)).then(result => report = result)
-      return !!report.messages[0]?.message
-    })
+        await Promise.resolve(
+          lintMyText(item.characters, localCustomDictionary)
+        ).then((result) => (report = result));
 
-    setTextLayersWithSuggestions(layersWithSuggestions)
-  }
+        if (report.messages.length > 0) {
+          const reportWithEnumerableProps = JSON.parse(
+            JSON.stringify(report.messages)
+          );
+
+          const minimalReport = reportWithEnumerableProps.map((message) => ({
+            actual: message.actual,
+            expected: message.expected.slice(0, 3),
+            rule: message.source,
+          }));
+
+          parent.postMessage(
+            {
+              pluginMessage: {
+                type: "text-linted",
+                minimalReport,
+                fullReport: reportWithEnumerableProps,
+              },
+            },
+            "*"
+          );
+        }
+        return !!report.messages[0]?.message;
+      }
+    );
+
+    setTextLayersWithSuggestions(layersWithSuggestions);
+  };
 
   // @ts-ignore
   const addToDictionary = (wordToAdd, suggestionId) => {
-    debugger
-    parent.postMessage({ 
-      pluginMessage: { 
-        type: "add-to-dictionary",
-        wordToAdd: wordToAdd
-      }, 
-    },"*");
-  }
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "add-to-dictionary",
+          wordToAdd: wordToAdd,
+        },
+      },
+      "*"
+    );
+  };
 
   const provideSampleText = () => {
-    const layerIsSelected = selectedTextLayers.length > 0
-    const suggestionsAvailable = textLayersWithSuggestions.length > 0
+    const layerIsSelected = selectedTextLayers.length > 0;
+    const suggestionsAvailable = textLayersWithSuggestions.length > 0;
 
     if (!layerIsSelected) {
-      return ''
+      return "";
     } else if (layerIsSelected && !suggestionsAvailable) {
-        // LanguageLinter will show a "no issue found" empty state
-        // if their sampleText provided to it has no issues. Since
-        // None of our layers have issues, we'll trigger that
-        // empty state.
-      return 'Hello, World'
+      // LanguageLinter will show a "no issue found" empty state
+      // if their sampleText provided to it has no issues. Since
+      // None of our layers have issues, we'll trigger that
+      // empty state.
+      return "Hello, World";
     } else {
-      return sampleText
+      return sampleText;
     }
-  }
+  };
 
-  return(
+  return (
     <>
       <div className="language-linter-container">
         <nav className="text-layer-nav">
@@ -179,7 +215,7 @@ const LanguageLinterPlugin = () => {
             disabled={sampleTextIndex + 1 >= maxTextIndex}
           ></button>
         </nav>
-        <LanguageLinter 
+        <LanguageLinter
           // LanguageLinter will show a "no issue found" empty state
           // if their sampleText provided to it has no issues. Since
           // None of our layers have issues, we'll trigger that

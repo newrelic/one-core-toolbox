@@ -1,26 +1,32 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "../../styles/ui.css";
 import ColorLinter from "./ColorLinter";
+import { PluginContext } from "../PluginContext";
 import LanguageLinterPlugin from "./LanguageLinterPlugin";
-import IconChevronLeft from '../../assets/icon-chevron-left.svg';
+import IconChevronLeft from "../../assets/icon-chevron-left.svg";
 
 declare function require(path: string): any;
 
 interface props {
-  setActivePlugin: (tab: string) => void,
-  openTo: string,
+  setActivePlugin: (tab: string) => void;
+  openTo: string;
 }
 
 const DesignLinter = (props: props) => {
-  const { setActivePlugin, openTo } = props
-
+  const { setActivePlugin, openTo } = props;
   const [activeTab, setActiveTab] = useState(openTo);
-  // const [activeScreen, setActiveScreen] = useState(openTo);
+
+  const handleTabClick = (nameOfTab: string) => {
+    const tabAsSingleWord = nameOfTab.split("-")[0];
+
+    setActiveTab(tabAsSingleWord);
+    setActivePlugin(nameOfTab);
+  };
 
   // Render the nav tabs in the plugin UI
   const renderNavigationTabs = () => {
-    const tabs: string[] = ["language", "color"];
+    const tabs: string[] = ["language-linter", "color-linter"];
 
     // for each tab in the above array
     return tabs.map((tab, index) => {
@@ -28,10 +34,10 @@ const DesignLinter = (props: props) => {
       let tabClassesOutput = tabClasses.join(" ");
       // create the label from the value of `tab`
       let tabLabel =
-        tab.charAt(0).toUpperCase() + tab.split("-").join(" ").substring(1);
+        tab.charAt(0).toUpperCase() + tab.split("-")[0].substring(1);
 
       // If it's the active tab, apply the class "active" to it
-      if (activeTab === tab) {
+      if (activeTab + "-linter" === tab) {
         tabClasses.push("active");
         tabClassesOutput = tabClasses.join(" ");
       }
@@ -39,7 +45,7 @@ const DesignLinter = (props: props) => {
       return (
         <li
           className={tabClassesOutput}
-          onClick={() => setActiveTab(tab)}
+          onClick={() => handleTabClick(tab)}
           key={index}
         >
           {tabLabel}
@@ -49,20 +55,20 @@ const DesignLinter = (props: props) => {
   };
 
   const renderDesignLinter = () => {
-    switch(activeTab) {
-      case 'language':
-        return <LanguageLinterPlugin />
-      case 'color':
-        return <ColorLinter />
+    switch (activeTab) {
+      case "language":
+        return <LanguageLinterPlugin />;
+      case "color":
+        return <ColorLinter />;
     }
-  }
+  };
 
   return (
     <>
       <ul className="tab-navigation">
-        <li 
-          className="tab-navigation-tab back-tab" 
-          onClick={() => setActivePlugin('home')}
+        <li
+          className="tab-navigation-tab back-tab"
+          onClick={() => setActivePlugin("home")}
         >
           <img src={IconChevronLeft} alt="back button" />
         </li>
@@ -70,7 +76,7 @@ const DesignLinter = (props: props) => {
       </ul>
       {renderDesignLinter()}
     </>
-  )
+  );
 };
 
 export default DesignLinter;

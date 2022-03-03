@@ -5,20 +5,43 @@ import oneCorePaintStyles from './oneCorePaintStyles.js';
 
 figma.showUI(__html__, { width: 300, height: 448 });
 
+// Used to send a custom event to New Relic
+let customEventData = {
+  fileName: figma.currentPage.parent.name,
+  fileKey: figma.fileKey,
+  // setting them in title case because that's how
+  // I did it orginally and though I regret it,
+  // I don't want to lose track of historical data
+  "User Name": figma.currentUser.name,
+  "User Avatar": figma.currentUser.photoUrl,
+  "User ID": figma.currentUser.id,
+  "Session ID": figma.currentUser.sessionId,
+};
+
 // handle submenu navigation
+const navigateTo = (screen: string) => {
+  figma.ui.postMessage({ type: "figma-command", message: {
+      message: screen,
+      ...customEventData
+    } 
+  });
+
+  console.log(`navigateTo('${screen}') run`);
+}
+
 switch (figma.command) {
-  case "home":
-    figma.ui.postMessage({ type: "figma-command", message: "open-home" });
+  case "open-home":
+    navigateTo('open-home')
     break;
-  case "table":
-    figma.ui.postMessage({ type: "figma-command", message: "open-table-creator" });
+  case "open-table-creator":
+    navigateTo('open-table-creator')
     break;
-  case "language":
-    figma.ui.postMessage({ type: "figma-command", message: "open-language-linter" });
+  case "open-language-linter":
+    navigateTo('open-language-linter')
     figma.ui.resize(475, 500)
     break;
-  case "color":
-    figma.ui.postMessage({ type: "figma-command", message: "open-color-linter" });
+  case "open-color-linter":
+    navigateTo('open-color-linter')
     figma.ui.resize(475, 500)
     break;
 }
@@ -142,10 +165,12 @@ const createTable = async (msg) => {
   });
   
   let tableData = {
-    userData: figma.currentUser, 
-    columnConfiguration: msg.columnConfiguration,
-    columnCount: msg.columnConfiguration.length,
-    rowCount: msg.rows
+    fileName: figma.currentPage.parent.name,
+    fileKey: figma.fileKey,
+    "Column count": msg.columnConfiguration.length,
+    "Row count": msg.rows,
+    "Column Configuration": msg.columnConfiguration,
+    ...customEventData,
   };
 
   figma.ui.postMessage({ type: "table-created", message: tableData });
@@ -307,7 +332,6 @@ const getColorStats = () => {
           }
       });
 
-      console.log(`relevantLayers is `, relevantLayers);
 
       let output = relevantLayers.flat()
       output = output.filter(layer => isVisibleNode(layer))
@@ -442,9 +466,7 @@ const getColorStats = () => {
       2
   )}%`;
 
-  const almostAllColors = [...colorsUsingOneCoreStyle, ...colorsNotUsingOneCoreColorStyle];
   const idsOfAllInstancesOfColor = allInstancesOfColor.map((color) => color.colorId);
-  const idsOfAlmostAllColors = almostAllColors.map((color) => color.colorId);
 
   const colorStats = {
       allInstancesOfColor: allInstancesOfColor,
@@ -452,9 +474,7 @@ const getColorStats = () => {
       colorsUsingOneCoreStyle: colorsUsingOneCoreStyle,
       colorsNotUsingOneCoreColorStyle: colorsNotUsingOneCoreColorStyle,
       oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
-      almostAllColors: almostAllColors,
       idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
-      idsOfAlmostAllColors: idsOfAlmostAllColors,
   };
 
   return colorStats
@@ -470,21 +490,36 @@ const selectAndZoomToLayer = (layerId: string) => {
 // ==============================================================
 // Receiving messages sent from the UI
 // ==============================================================
+
 figma.ui.onmessage = async (msg) => {
-  /*-- Table creator messages --*/
+  /*-- Handle tab navigation messages --*/
   if (msg.type === "navigate-to-tab") {
     switch (msg.tabClicked) {
       case "home":
+        figma.ui.resize(300, 448)
+        navigateTo('open-home')
+        break;
       case "table-creator":
         figma.ui.resize(300, 448)
+        navigateTo('open-table-creator')
         break;
       case "language-linter":
         sendCurrentTextSelection()
         figma.ui.resize(475, 500)
+        navigateTo('open-language-linter')
+        break;
+      case "color-linter":
+        figma.ui.resize(475, 500)
+        navigateTo('open-color-linter')
         break;
     }
   }
 
+  if (msg.type === 'close-plugin') {
+    figma.closePlugin();
+  }
+        
+  /*-- Table creator messages --*/
   if (msg.type === "create-table") {
     createTable(msg);
   }
@@ -492,13 +527,17 @@ figma.ui.onmessage = async (msg) => {
   /*-- Language linter messages --*/
   if (msg.type === 'request-selection') {
     sendCurrentTextSelection();
-    figma.ui.postMessage({
-        type: 'color-stats',
-        message: {
-          colorStats: getColorStats(),
-          selectionMade: figma.currentPage.selection.length > 0
-        },
-    });
+
+    if (msg.message === 'colors') {
+      figma.ui.postMessage({
+          type: 'color-stats',
+          message: {
+            ...customEventData,
+            colorStats: getColorStats(),
+            selectionMade: figma.currentPage.selection.length > 0
+          },
+      });
+    }
   }
 
   if (msg.type === 'request-local-custom-dictionary') {
@@ -547,6 +586,14 @@ figma.ui.onmessage = async (msg) => {
     activeTextLayer.insertCharacters(0, msg.updatedText)
 
     figma.ui.postMessage({ type: "source-text-updated", message: msg.updatedText });
+  }
+
+  if (msg.type === 'text-linted') {
+    figma.ui.postMessage({ type: "text-linted", message: {
+      customEventData,
+      minimalReport: msg.minimalReport,
+      fullReport: msg.fullReport
+    } });
   }
 
   /*-- Color linter messages --*/
