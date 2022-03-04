@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
+import isEqual from "lodash.isequal";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
 require("babel-polyfill");
@@ -13,6 +14,7 @@ const LanguageLinterPlugin = () => {
   );
   const [sampleText, setSampleText] = useState("");
   const [maxTextIndex, setMaxTextIndex] = useState(0);
+  const [selectionHasChanged, setSelectionHasChanged] = useState(false);
 
   const { state } = useContext(PluginContext);
   const {
@@ -21,6 +23,8 @@ const LanguageLinterPlugin = () => {
     setSampleTextIndex,
     localCustomDictionary,
     localCustomDictionaryInitialized,
+    currentSelection,
+    currentLayersLintedForLanguage,
   } = state;
 
   // Get the selected layer when the plugin loads
@@ -30,7 +34,8 @@ const LanguageLinterPlugin = () => {
       { pluginMessage: { type: "request-local-custom-dictionary" } },
       "*"
     );
-    parent.postMessage({ pluginMessage: { type: "request-selection" } }, "*");
+    setSelectionHasChanged(false);
+    parent.postMessage({ pluginMessage: { type: "run-language-linter" } }, "*");
   }, []);
 
   // when `selectedTextLayers` is updated update the sample text
@@ -61,6 +66,7 @@ const LanguageLinterPlugin = () => {
   }, [sampleText]);
 
   useEffect(() => {
+    console.log("useEffect fired");
     if (localCustomDictionaryInitialized && selectedTextLayers.length > 0) {
       getTextLayersWithSuggestions();
     } else if (
@@ -75,6 +81,20 @@ const LanguageLinterPlugin = () => {
       );
     }
   }, [selectedTextLayers, localCustomDictionary]);
+
+  useEffect(() => {
+    if (
+      !isEqual(currentSelection, currentLayersLintedForLanguage) &&
+      currentLayersLintedForLanguage
+    ) {
+      setSelectionHasChanged(true);
+    }
+  }, [currentSelection, currentLayersLintedForLanguage]);
+
+  const lintSelectedLayers = () => {
+    setSelectionHasChanged(false);
+    parent.postMessage({ pluginMessage: { type: "run-language-linter" } }, "*");
+  };
 
   const updateSourceText = (updatedText) => {
     parent.postMessage(
@@ -224,6 +244,16 @@ const LanguageLinterPlugin = () => {
           customDictionary={localCustomDictionary}
           addToDictionary={addToDictionary}
         />
+        {selectionHasChanged && (
+          <footer className="color-linting-footer">
+            <button
+              className="btn btn-primary"
+              onClick={() => lintSelectedLayers()}
+            >
+              Check current selection
+            </button>
+          </footer>
+        )}
       </div>
     </>
   );

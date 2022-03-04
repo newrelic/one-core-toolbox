@@ -24,8 +24,6 @@ const navigateTo = (screen: string) => {
       ...customEventData
     } 
   });
-
-  console.log(`navigateTo('${screen}') run`);
 }
 
 switch (figma.command) {
@@ -218,17 +216,12 @@ const sendCurrentTextSelection = () => {
     }
   })
 
-  // TODO!: 
-  // - [ ] If there are multiple layers selected. Discard the layers without errors.
-  // - [ ] If a layer is updated while it's open, check it for errors and add it 
-  //       to the navigable layers if necessary
-
   // send the selection array to the UI
   return figma.ui.postMessage({ 
-    type: "selection-change", 
+    type: "new-text-selection", 
     message: {
       textLayers, 
-      selectedLayer: selection
+      selectedLayers: selection
     } 
   });
 }
@@ -319,7 +312,6 @@ const getColorStats = () => {
           }
 
           // return the layer if it fit's the criteria of isRelevantLayer()
-          console.log(`'findAll' in selectedLayer ===`, 'findAll' in selectedLayer);
           const selectedLayerHasChildren = 
             'findAll' in selectedLayer && 
             selectedLayer?.children?.length > 0
@@ -327,7 +319,6 @@ const getColorStats = () => {
           if (selectedLayerHasChildren) {
             // if it has children
             outputForLayersWithChildren = selectedLayer.findAll((n) => isRelevantLayer(n));
-            console.log(selectedLayer);
             return [...outputForLayersWithChildren];
           } else if (isRelevantLayer(selectedLayer)) {
             // if it's a single layer
@@ -520,6 +511,13 @@ figma.ui.onmessage = async (msg) => {
     }
   }
 
+  if (msg.type === "initialize-selection") {
+    figma.ui.postMessage({ 
+      type: "initial-selection", 
+      message: figma.currentPage.selection
+    });
+  }
+
   if (msg.type === 'close-plugin') {
     figma.closePlugin();
   }
@@ -530,19 +528,8 @@ figma.ui.onmessage = async (msg) => {
   }
 
   /*-- Language linter messages --*/
-  if (msg.type === 'request-selection') {
+  if (msg.type === 'run-language-linter') {
     sendCurrentTextSelection();
-
-    if (msg.message === 'colors') {
-      figma.ui.postMessage({
-          type: 'color-stats',
-          message: {
-            ...customEventData,
-            colorStats: getColorStats(),
-            selectionMade: figma.currentPage.selection.length > 0
-          },
-      });
-    }
   }
 
   if (msg.type === 'request-local-custom-dictionary') {
@@ -571,8 +558,7 @@ figma.ui.onmessage = async (msg) => {
 
   // scroll and zoom the active layer into the center of the screen
   if (msg.type === 'sample-text-changed') {
-    const activeTextLayer = figma.getNodeById(msg.activeNodeId)
-    figma.viewport.scrollAndZoomIntoView([activeTextLayer])
+    selectAndZoomToLayer(msg.activeNodeId)
   }
 
   if (msg.type === 'update-source-text') {
@@ -602,12 +588,31 @@ figma.ui.onmessage = async (msg) => {
   }
 
   /*-- Color linter messages --*/
+  if (msg.type === 'run-color-linter') {
+    figma.ui.postMessage({
+        type: 'color-stats',
+        message: {
+          ...customEventData,
+          colorStats: getColorStats(),
+          selectionMade: figma.currentPage.selection.length > 0
+        },
+    });
+  }
+  
   if (msg.type === 'select-layer') {
     selectAndZoomToLayer(msg.layerId);
   }
 };
 
+// ==============================================================
+// Figma Events
+// https://www.figma.com/plugin-docs/api/properties/figma-on
+// ==============================================================
 figma.on("selectionchange", () => {
-  console.log('selectionchange was fired');
-  sendCurrentTextSelection()
+  console.log('selectionchange event was fired');
+  
+  figma.ui.postMessage({ 
+    type: "selection-changed", 
+    message: figma.currentPage.selection 
+  });
 })

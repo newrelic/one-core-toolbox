@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
 import { PluginContext } from "./PluginContext";
@@ -48,6 +49,10 @@ const App = ({}) => {
   );
   const [loadingColorData, setLoadingColorData] = useState<Boolean>(false);
   const [selectionMade, setSelectionMade] = useState<Boolean>(false);
+  const [currentSelection, setCurrentSelection] = useState();
+  const [incomingSelection, setIncomingSelection] = useState();
+  const [currentLayersLintedForLanguage, setCurrentLayersLintedForLanguage] =
+    useState();
 
   const triggerNewRelicCustomEvent = (
     eventName: string,
@@ -57,16 +62,21 @@ const App = ({}) => {
     // a script tag. Typescript will complain. So...
     // @ts-ignore
     newrelic.addPageAction(eventName, customData);
-    console.log("custom event posted", eventName);
+    // console.log("custom event posted", eventName);
   };
 
-  // Handle submenu navigation: Part 1
-  // When a figma command is sent, store it's contents in state
+  // Listen for messages from controller
   useEffect(() => {
+    parent.postMessage(
+      { pluginMessage: { type: "initialize-selection" } },
+      "*"
+    );
+
     window.onmessage = (event) => {
       const { type, message } = event.data.pluginMessage;
 
       switch (type) {
+        // Navigation
         case "figma-command":
           triggerNewRelicCustomEvent(
             `OneCoreToolbox: ${message.message}`,
@@ -74,16 +84,26 @@ const App = ({}) => {
           );
           setLatestFigmaCommand(message.message);
           break;
+        // Keep selection updated (used by several plugins)
+        case "initial-selection":
+          setCurrentSelection(message);
+          break;
+        case "selection-changed":
+          setIncomingSelection(message);
+          break;
+        // Table creator
         case "table-created":
           triggerNewRelicCustomEvent("OneCoreToolbox: table-created", message);
           parent.postMessage({ pluginMessage: { type: "close-plugin" } }, "*");
           break;
-        case "selection-change":
+        // Language linter
+        case "new-text-selection":
           // reset the index of the sample text to 0
           setSampleTextIndex(0);
 
           // Filter out text layers that have no suggestions
           setSelectedTextLayers(message.textLayers);
+          setCurrentLayersLintedForLanguage(message.selectedLayers);
           break;
         case "text-linted":
           triggerNewRelicCustomEvent("OneCoreToolbox: language-linted", {
@@ -102,10 +122,10 @@ const App = ({}) => {
           });
           break;
         case "local-custom-dictionary-retrieved":
-          console.log(`client storage is: ${JSON.stringify(message)}`);
           setLocalCustomDictionaryInitialized(true);
           setLocalCustomDictionary(message);
           break;
+        // Color linter
         case "color-stats":
           setLoadingColorData(false);
           setColorsWithIssues(
@@ -149,6 +169,14 @@ const App = ({}) => {
       }
     }
   }, [latestFigmaCommand]);
+
+  useEffect(() => {
+    if (currentSelection && incomingSelection) {
+      if (!isEqual(currentSelection, incomingSelection)) {
+        setCurrentSelection(incomingSelection);
+      }
+    }
+  }, [incomingSelection]);
 
   const handlePluginNavigation = (destination) => {
     setActivePlugin(destination);
@@ -208,6 +236,9 @@ const App = ({}) => {
     setLoadingColorData,
     selectionMade,
     setSelectionMade,
+    currentSelection,
+    incomingSelection,
+    currentLayersLintedForLanguage,
   };
 
   return (

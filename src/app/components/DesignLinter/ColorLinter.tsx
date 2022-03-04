@@ -20,10 +20,7 @@ const ColorLinter = () => {
 
   React.useEffect(() => {
     setLoadingColorData(true);
-    parent.postMessage(
-      { pluginMessage: { type: "request-selection", message: "colors" } },
-      "*"
-    );
+    parent.postMessage({ pluginMessage: { type: "run-color-linter" } }, "*");
   }, []);
 
   const ignoreColorIssue: (colorId: string) => void = (colorId) => {
@@ -55,10 +52,7 @@ const ColorLinter = () => {
 
   const handleRescanLayersClick = () => {
     setLoadingColorData(true);
-    parent.postMessage(
-      { pluginMessage: { type: "request-selection", message: "colors" } },
-      "*"
-    );
+    parent.postMessage({ pluginMessage: { type: "run-color-linter" } }, "*");
   };
 
   const renderEmptyState = () => {
