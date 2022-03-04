@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import uuid from 'uuid-random';
 import { isVisibleNode } from "@figma-plugin/helpers";
 import oneCorePaintStyles from './oneCorePaintStyles.js';
@@ -320,9 +319,15 @@ const getColorStats = () => {
           }
 
           // return the layer if it fit's the criteria of isRelevantLayer()
-          if ('findAll' in selectedLayer) {
+          console.log(`'findAll' in selectedLayer ===`, 'findAll' in selectedLayer);
+          const selectedLayerHasChildren = 
+            'findAll' in selectedLayer && 
+            selectedLayer?.children?.length > 0
+            
+          if (selectedLayerHasChildren) {
             // if it has children
             outputForLayersWithChildren = selectedLayer.findAll((n) => isRelevantLayer(n));
+            console.log(selectedLayer);
             return [...outputForLayersWithChildren];
           } else if (isRelevantLayer(selectedLayer)) {
             // if it's a single layer
