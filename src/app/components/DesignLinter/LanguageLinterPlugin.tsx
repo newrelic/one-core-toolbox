@@ -250,6 +250,7 @@ const LanguageLinterPlugin = () => {
           updateTimer={100}
           customDictionary={localCustomDictionary}
           addToDictionary={addToDictionary}
+          openLinksInNewTab={true}
         />
         {selectionHasChanged && (
           <footer className="color-linting-footer">

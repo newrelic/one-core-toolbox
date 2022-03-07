@@ -44,7 +44,10 @@ const ColorTile = (props: props) => {
   const [menuTimer, setMenuTimer] = useState(null);
 
   const handleColorTileClick = (layerId: string) => {
-    setIsExpanded(!isExpanded);
+    // * Temporarily turing this off for beta testing
+    // until proper suggestions are ready.
+    // setIsExpanded(!isExpanded);
+
     // Tell the controller to select and zoom into it
     parent.postMessage(
       {
@@ -60,8 +63,8 @@ const ColorTile = (props: props) => {
   };
 
   const truncateLayerName = (layerName: string): string => {
-    if (layerName.length > 25) {
-      return layerName.substring(0, 25) + "...";
+    if (layerName.length > 20) {
+      return layerName.substring(0, 20) + "...";
     }
 
     return layerName;

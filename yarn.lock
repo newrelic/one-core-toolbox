@@ -2658,10 +2658,10 @@ neo-async@^2.5.0, neo-async@^2.6.1:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-new-relic-language-linter@^1.2.19:
-  version "1.2.22"
-  resolved "https://registry.yarnpkg.com/new-relic-language-linter/-/new-relic-language-linter-1.2.22.tgz#e2222e40005f83b504e66aa004e066ee86663ec3"
-  integrity sha512-ZUPopBpO1R/5LDcnIWoToDMiTAAXuSUMC3h4gda+vNW9BEeErVW/ZLhcvD7IipCUJnFjXzHJheTk+yC9JZjBcA==
+new-relic-language-linter@1.2.25:
+  version "1.2.25"
+  resolved "https://registry.yarnpkg.com/new-relic-language-linter/-/new-relic-language-linter-1.2.25.tgz#82578b4511dcf31461d12ba91bb752e8e64646b4"
+  integrity sha512-aWU1CoZiAinUdQddwoFgKycxcHMZ3v2i4nsiZU4nmcq0diiI2Qgtt9wkwKYJHpGNivGFLIVzw9VlNrnWmV7Ofw==
   dependencies:
     retext "^8.1.0"
     retext-capitalization "^1.1.4"
