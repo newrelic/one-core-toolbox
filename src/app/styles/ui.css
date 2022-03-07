@@ -513,6 +513,10 @@ input:checked + .slider:before {
   overflow-y: scroll;
 }
 
+.selection-has-changed {
+  padding-bottom: 70px;
+}
+
 .suggestions-empty-state,
 .suggestion-list {
   flex-grow: 1;

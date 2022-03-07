@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
 import isEqual from "lodash.isequal";
+import classNames from "classnames";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
 require("babel-polyfill");
@@ -202,9 +203,13 @@ const LanguageLinterPlugin = () => {
     }
   };
 
+  const colorLinterContainerClasses = classNames("language-linter-container", {
+    "selection-has-changed": selectionHasChanged,
+  });
+
   return (
     <>
-      <div className="language-linter-container">
+      <div className={colorLinterContainerClasses}>
         <nav className="text-layer-nav">
           <button
             className={"nav-arrow left-nav-arrow"}
