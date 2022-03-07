@@ -208,11 +208,11 @@ const sendCurrentTextSelection = () => {
       
       // Add any children that are text layers to the output array
       selectedTextLayers.forEach((layer) => {
-        pushTextLayerToArray(layer, textLayers)
+        isVisibleNode(layer) && pushTextLayerToArray(layer, textLayers)
       })
       
     } else if (selectedLayer.type === 'TEXT') {
-      pushTextLayerToArray(selectedLayer, textLayers)
+      isVisibleNode(selectedLayer) && pushTextLayerToArray(selectedLayer, textLayers)
     }
   })
 

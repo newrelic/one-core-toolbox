@@ -82,6 +82,8 @@ const LanguageLinterPlugin = () => {
     }
   }, [selectedTextLayers, localCustomDictionary]);
 
+  // Determine whether the the selection has changed.
+  // Then save that to state.
   useEffect(() => {
     if (
       !isEqual(currentSelection, currentLayersLintedForLanguage) &&
