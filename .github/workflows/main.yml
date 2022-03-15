@@ -6,6 +6,10 @@ name: Manual workflow
 # or API.
 on:
   workflow_dispatch:
+  
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: '* 1 * * *'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -44,5 +48,5 @@ jobs:
         target-folder: data # Saves the data into the 'data' directory on the main branch.
         silent: true
         single-commit: true
-        commit-message: "please work"
+        commit-message: "chore: Fetch styles from Figma"
         
