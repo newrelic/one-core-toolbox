@@ -1,0 +1,51 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      name:
+        # Friendly description to be shown in the UI instead of 'name'
+        description: 'Person to greet'
+        # Default value if no value is explicitly provided
+        default: 'World'
+        # Input has to be provided for the workflow to run
+        required: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  fetchFigmaFileData:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    - name: Checkout 🛎️
+      uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+    - name: Fetch API Data
+      # You may pin to the exact commit or the version.
+      # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
+      uses: JamesIves/fetch-api-data-action@v2.2.0
+      with:
+        # The URL of the endpoint you would like to retrieve data from.
+        endpoint: https://api.figma.com/v1/files/XhLTqysjEEQJ4js7g9pc1h/styles
+        # Any applicable configuration settings that should be set such as authentication tokens. You can reference secrets using the secrets syntax, or you can reference data returned from the `TOKEN_ENDPOINT` request using the triple bracket syntax.
+        configuration: '{ "method": "GET", "headers": {"X-Figma-Token": "341612-b9037faf-b05b-4ba4-8df1-fd9866c06f21"} }'
+    - name: Build and Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        branch: main # Pushes the updates to the main branch.
+        folder: fetch-api-data-action # The location of the data.json file saved by the Fetch API Data action.
+        target-folder: data # Saves the data into the 'data' directory on the main branch.
+        silent: true
+        single-commit: true
+        commit-message: "please work"
+        
