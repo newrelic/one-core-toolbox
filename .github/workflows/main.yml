@@ -1,14 +1,11 @@
+
 # This is a basic workflow that is manually triggered
 
-name: Fetch One Core Light Theme Tokens
+name: Manual workflow
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
 on:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron: '* 1 * * *'
-    
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -48,5 +45,4 @@ jobs:
         target-folder: data # Saves the data into the 'data' directory on the main branch.
         silent: true
         single-commit: true
-        commit-message: "chore: Fetch styles from Figma"
-        
+        commit-message: "please work"
