@@ -1,4 +1,3 @@
-
 # This is a basic workflow that is manually triggered
 
 name: Manual workflow
@@ -38,11 +37,11 @@ jobs:
         configuration: '{ "method": "GET", "headers": {"X-Figma-Token": "341612-b9037faf-b05b-4ba4-8df1-fd9866c06f21"} }'
         set-output: false
     - name: Build and Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@3.5.9
+      uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
         branch: main # Pushes the updates to the main branch.
         folder: fetch-api-data-action # The location of the data.json file saved by the Fetch API Data action.
-        TARGET_FOLDER: data # Saves the data into the 'data' directory on the main branch.
+        target-folder: data # Saves the data into the 'data' directory on the main branch.
         silent: false
-        SINGLE_COMMIT: true
-        COMMIT_MESSAGE: "please work"
+        single-commit: true
+        commit-message: "please work"
