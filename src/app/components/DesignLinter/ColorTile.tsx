@@ -3,7 +3,6 @@ import { useState, useContext, useEffect } from "react";
 import { PluginContext } from "../PluginContext";
 import chroma from "chroma-js";
 import classNames from "classnames";
-import oneCorePaintStyles from "../../../plugin/oneCorePaintStyles.js";
 require("babel-polyfill");
 
 import "../../styles/ui.css";

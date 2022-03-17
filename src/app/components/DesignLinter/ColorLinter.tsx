@@ -92,7 +92,10 @@ const ColorLinter = () => {
               <>
                 To fix these issues, replace each of the colors listed below
                 with a One Core color style.{` `}
-                <a href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens">
+                <a
+                  href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens"
+                  target="_blank"
+                >
                   See our docs
                 </a>{" "}
                 {` `}
