@@ -167,6 +167,12 @@ const ColorTile = (props: props) => {
                 {colorStyle.description}
               </p>
             </div>
+            <button
+              className="btn-suggested-color-style-cta"
+              onClick={(e) => handleSuggestionFixClick(e, colorStyle.key)}
+            >
+              Apply fix
+            </button>
           </li>
         );
       });
@@ -216,6 +222,21 @@ const ColorTile = (props: props) => {
     e.stopPropagation();
     ignoreColorIssue(colorId);
     setMenuActive(false);
+  };
+
+  const handleSuggestionFixClick = (e, colorStyleKey: string) => {
+    e.stopPropagation();
+
+    parent.postMessage(
+      {
+        pluginMessage: {
+          type: "apply-color-style",
+          layerId: layerId,
+          colorStyleKey,
+        },
+      },
+      "*"
+    );
   };
 
   const colorTileContainerClasses = classNames("color-tile-container", {
