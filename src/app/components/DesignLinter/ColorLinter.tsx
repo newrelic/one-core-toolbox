@@ -91,8 +91,12 @@ const ColorLinter = () => {
             {colorsWithIssues.length ? (
               <>
                 To fix these issues, replace each of the colors listed below
-                with a One Core color style. Not sure what that means?{` `}
-                <a href="#">See how</a>.
+                with a One Core color style.{` `}
+                <a href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens">
+                  See our docs
+                </a>{" "}
+                {` `}
+                for more info.
               </>
             ) : (
               <>

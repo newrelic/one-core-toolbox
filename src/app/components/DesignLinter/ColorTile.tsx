@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { PluginContext } from "../PluginContext";
 import chroma from "chroma-js";
 import classNames from "classnames";
 import oneCorePaintStyles from "../../../plugin/oneCorePaintStyles.js";
@@ -15,6 +16,7 @@ interface colorData {
   layerName: string;
   colorType: string;
   colorInHex: string;
+  layerType: string;
 }
 
 interface props {
@@ -23,11 +25,15 @@ interface props {
 }
 
 const ColorTile = (props: props) => {
+  const { state } = useContext(PluginContext);
+
+  const { colorTokens, activeColorTile, setActiveColorTile } = state;
+
   const {
     colorId,
     layerId,
     layerName,
-    // layerType,
+    layerType,
     // colorStyleId,
     // hasColorStyle,
     // visible,
@@ -43,9 +49,16 @@ const ColorTile = (props: props) => {
   const [menuHovered, setMenuHovered] = useState(false);
   const [menuTimer, setMenuTimer] = useState(null);
 
+  useEffect(() => {
+    if (activeColorTile === colorId) {
+      setIsExpanded(true);
+    } else {
+      setIsExpanded(false);
+    }
+  }, [activeColorTile]);
+
   const handleColorTileClick = (layerId: string) => {
-    // * Temporarily turing this off for beta testing
-    // until proper suggestions are ready.
+    setActiveColorTile(colorId);
     // setIsExpanded(!isExpanded);
 
     // Tell the controller to select and zoom into it
@@ -71,34 +84,90 @@ const ColorTile = (props: props) => {
   };
 
   const renderTokenSuggestions = () => {
-    const stylesWithSimilarity = oneCorePaintStyles.map((oneCoreColorStyle) => {
-      const oneCoreColor = oneCoreColorStyle.color.color.hex;
-      const similarity: number =
-        100 - chroma.distance(oneCoreColor, colorInHex);
+    if (colorTokens?.length > 0) {
+      let relevantColorStyles = [];
+      let mostRelevantColorStyles = [];
 
-      return {
-        ...oneCoreColorStyle,
-        similarity,
-      };
-    });
+      if (layerType === "TEXT") {
+        // text styles sorted reverse alphabetically
+        relevantColorStyles = colorTokens
+          .filter((token) => token.name.toLowerCase().includes("text"))
+          .sort((a, b) => {
+            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+              return -1;
+            } else {
+              return 1;
+            }
+          });
+      } else if (colorType === "fill") {
+        // background styles sorted reverse alphabetically
+        relevantColorStyles = colorTokens
+          .filter((token) => token.name.toLowerCase().includes("background"))
+          .sort((a, b) => {
+            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+              return -1;
+            } else {
+              return 1;
+            }
+          });
+      } else if (colorType === "stroke") {
+        // border styles sorted reverse alphabetically
+        relevantColorStyles = colorTokens
+          .filter((token) => token.name.toLowerCase().includes("border"))
+          .sort((a, b) => {
+            if (a.name.toLowerCase() > b.name.toLowerCase()) {
+              return -1;
+            } else {
+              return 1;
+            }
+          });
+      }
 
-    const stylesSortedBySimilarity = stylesWithSimilarity.sort((a, b) => {
-      return b.similarity - a.similarity;
-    });
+      // sort colors styles by proximity to source color
+      mostRelevantColorStyles = relevantColorStyles
+        .map((relevantColorStyle) => {
+          if (relevantColorStyle.hex === "None") {
+            return {
+              ...relevantColorStyle,
+              similarity: 0,
+            };
+          }
+          // Add a similarity property to each relevantColorStyle
+          const oneCoreColor = relevantColorStyle.hex;
+          const similarity: number =
+            100 - chroma.distance(oneCoreColor, colorInHex);
 
-    const closestColorStyles = stylesSortedBySimilarity.slice(0, 4);
+          return {
+            ...relevantColorStyle,
+            similarity,
+          };
+        })
+        // sort them by proximity
+        .sort((a, b) => {
+          return b.similarity - a.similarity;
+        })
+        // Take the top 5 closest suggestions
+        .slice(0, 7);
 
-    return closestColorStyles.map((colorStyle, index) => {
-      return (
-        <li className="suggested-color-style-list-item" key={index}>
-          <span
-            className="suggested-color-style-sample"
-            style={{ backgroundColor: colorStyle.color.color.hex }}
-          ></span>
-          {colorStyle.name}
-        </li>
-      );
-    });
+      return mostRelevantColorStyles.map((colorStyle, index) => {
+        return (
+          <li className="suggested-color-style-list-item" key={index}>
+            <span
+              className="suggested-color-style-sample"
+              style={{ backgroundColor: colorStyle.hex }}
+            ></span>
+            <div className="suggested-color-style-primary-content">
+              <h5 className="suggested-color-style-heading">
+                {colorStyle.name}
+              </h5>
+              <p className="suggested-color-style-description">
+                {colorStyle.description}
+              </p>
+            </div>
+          </li>
+        );
+      });
+    }
   };
 
   const handleMenuClick = (e) => {

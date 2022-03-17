@@ -35,7 +35,7 @@ interface colorList {
 }
 
 const App = ({}) => {
-  const [activePlugin, setActivePlugin] = useState("table-creator");
+  const [activePlugin, setActivePlugin] = useState("home");
   const [latestFigmaCommand, setLatestFigmaCommand] = useState("");
   const [selectedTextLayers, setSelectedTextLayers] = useState([]);
   const [sampleTextIndex, setSampleTextIndex] = useState(0);
@@ -53,6 +53,8 @@ const App = ({}) => {
   const [incomingSelection, setIncomingSelection] = useState();
   const [currentLayersLintedForLanguage, setCurrentLayersLintedForLanguage] =
     useState();
+  const [colorTokens, setColorTokens] = useState();
+  const [activeColorTile, setActiveColorTile] = useState<String>();
 
   const triggerNewRelicCustomEvent = (
     eventName: string,
@@ -132,6 +134,7 @@ const App = ({}) => {
             message?.colorStats?.colorsNotUsingOneCoreColorStyle
           );
           setSelectionMade(message?.selectionMade);
+          setColorTokens(message.colorTokens);
 
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {
@@ -239,6 +242,9 @@ const App = ({}) => {
     currentSelection,
     incomingSelection,
     currentLayersLintedForLanguage,
+    colorTokens,
+    activeColorTile,
+    setActiveColorTile,
   };
 
   return (

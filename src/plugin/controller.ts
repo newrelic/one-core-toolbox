@@ -1,6 +1,7 @@
 import uuid from 'uuid-random';
 import { isVisibleNode } from "@figma-plugin/helpers";
 import oneCorePaintStyles from './oneCorePaintStyles.js';
+import rawColorTokens from '../../data/data.json'
 
 figma.showUI(__html__, { width: 300, height: 448 });
 
@@ -274,6 +275,37 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
     }
 };
 
+let colorTokens = []
+
+// Add hex values to colorTokens objects
+const getColorTokens = async () => {
+  colorTokens = await Promise.all(rawColorTokens.meta.styles.map(async (style) => {
+    const tempRectangle = figma.createRectangle()
+    let colorStyleWithHex = {}
+    
+    const importedStyle = await figma.importStyleByKeyAsync(style.key)
+    tempRectangle.fillStyleId = importedStyle.id
+  
+    if (tempRectangle.fills[0].color !== undefined) {
+      colorStyleWithHex = {
+        ...style,
+        hex: rgbToHex(tempRectangle.fills[0].color.r, tempRectangle.fills[0].color.g, tempRectangle.fills[0].color.b)
+      }
+    } else {
+      colorStyleWithHex = {
+        ...style,
+        hex: 'None' // Currently, some colors in the file are empty & listed as "TBD"
+      }
+    }
+
+    tempRectangle.remove()
+
+    return colorStyleWithHex
+  }))
+}
+
+getColorTokens()
+
 const getColorStats = () => {
     const getRawLayersWithColor = () => {
       // get the selected layers
@@ -406,7 +438,7 @@ const getColorStats = () => {
       return oneCorePaintStyles.some((style) => {
           // if the argument color matches the current style color
           // return true
-          return colorInHex === style.color.color.hex;
+          return colorInHex === style?.color?.color?.hex;
       }, false);
   };
 
@@ -594,6 +626,7 @@ figma.ui.onmessage = async (msg) => {
         message: {
           ...customEventData,
           colorStats: getColorStats(),
+          colorTokens: colorTokens,
           selectionMade: figma.currentPage.selection.length > 0
         },
     });
