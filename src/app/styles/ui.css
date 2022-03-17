@@ -649,6 +649,16 @@ input:checked + .slider:before {
   transition: all 0.095s ease-out;
 }
 
+.color-tile-container.expanded {
+  box-shadow: 0 0 0 3px hsl(204deg 68% 54% / 10%);
+  border-color: hsl(204deg 35% 68%);
+}
+
+.color-tile-container.expanded:hover {
+  box-shadow: 0 0 0 3px hsl(204deg 68% 54% / 10%);
+  border-color: hsl(204deg 35% 68%);
+}
+
 .color-tile-container:hover {
   border-color: rgba(0 0 0 / 28%);
   transform: translateY(-1px);
@@ -772,8 +782,6 @@ input:checked + .slider:before {
 
 .expanded .suggested-color-styles-container {
   display: flex;
-  box-shadow: 0 0 0 3px hsl(204deg 68% 54% / 10%);
-  border-color: hsl(204deg 35% 68%);
 }
 
 .suggested-color-style-header {

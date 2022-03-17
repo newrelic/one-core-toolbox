@@ -58,7 +58,11 @@ const ColorTile = (props: props) => {
   }, [activeColorTile]);
 
   const handleColorTileClick = (layerId: string) => {
-    setActiveColorTile(colorId);
+    if (!isExpanded) {
+      setActiveColorTile(colorId);
+    } else {
+      setActiveColorTile("");
+    }
     // setIsExpanded(!isExpanded);
 
     // Tell the controller to select and zoom into it
