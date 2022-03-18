@@ -279,11 +279,15 @@ let colorTokens = []
 
 // Add hex values to colorTokens objects
 const getColorTokens = async () => {
-  colorTokens = await Promise.all(rawColorTokens.meta.styles.map(async (style) => {
+  const allColorTokens = await Promise.all(rawColorTokens.meta.styles.map(async (style) => {
+    // Create a rectangle which we'll apply the token to
+    // in order to get it's hex value
     const tempRectangle = figma.createRectangle()
     let colorStyleWithHex = {}
     
+    // Apply the token 
     const importedStyle = await figma.importStyleByKeyAsync(style.key)
+    tempRectangle.visible = false
     tempRectangle.fillStyleId = importedStyle.id
   
     if (tempRectangle.fills[0].color !== undefined) {
@@ -298,10 +302,26 @@ const getColorTokens = async () => {
       }
     }
 
+    // remove the rectangle from the document
     tempRectangle.remove()
 
     return colorStyleWithHex
   }))
+
+  const privateTokenCategories = [
+    'Buttons', 
+    'Background nav', 
+    'Text nav', 
+    'Multi Control', 
+    'Logo' 
+  ]
+
+  // Set `colorTokens` to allColorTokens minus the private tokens
+  colorTokens = allColorTokens.filter(token => {
+    return !privateTokenCategories.some(category => token.name.includes(category))
+  })
+
+  console.log(colorTokens);
 }
 
 getColorTokens()

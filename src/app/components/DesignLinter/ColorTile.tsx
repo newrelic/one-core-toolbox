@@ -25,7 +25,6 @@ interface props {
 
 const ColorTile = (props: props) => {
   const { state } = useContext(PluginContext);
-
   const { colorTokens, activeColorTile, setActiveColorTile } = state;
 
   const {
