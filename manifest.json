@@ -14,7 +14,6 @@
     {"separator": true},
     {"name": "Table creator", "command": "open-table-creator"},
     {"name": "Design linter", "menu": [
-      {"name": "Language", "command": "open-language-linter"},
       {"name": "Color", "command": "open-color-linter"}
     ]}
   ]

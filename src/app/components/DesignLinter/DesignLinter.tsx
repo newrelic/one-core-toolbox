@@ -25,7 +25,7 @@ const DesignLinter = (props: props) => {
 
   // Render the nav tabs in the plugin UI
   const renderNavigationTabs = () => {
-    const tabs: string[] = ["language-linter", "color-linter"];
+    const tabs: string[] = ["color-linter"];
 
     // for each tab in the above array
     return tabs.map((tab, index) => {

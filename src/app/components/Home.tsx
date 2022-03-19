@@ -32,7 +32,7 @@ const Home = (props) => {
         heading="Design linter"
         description="Checks for language, colors, and more to come..."
         icon={IconDesignLinter}
-        onClick={() => setActivePlugin("language-linter")}
+        onClick={() => setActivePlugin("color-linter")}
       />
 
       <p className="home-support">
