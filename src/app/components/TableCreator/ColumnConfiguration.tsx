@@ -211,7 +211,9 @@ const ColumnConfiguration = ({
         </div>
         <label className="input-container" htmlFor="column-multi-value">
           <h5 className="label">Multi-value</h5>
-          <div className={`switch ${multiValueDisabled() ? "disabled" : ""}`}>
+          <div
+            className={`ui-switch ${multiValueDisabled() ? "disabled" : ""}`}
+          >
             <input
               type="checkbox"
               id="column-multi-value"

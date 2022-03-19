@@ -434,26 +434,26 @@ button[disabled] {
 
 /*-- Toggle styles --*/
 /* The switch - the box around the slider */
-.switch {
+.ui-switch {
   position: relative;
   display: inline-block;
   width: 24px;
   height: 12px;
 }
 
-.switch.disabled .slider {
+.ui-switch.disabled .slider {
   box-shadow: 0 0 0 1px #d1d4d4;
   background-color: #fff;
   cursor: not-allowed;
 }
 
-.switch.disabled .slider:before {
+.ui-switch.disabled .slider:before {
   box-shadow: 0 0 0 1px #d1d4d4;
   background-color: #f3f4f4;
 }
 
 /* Hide default HTML checkbox */
-.switch input {
+.ui-switch input {
   opacity: 0;
   width: 0;
   height: 0;
