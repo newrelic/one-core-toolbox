@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useState, useContext, useEffect } from "react";
-import { PluginContext } from "../PluginContext";
+import { value useState, value useContext, value useEffect } from "react";
+import { value PluginContext } from "../PluginContext";
 import chroma from "chroma-js";
 import classNames from "classnames";
 import iconLayerText from "../../assets/icon-layer-text.svg";
@@ -9,7 +9,8 @@ import iconLayerLine from "../../assets/icon-layer-line.svg";
 import iconLayerPolygon from "../../assets/icon-layer-polygon.svg";
 import iconLayerRectangle from "../../assets/icon-layer-rectangle.svg";
 import iconLayerBooleanOperation from "../../assets/icon-layer-boolean-operation.svg";
-import { Icon } from "react-figma-plugin-ds";
+import { value Icon } from "react-figma-plugin-ds";
+import { value Check } from "react-feather";
 import "react-figma-plugin-ds/figma-plugin-ds.css";
 require("babel-polyfill");
 
@@ -33,7 +34,13 @@ interface props {
 
 const ColorTile = (props: props) => {
   const { state } = useContext(PluginContext);
-  const { colorTokens, activeColorTile, setActiveColorTile } = state;
+  const { 
+    colorTokens, 
+    activeColorTile, 
+    setActiveColorTile,
+    colorIssuesFixed,
+    setColorIssuesFixed 
+  } = state;
 
   const {
     colorId,
@@ -70,7 +77,6 @@ const ColorTile = (props: props) => {
     } else {
       setActiveColorTile("");
     }
-    // setIsExpanded(!isExpanded);
 
     // Tell the controller to select and zoom into it
     parent.postMessage(
@@ -88,10 +94,8 @@ const ColorTile = (props: props) => {
 
   const truncateLayerName = (
     layerName: string,
-    length: number = 20
+    length: number = 25
   ): string => {
-    length === undefined ? 20 : length;
-
     if (layerName.length > length) {
       return layerName.substring(0, length) + "...";
     }
@@ -167,7 +171,11 @@ const ColorTile = (props: props) => {
 
       return mostRelevantColorStyles.map((colorStyle, index) => {
         return (
-          <li className="suggested-color-style-list-item" key={index}>
+          <li
+            className="suggested-color-style-list-item"
+            key={index}
+            onClick={(e) => handleSuggestionFixClick(e, colorStyle.key)}
+          >
             <span
               className="suggested-color-style-sample"
               style={{ backgroundColor: colorStyle.hex }}
@@ -246,12 +254,15 @@ const ColorTile = (props: props) => {
           type: "apply-color-style",
           layerId: layerId,
           colorStyleKey,
+          colorType,
         },
       },
       "*"
     );
 
+    handleColorTileClick(layerId)
     setIssueFixed(true);
+    !issueFixed && setColorIssuesFixed(colorIssuesFixed + 1)
   };
 
   const layerTypeIcons = {
@@ -271,6 +282,22 @@ const ColorTile = (props: props) => {
     ),
   };
 
+  const colorTileHeadingText = () => {
+    if (issueFixed) {
+      return (
+        <>
+          Fixed {` `} <Check color="#126440" size={17} />
+        </>
+      );
+    } else {
+      return (
+        colorType.charAt(0).toUpperCase() +
+        colorType.slice(1) +
+        " needs One Core color style"
+      );
+    }
+  };
+
   const colorTileContainerClasses = classNames("color-tile-container", {
     "menu-active": menuActive,
     "color-tile-hover-state-disabled": menuButtonHovered || menuHovered,
@@ -285,10 +312,7 @@ const ColorTile = (props: props) => {
     >
       <div className="color-tile-header">
         <div className="color-tile-title-section">
-          <h4 className="color-tile-heading">
-            {layerTypeIcons[layerType]}
-            {truncateLayerName(layerName, 40)}
-          </h4>
+          <h4 className="color-tile-heading">{colorTileHeadingText()}</h4>
           <button
             className="btn-color-tile-menu"
             onClick={(e) => handleMenuClick(e)}
@@ -318,7 +342,14 @@ const ColorTile = (props: props) => {
             </ul>
             <hr />
             <ul className="color-tile-menu-items">
-              <li className="color-tile-menu-item">How to fix?</li>
+              <li className="color-tile-menu-item">
+                <a 
+                  href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens"
+                  target="_blank"
+                >
+                  See docs
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -331,8 +362,11 @@ const ColorTile = (props: props) => {
             ></span>
             {colorInHex}
           </li>
-          <li className="color-tile-meta-list-item color-tile-meta-layer-name">
-            Layer: {truncateLayerName(layerName)}
+          <li className="color-tile-meta-list-item color-tile-meta-layer-name-item">
+            {layerTypeIcons[layerType]}
+            <span className="color-tile-meta-layer-name">
+              {truncateLayerName(layerName)}
+            </span>
           </li>
           <li className="color-tile-meta-list-item">Type: {colorType}</li>
         </ul>

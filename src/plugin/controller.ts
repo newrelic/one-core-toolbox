@@ -660,7 +660,7 @@ figma.ui.onmessage = async (msg) => {
 
   if (msg.type === 'apply-color-style') {
     figma.importStyleByKeyAsync(msg.colorStyleKey).then(imported => {
-        figma.getNodeById(msg.layerId).fillStyleId = imported.id
+        figma.getNodeById(msg.layerId)[`${msg.colorType}StyleId`] = imported.id
     })
   }
 };

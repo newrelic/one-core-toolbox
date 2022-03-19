@@ -608,6 +608,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex-grow: 1;
   padding: 24px;
   overflow: auto;
   max-height: calc(100% - 105px);
@@ -654,6 +655,11 @@ input:checked + .slider:before {
   border-color: hsl(204deg 35% 68%);
 }
 
+.color-tile-container.issue-fixed {
+  background-color: #f2fcf5;
+  border: 1px solid #d2e6d6;
+}
+
 .color-tile-container.expanded:hover {
   box-shadow: 0 0 0 3px hsl(204deg 68% 54% / 10%);
   border-color: hsl(204deg 35% 68%);
@@ -697,12 +703,12 @@ input:checked + .slider:before {
 
 .custom-layer-icon {
   display: block;
-  margin-right: 8px;
+  margin-right: 7px;
   opacity: 0.5;
 }
 
 .icon.layer-icon {
-  margin-right: 8px;
+  margin-right: 7px;
   background-position: center;
   height: 17px;
   width: 17px;
@@ -714,10 +720,15 @@ input:checked + .slider:before {
 .color-tile-heading {
   display: flex;
   align-items: center;
+  gap: 6px;
   margin: 0;
   font-weight: 500;
   font-size: 14px;
   color: #283636;
+}
+
+.issue-fixed .color-tile-heading {
+  color: #126440;
 }
 
 .color-tile-meta-list {
@@ -733,11 +744,24 @@ input:checked + .slider:before {
   color: rgba(85 96 96 / 85%);
 }
 
+.issue-fixed .color-tile-meta-list-item {
+  color: #568872;
+}
+
 .color-tile-meta-list-item:not(:last-child):after {
   content: "/";
   margin-left: 14px;
   user-select: none;
   color: rgba(209 212 212 / 90%);
+}
+
+.color-tile-meta-layer-name-item {
+  display: flex;
+  align-items: center;
+}
+
+.color-tile-meta-layer-name {
+  flex-shrink: 0;
 }
 
 .color-tile-meta-color {
@@ -849,6 +873,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: row;
   gap: 9px;
+  position: relative;
   align-items: center;
   padding: 10px 12px 8px;
   font-size: 12px;
@@ -857,7 +882,8 @@ input:checked + .slider:before {
 }
 
 .suggested-color-style-list-item:hover {
-  background-color: rgba(0 0 0 / 2%);
+  background-color: hsl(0deg 0% 98%);
+  cursor: pointer;
 }
 
 .suggested-color-style-primary-content {
@@ -889,12 +915,21 @@ input:checked + .slider:before {
 }
 
 .btn-suggested-color-style-cta {
-  flex-shrink: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 0 16px 0 24px;
   font-size: 12px;
   opacity: 0;
   color: rgb(24 160 251 / 100%);
   border: none;
   background-color: transparent;
+  background-image: linear-gradient(
+    to right,
+    transparent,
+    hsl(0deg 0% 97%) 20%
+  );
   transition: opacity 0.075s ease-out;
   cursor: pointer;
 }
@@ -958,6 +993,11 @@ input:checked + .slider:before {
 .color-tile-menu-item {
   font-size: 12px;
   padding: 5px 14px;
+}
+
+.color-tile-menu-item a {
+  color: #fff;
+  text-decoration: none;
 }
 
 .color-tile-menu-item:hover {

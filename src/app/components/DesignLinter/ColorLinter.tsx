@@ -1,6 +1,6 @@
 import * as React from "react";
-import { useContext } from "react";
-import { PluginContext } from "../PluginContext";
+import { value useContext } from "react";
+import { value PluginContext } from "../PluginContext";
 import ColorTile from "./ColorTile";
 import classNames from "classnames";
 require("babel-polyfill");
@@ -16,6 +16,8 @@ const ColorLinter = () => {
     loadingColorData,
     setLoadingColorData,
     selectionMade,
+    colorIssuesFixed,
+    setColorIssuesFixed,
   } = state;
 
   React.useEffect(() => {
@@ -85,10 +87,10 @@ const ColorLinter = () => {
       return (
         <div className={"color-linting-sumary"}>
           <h3 className="color-linting-summary-heading">
-            {colorsWithIssues.length} color issues found
+            {colorsWithIssues.length - colorIssuesFixed} color issues found
           </h3>
           <p className="color-linting-summary-description">
-            {colorsWithIssues.length ? (
+            {colorsWithIssues.length - colorIssuesFixed > 0 ? (
               <>
                 To fix these issues, replace each of the colors listed below
                 with a One Core color style.{` `}

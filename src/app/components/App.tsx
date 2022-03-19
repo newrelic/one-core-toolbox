@@ -1,9 +1,9 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { value useState, value useEffect } from "react";
 import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
-import { PluginContext } from "./PluginContext";
+import { value PluginContext } from "./PluginContext";
 import Home from "./Home";
 import "../styles/ui.css";
 
@@ -55,6 +55,7 @@ const App = ({}) => {
     useState();
   const [colorTokens, setColorTokens] = useState();
   const [activeColorTile, setActiveColorTile] = useState<String>();
+  const [colorIssuesFixed, setColorIssuesFixed] = useState<Number>(0);
 
   const triggerNewRelicCustomEvent = (
     eventName: string,
@@ -135,6 +136,7 @@ const App = ({}) => {
           );
           setSelectionMade(message?.selectionMade);
           setColorTokens(message.colorTokens);
+          setColorIssuesFixed(0)
 
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {
@@ -245,6 +247,8 @@ const App = ({}) => {
     colorTokens,
     activeColorTile,
     setActiveColorTile,
+    colorIssuesFixed,
+    setColorIssuesFixed,
   };
 
   return (
