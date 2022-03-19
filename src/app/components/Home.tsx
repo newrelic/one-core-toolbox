@@ -30,7 +30,7 @@ const Home = (props) => {
       />
       <PluginTile
         heading="Design linter"
-        description="Checks for language, colors, and more to come..."
+        description="Checks your layers for color styles, and soon will check for language too."
         icon={IconDesignLinter}
         onClick={() => setActivePlugin("color-linter")}
       />
