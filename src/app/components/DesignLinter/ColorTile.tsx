@@ -3,6 +3,14 @@ import { useState, useContext, useEffect } from "react";
 import { PluginContext } from "../PluginContext";
 import chroma from "chroma-js";
 import classNames from "classnames";
+import iconLayerText from "../../assets/icon-layer-text.svg";
+import iconLayerEllipse from "../../assets/icon-layer-ellipse.svg";
+import iconLayerLine from "../../assets/icon-layer-line.svg";
+import iconLayerPolygon from "../../assets/icon-layer-polygon.svg";
+import iconLayerRectangle from "../../assets/icon-layer-rectangle.svg";
+import iconLayerBooleanOperation from "../../assets/icon-layer-boolean-operation.svg";
+import { Icon } from "react-figma-plugin-ds";
+import "react-figma-plugin-ds/figma-plugin-ds.css";
 require("babel-polyfill");
 
 import "../../styles/ui.css";
@@ -46,6 +54,7 @@ const ColorTile = (props: props) => {
   const [menuButtonHovered, setMenuButtonHovered] = useState(false);
   const [menuHovered, setMenuHovered] = useState(false);
   const [menuTimer, setMenuTimer] = useState(null);
+  const [issueFixed, setIssueFixed] = useState(false);
 
   useEffect(() => {
     if (activeColorTile === colorId) {
@@ -77,9 +86,14 @@ const ColorTile = (props: props) => {
     setMenuActive(false);
   };
 
-  const truncateLayerName = (layerName: string): string => {
-    if (layerName.length > 20) {
-      return layerName.substring(0, 20) + "...";
+  const truncateLayerName = (
+    layerName: string,
+    length: number = 20
+  ): string => {
+    length === undefined ? 20 : length;
+
+    if (layerName.length > length) {
+      return layerName.substring(0, length) + "...";
     }
 
     return layerName;
@@ -149,7 +163,7 @@ const ColorTile = (props: props) => {
           return b.similarity - a.similarity;
         })
         // Take the top 5 closest suggestions
-        .slice(0, 7);
+        .slice(0, 4);
 
       return mostRelevantColorStyles.map((colorStyle, index) => {
         return (
@@ -236,12 +250,32 @@ const ColorTile = (props: props) => {
       },
       "*"
     );
+
+    setIssueFixed(true);
+  };
+
+  const layerTypeIcons = {
+    TEXT: <img src={iconLayerText} className="custom-layer-icon" />,
+    ELLIPSE: <img src={iconLayerEllipse} className="custom-layer-icon" />,
+    FRAME: <Icon className="layer-icon" name="frame" />,
+    GROUP: <Icon className="layer-icon" name="group" />,
+    COMPONENT: <Icon className="layer-icon" name="component" />,
+    INSTANCE: <Icon className="layer-icon" name="instance" />,
+    LINE: <img src={iconLayerLine} className="custom-layer-icon" />,
+    POLYGON: <img src={iconLayerPolygon} className="custom-layer-icon" />,
+    RECTANGLE: <img src={iconLayerRectangle} className="custom-layer-icon" />,
+    SHAPE_WITH_TEXT: <img src={iconLayerText} className="custom-layer-icon" />,
+    STAR: <Icon className="custom-layer-icon" name="star-off" />,
+    BOOLEAN_OPERATION: (
+      <img src={iconLayerBooleanOperation} className="custom-layer-icon" />
+    ),
   };
 
   const colorTileContainerClasses = classNames("color-tile-container", {
     "menu-active": menuActive,
     "color-tile-hover-state-disabled": menuButtonHovered || menuHovered,
     expanded: isExpanded,
+    "issue-fixed": issueFixed,
   });
 
   return (
@@ -251,7 +285,10 @@ const ColorTile = (props: props) => {
     >
       <div className="color-tile-header">
         <div className="color-tile-title-section">
-          <h4 className="color-tile-heading">Missing One Core Color style</h4>
+          <h4 className="color-tile-heading">
+            {layerTypeIcons[layerType]}
+            {truncateLayerName(layerName, 40)}
+          </h4>
           <button
             className="btn-color-tile-menu"
             onClick={(e) => handleMenuClick(e)}

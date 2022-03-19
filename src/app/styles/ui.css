@@ -695,7 +695,25 @@ input:checked + .slider:before {
   position: relative;
 }
 
+.custom-layer-icon {
+  display: block;
+  margin-right: 8px;
+  opacity: 0.5;
+}
+
+.icon.layer-icon {
+  margin-right: 8px;
+  background-position: center;
+  height: 17px;
+  width: 17px;
+  transform: scale(0.75);
+  margin-left: -2px;
+  opacity: 0.65;
+}
+
 .color-tile-heading {
+  display: flex;
+  align-items: center;
   margin: 0;
   font-weight: 500;
   font-size: 14px;
@@ -821,8 +839,6 @@ input:checked + .slider:before {
 .suggested-color-style-list {
   display: block;
   padding: 0;
-  max-height: 180px;
-  overflow: auto;
   list-style-type: none;
   background-color: #fff;
   border: 1px solid #e1e2e2;

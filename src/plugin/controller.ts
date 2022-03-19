@@ -320,11 +320,7 @@ const getColorTokens = async () => {
   colorTokens = allColorTokens.filter(token => {
     return !privateTokenCategories.some(category => token.name.includes(category))
   })
-
-  console.log(colorTokens);
 }
-
-getColorTokens()
 
 const getColorStats = () => {
     const getRawLayersWithColor = () => {
@@ -641,15 +637,21 @@ figma.ui.onmessage = async (msg) => {
 
   /*-- Color linter messages --*/
   if (msg.type === 'run-color-linter') {
-    figma.ui.postMessage({
-        type: 'color-stats',
-        message: {
-          ...customEventData,
-          colorStats: getColorStats(),
-          colorTokens: colorTokens,
-          selectionMade: figma.currentPage.selection.length > 0
-        },
-    });
+    const sendColorData = async () => {
+      await getColorTokens()
+
+      figma.ui.postMessage({
+          type: 'color-stats',
+          message: {
+            ...customEventData,
+            colorStats: getColorStats(),
+            colorTokens: colorTokens,
+            selectionMade: figma.currentPage.selection.length > 0
+          },
+      });
+    }
+
+    sendColorData()
   }
   
   if (msg.type === 'select-layer') {
