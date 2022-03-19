@@ -1,6 +1,6 @@
 import * as React from "react";
-import { value useState, value useContext, value useEffect } from "react";
-import { value PluginContext } from "../PluginContext";
+import { useState, useContext, useEffect } from "react";
+import { PluginContext } from "../PluginContext";
 import chroma from "chroma-js";
 import classNames from "classnames";
 import iconLayerText from "../../assets/icon-layer-text.svg";
@@ -9,8 +9,8 @@ import iconLayerLine from "../../assets/icon-layer-line.svg";
 import iconLayerPolygon from "../../assets/icon-layer-polygon.svg";
 import iconLayerRectangle from "../../assets/icon-layer-rectangle.svg";
 import iconLayerBooleanOperation from "../../assets/icon-layer-boolean-operation.svg";
-import { value Icon } from "react-figma-plugin-ds";
-import { value Check } from "react-feather";
+import { Icon } from "react-figma-plugin-ds";
+import { Check } from "react-feather";
 import "react-figma-plugin-ds/figma-plugin-ds.css";
 require("babel-polyfill");
 
@@ -34,12 +34,12 @@ interface props {
 
 const ColorTile = (props: props) => {
   const { state } = useContext(PluginContext);
-  const { 
-    colorTokens, 
-    activeColorTile, 
+  const {
+    colorTokens,
+    activeColorTile,
     setActiveColorTile,
     colorIssuesFixed,
-    setColorIssuesFixed 
+    setColorIssuesFixed,
   } = state;
 
   const {
@@ -260,9 +260,9 @@ const ColorTile = (props: props) => {
       "*"
     );
 
-    handleColorTileClick(layerId)
+    handleColorTileClick(layerId);
     setIssueFixed(true);
-    !issueFixed && setColorIssuesFixed(colorIssuesFixed + 1)
+    !issueFixed && setColorIssuesFixed(colorIssuesFixed + 1);
   };
 
   const layerTypeIcons = {
@@ -343,7 +343,7 @@ const ColorTile = (props: props) => {
             <hr />
             <ul className="color-tile-menu-items">
               <li className="color-tile-menu-item">
-                <a 
+                <a
                   href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens"
                   target="_blank"
                 >

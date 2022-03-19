@@ -1,9 +1,9 @@
 import * as React from "react";
-import { value useState, value useEffect } from "react";
+import { useState, useEffect } from "react";
 import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
-import { value PluginContext } from "./PluginContext";
+import { PluginContext } from "./PluginContext";
 import Home from "./Home";
 import "../styles/ui.css";
 
@@ -136,7 +136,7 @@ const App = ({}) => {
           );
           setSelectionMade(message?.selectionMade);
           setColorTokens(message.colorTokens);
-          setColorIssuesFixed(0)
+          setColorIssuesFixed(0);
 
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {

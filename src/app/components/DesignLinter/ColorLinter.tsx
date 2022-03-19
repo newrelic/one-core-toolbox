@@ -1,6 +1,6 @@
 import * as React from "react";
-import { value useContext } from "react";
-import { value PluginContext } from "../PluginContext";
+import { useContext } from "react";
+import { PluginContext } from "../PluginContext";
 import ColorTile from "./ColorTile";
 import classNames from "classnames";
 require("babel-polyfill");
