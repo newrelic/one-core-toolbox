@@ -347,7 +347,7 @@ const ColorTile = (props: props) => {
                   href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens"
                   target="_blank"
                 >
-                  See docs
+                  See color docs
                 </a>
               </li>
             </ul>

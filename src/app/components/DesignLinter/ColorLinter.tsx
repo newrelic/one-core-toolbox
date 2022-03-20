@@ -98,9 +98,8 @@ const ColorLinter = () => {
                   href="https://one-core.datanerd.us/foundation/design/color/#semantic-tokens"
                   target="_blank"
                 >
-                  See our docs
+                  See color docs
                 </a>{" "}
-                {` `}
                 for more info.
               </>
             ) : (
