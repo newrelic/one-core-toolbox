@@ -81,11 +81,8 @@ const App = ({}) => {
       switch (type) {
         // Navigation
         case "figma-command":
-          triggerNewRelicCustomEvent(
-            `OneCoreToolbox: ${message.message}`,
-            message
-          );
-          setLatestFigmaCommand(message.message);
+          triggerNewRelicCustomEvent(`OneCoreToolbox: plugin-opened`, message);
+          setLatestFigmaCommand(message.openedTo);
           break;
         // Keep selection updated (used by several plugins)
         case "initial-selection":

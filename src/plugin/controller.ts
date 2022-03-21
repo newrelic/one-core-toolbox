@@ -21,7 +21,7 @@ let customEventData = {
 // handle submenu navigation
 const navigateTo = (screen: string) => {
   figma.ui.postMessage({ type: "figma-command", message: {
-      message: screen,
+      openedTo: screen,
       ...customEventData
     } 
   });
