@@ -140,7 +140,6 @@ const App = ({}) => {
 
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {
-              // ...message,
               fileName: message.fileName,
               fileKey: message.fileKey,
               "User Name": message["User Name"],
@@ -149,6 +148,11 @@ const App = ({}) => {
               "Session ID": message["Session ID"],
               ...message.colorStats,
             });
+          break;
+        case "color-replaced":
+          triggerNewRelicCustomEvent(`OneCoreToolbox: color-replaced`, {
+            ...message,
+          });
           break;
       }
     };

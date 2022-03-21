@@ -660,8 +660,22 @@ figma.ui.onmessage = async (msg) => {
 
   if (msg.type === 'apply-color-style') {
     figma.importStyleByKeyAsync(msg.colorStyleKey).then(imported => {
-        figma.getNodeById(msg.layerId)[`${msg.colorType}StyleId`] = imported.id
+      figma.getNodeById(msg.layerId)[`${msg.colorType}StyleId`] = imported.id
+        
+      figma.ui.postMessage({
+          type: 'color-replaced',
+          message: {
+            ...customEventData,
+            layerId: msg.layerId,
+            layerName: figma.getNodeById(msg.layerId).name,
+            originalColor: msg.originalColor,
+            colorStyleKey: msg.colorStyleKey,
+            colorStyleName: msg.colorStyleName,
+            colorStyleColor: msg.colorStyleColor,
+          },
+      });
     })
+
   }
 };
 

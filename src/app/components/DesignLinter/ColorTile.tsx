@@ -27,6 +27,12 @@ interface colorData {
   layerType: string;
 }
 
+interface colorStyleData {
+  colorStyleKey: string;
+  colorStyleName: string;
+  colorStyleColor: string;
+}
+
 interface props {
   colorData: colorData;
   ignoreColorIssue: (colorId) => void;
@@ -174,7 +180,13 @@ const ColorTile = (props: props) => {
           <li
             className="suggested-color-style-list-item"
             key={index}
-            onClick={(e) => handleSuggestionFixClick(e, colorStyle.key)}
+            onClick={(e) =>
+              handleSuggestionFixClick(e, {
+                colorStyleKey: colorStyle.key,
+                colorStyleName: colorStyle.name,
+                colorStyleColor: colorStyle.hex,
+              })
+            }
           >
             <span
               className="suggested-color-style-sample"
@@ -188,12 +200,7 @@ const ColorTile = (props: props) => {
                 {colorStyle.description}
               </p>
             </div>
-            <button
-              className="btn-suggested-color-style-cta"
-              onClick={(e) => handleSuggestionFixClick(e, colorStyle.key)}
-            >
-              Apply fix
-            </button>
+            <button className="btn-suggested-color-style-cta">Apply fix</button>
           </li>
         );
       });
@@ -245,16 +252,19 @@ const ColorTile = (props: props) => {
     setMenuActive(false);
   };
 
-  const handleSuggestionFixClick = (e, colorStyleKey: string) => {
+  const handleSuggestionFixClick = (e, colorStyleData: colorStyleData) => {
     e.stopPropagation();
 
     parent.postMessage(
       {
         pluginMessage: {
           type: "apply-color-style",
-          layerId: layerId,
-          colorStyleKey,
           colorType,
+          layerId: layerId,
+          originalColor: colorInHex,
+          colorStyleKey: colorStyleData.colorStyleKey,
+          colorStyleName: colorStyleData.colorStyleName,
+          colorStyleColor: colorStyleData.colorStyleColor,
         },
       },
       "*"
