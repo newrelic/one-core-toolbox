@@ -134,7 +134,7 @@ const App = ({}) => {
           setSelectionMade(message?.selectionMade);
           setColorTokens(message.colorTokens);
           setColorIssuesFixed(0);
-
+          
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {
               fileName: message.fileName,
@@ -143,7 +143,13 @@ const App = ({}) => {
               "User Avatar": message["User Avatar"],
               "User ID": message["User ID"],
               "Session ID": message["Session ID"],
-              ...message.colorStats,
+              selectedLayersWithColor: message.colorStats.selectedLayersWithColor.length,
+              allInstancesOfColor: message.colorStats.allInstancesOfColor.length, 
+              colorsWithColorStyle: message.colorStats.colorsWithColorStyle.length, 
+              colorsUsingOneCoreStyle: message.colorStats.colorsUsingOneCoreStyle.length, 
+              colorsNotUsingOneCoreColorStyle: message.colorStats.colorsNotUsingOneCoreColorStyle.length, 
+              oneCoreColorStyleCoverage: message.colorStats.oneCoreColorStyleCoverage.length, 
+              idsOfAllInstancesOfColor: message.colorStats.idsOfAllInstancesOfColor.length, 
             });
           break;
         case "color-replaced":

@@ -513,6 +513,7 @@ const getColorStats = () => {
   const idsOfAllInstancesOfColor = allInstancesOfColor.map((color) => color.colorId);
 
   const colorStats = {
+      selectedLayersWithColor: rawLayersWithColor,
       allInstancesOfColor: allInstancesOfColor,
       colorsWithColorStyle: colorsWithColorStyle,
       colorsUsingOneCoreStyle: colorsUsingOneCoreStyle,
