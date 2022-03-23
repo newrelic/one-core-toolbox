@@ -223,7 +223,7 @@ const ColorTile = (props: props) => {
     setMenuTimer(
       setTimeout(() => {
         setMenuActive(false);
-      }, 200)
+      }, 400)
     );
 
     return () => clearTimeout(menuTimer);
