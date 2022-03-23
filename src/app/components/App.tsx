@@ -175,6 +175,9 @@ const App = ({}) => {
         case "open-color-linter":
           setActivePlugin("color-linter");
           break;
+        case "open-theme-switcher":
+          setActivePlugin("theme-switcher");
+          break;
       }
     }
   }, [latestFigmaCommand]);

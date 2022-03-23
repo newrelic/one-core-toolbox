@@ -15,6 +15,7 @@
     {"name": "Table creator", "command": "open-table-creator"},
     {"name": "Design linter", "menu": [
       {"name": "Color", "command": "open-color-linter"}
-    ]}
+      ]},
+    {"name": "Theme switcher", "command": "open-theme-switcher"}
   ]
 }
