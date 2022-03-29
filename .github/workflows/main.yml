@@ -29,7 +29,7 @@ jobs:
       with:
         node-version: 'v14.18.1'
         registry-url: 'https://registry.npmjs.org'
-    - name: Fetch API Data
+    - name: Fetch light mode data
       # You may pin to the exact commit or the version.
       # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
       uses: JamesIves/fetch-api-data-action@releases/v2
@@ -39,7 +39,18 @@ jobs:
         # Any applicable configuration settings that should be set such as authentication tokens. You can reference secrets using the secrets syntax, or you can reference data returned from the `TOKEN_ENDPOINT` request using the triple bracket syntax.
         configuration: '{ "method": "GET", "headers": {"X-Figma-Token": "${{ secrets.FIGMA_API_KEY }}"} }'
         set-output: false
-        save-name: light-mode.json
+        save-name: light-mode
+    - name: Fetch dark mode data
+      # You may pin to the exact commit or the version.
+      # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
+      uses: JamesIves/fetch-api-data-action@releases/v2
+      with:
+        # The URL of the endpoint you would like to retrieve data from.
+        endpoint: https://api.figma.com/v1/files/r2A9XUUQxda5FmgXSsqPU2/styles
+        # Any applicable configuration settings that should be set such as authentication tokens. You can reference secrets using the secrets syntax, or you can reference data returned from the `TOKEN_ENDPOINT` request using the triple bracket syntax.
+        configuration: '{ "method": "GET", "headers": {"X-Figma-Token": "${{ secrets.FIGMA_API_KEY }}"} }'
+        set-output: false
+        save-name: dark-mode
     - name: Build and Deploy 🚀
       uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
