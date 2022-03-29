@@ -110,7 +110,21 @@ const ColorTile = (props: props) => {
   };
 
   const renderTokenSuggestions = () => {
+    
     if (colorTokens?.length > 0) {
+      const privateTokenCategories = [
+        'Buttons', 
+        'Background nav', 
+        'Text nav', 
+        'Multi Control', 
+        'Logo' 
+      ]
+      
+      // Set `colorTokens` to colorTokensOutput minus the private tokens
+      const filteredColorTokens = colorTokens.filter(token => {
+        return !privateTokenCategories.some(category => token.name.includes(category))
+      })
+      
       let relevantColorStyles = [];
       let mostRelevantColorStyles = [];
 
@@ -127,7 +141,7 @@ const ColorTile = (props: props) => {
           });
       } else if (colorType === "fill") {
         // background styles sorted reverse alphabetically
-        relevantColorStyles = colorTokens
+        relevantColorStyles = filteredColorTokens
           .filter((token) => token.name.toLowerCase().includes("background"))
           .sort((a, b) => {
             if (a.name.toLowerCase() > b.name.toLowerCase()) {
@@ -138,7 +152,7 @@ const ColorTile = (props: props) => {
           });
       } else if (colorType === "stroke") {
         // border styles sorted reverse alphabetically
-        relevantColorStyles = colorTokens
+        relevantColorStyles = filteredColorTokens
           .filter((token) => token.name.toLowerCase().includes("border"))
           .sort((a, b) => {
             if (a.name.toLowerCase() > b.name.toLowerCase()) {
@@ -387,7 +401,6 @@ const ColorTile = (props: props) => {
           <h5 className="suggested-color-style-heading">
             Suggested color styles
           </h5>
-          <button className="btn-suggested-color-style-help">Help</button>
         </div>
 
         <ul className="suggested-color-style-list">

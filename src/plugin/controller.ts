@@ -1,7 +1,8 @@
 import uuid from 'uuid-random';
 import { isVisibleNode } from "@figma-plugin/helpers";
-import oneCorePaintStyles from './oneCorePaintStyles.js';
-import rawColorTokens from '../../data/data.json'
+import colorTokens from './colorTokens.js';
+import rawLightColorTokens from '../../data/light-mode.json'
+import rawDarkColorTokens from '../../data/dark-mode.json'
 
 figma.showUI(__html__, { width: 300, height: 448 });
 
@@ -259,7 +260,7 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
         };
 
         array.push({
-            colorId: uuid(), // generat a Unique ID to keep track of colors,
+            colorId: uuid(), // generate a Unique ID to keep track of colors,
             layerId: layer.layerId,
             layerName: layer.name,
             layerType: layer.type,
@@ -275,21 +276,29 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
     }
 };
 
+
 let colorTokens = []
 
 // Add hex values to colorTokens objects
 const getColorTokens = async () => {
-  const allColorTokens = await Promise.all(rawColorTokens.meta.styles.map(async (style) => {
+  const lightModeTokens = await Promise.all(rawLightColorTokens.meta.styles.map(async (style) => style));
+  const darkModeTokens = await Promise.all(rawDarkColorTokens.meta.styles.map(async (style) => style));
+  
+  const allColorTokens = lightModeTokens.concat(darkModeTokens)
+  
+  colorTokens = await Promise.all(allColorTokens.map(async (style) => {
     // Create a rectangle which we'll apply the token to
     // in order to get it's hex value
     const tempRectangle = figma.createRectangle()
+    tempRectangle.visible = false
+    
     let colorStyleWithHex = {}
     
-    // Apply the token 
+    // Apply the token to `tempRectangle`
     const importedStyle = await figma.importStyleByKeyAsync(style.key)
-    tempRectangle.visible = false
     tempRectangle.fillStyleId = importedStyle.id
-  
+    
+    // Set the colorStyleWithHex prop for this token
     if (tempRectangle.fills[0].color !== undefined) {
       colorStyleWithHex = {
         ...style,
@@ -301,28 +310,15 @@ const getColorTokens = async () => {
         hex: 'None' // Currently, some colors in the file are empty & listed as "TBD"
       }
     }
-
     // remove the rectangle from the document
     tempRectangle.remove()
-
+    
     return colorStyleWithHex
   }))
-
-  const privateTokenCategories = [
-    'Buttons', 
-    'Background nav', 
-    'Text nav', 
-    'Multi Control', 
-    'Logo' 
-  ]
-
-  // Set `colorTokens` to allColorTokens minus the private tokens
-  colorTokens = allColorTokens.filter(token => {
-    return !privateTokenCategories.some(category => token.name.includes(category))
-  })
 }
 
 const getColorStats = () => {
+  getColorTokens()
     const getRawLayersWithColor = () => {
       // get the selected layers
       let selection = figma.currentPage.selection;
@@ -441,7 +437,7 @@ const getColorStats = () => {
 
   // Checklist for verifying that a layers uses a One Core color style
   // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
-  // 2. The key extracted from it's (fill/stroke)styleId matches a key from the `oneCorePaintStyles` array
+  // 2. The key extracted from it's (fill/stroke)styleId matches a key from the `colorTokens` array
 
   // This will give you the total number of colors that use a color style
   // const amountOfColorsUsingColorStyle = allInstancesOfColor.reduce((prev, color, index) => {
@@ -451,7 +447,7 @@ const getColorStats = () => {
   const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
       // for every One Core color style...
 
-      return oneCorePaintStyles.some((style) => {
+      return colorTokens.some((style) => {
           // if the argument color matches the current style color
           // return true
           return colorInHex === style?.color?.color?.hex;
@@ -460,7 +456,7 @@ const getColorStats = () => {
 
   const doesKeyMatchAnyOneCoreColorStyleKey = (key) => {
       // for every One Core color style...
-      return oneCorePaintStyles.some((style) => {
+      return colorTokens.some((style) => {
           // if the argument color matches the current style color
           // return true
           return key.includes(style.key);
@@ -483,7 +479,7 @@ const getColorStats = () => {
 
       // add the style name to the colors
       colors.map((color, index) => {
-          oneCorePaintStyles.map((style) => {
+          colorTokens.map((style) => {
               if (color.colorStyleId.includes(style.key)) {
                   colors[index] = {
                       ...color,
@@ -501,7 +497,7 @@ const getColorStats = () => {
   // Every color that isn't using a one core color style
   // loop through all colors...
   const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
-      return !oneCorePaintStyles.some((oneCoreColor) => {
+      return !colorTokens.some((oneCoreColor) => {
           return color.colorStyleId.includes(oneCoreColor.key)
       });
   });
