@@ -1,6 +1,5 @@
 import uuid from 'uuid-random';
 import { isVisibleNode } from "@figma-plugin/helpers";
-import colorTokens from './colorTokens.js';
 import rawLightColorTokens from '../../data/light-mode.json'
 import rawDarkColorTokens from '../../data/dark-mode.json'
 
@@ -11,7 +10,7 @@ let customEventData = {
   fileName: figma.currentPage.parent.name,
   fileKey: figma.fileKey,
   // setting them in title case because that's how
-  // I did it orginally and though I regret it,
+  // I did it originally and though I regret it,
   // I don't want to lose track of historical data
   "User Name": figma.currentUser.name,
   "User Avatar": figma.currentUser.photoUrl,
@@ -281,8 +280,18 @@ let colorTokens = []
 
 // Add hex values to colorTokens objects
 const getColorTokens = async () => {
-  const lightModeTokens = await Promise.all(rawLightColorTokens.meta.styles.map(async (style) => style));
-  const darkModeTokens = await Promise.all(rawDarkColorTokens.meta.styles.map(async (style) => style));
+  const lightModeTokens = await Promise.all(rawLightColorTokens.meta.styles.map(async (style) => {
+    return {
+      ...style,
+      theme: 'light'
+    }
+  }));
+  const darkModeTokens = await Promise.all(rawDarkColorTokens.meta.styles.map(async (style) => {
+    return {
+      ...style,
+      theme: 'dark'
+    }
+  }));
   
   const allColorTokens = lightModeTokens.concat(darkModeTokens)
   

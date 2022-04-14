@@ -112,25 +112,15 @@ const ColorTile = (props: props) => {
   const renderTokenSuggestions = () => {
     
     if (colorTokens?.length > 0) {
-      const privateTokenCategories = [
-        'Buttons', 
-        'Background nav', 
-        'Text nav', 
-        'Multi Control', 
-        'Logo' 
-      ]
-      
       // Set `colorTokens` to colorTokensOutput minus the private tokens
-      const filteredColorTokens = colorTokens.filter(token => {
-        return !privateTokenCategories.some(category => token.name.includes(category))
-      })
+      const filteredColorTokens = colorTokens.filter(token => !token.name.toLowerCase().includes('private'))
       
       let relevantColorStyles = [];
       let mostRelevantColorStyles = [];
 
       if (layerType === "TEXT") {
         // text styles sorted reverse alphabetically
-        relevantColorStyles = colorTokens
+        relevantColorStyles = filteredColorTokens
           .filter((token) => token.name.toLowerCase().includes("text"))
           .sort((a, b) => {
             if (a.name.toLowerCase() > b.name.toLowerCase()) {
@@ -185,6 +175,19 @@ const ColorTile = (props: props) => {
         // sort them by proximity
         .sort((a, b) => {
           return b.similarity - a.similarity;
+        })
+        // If there's a pair of light and dark mode tokens, remove one.
+        // For example: If the color we're suggesting tokens for is #000
+        // we may end up suggesting `Attention/Text/Text On Notification Inverted`
+        // twice. Once for it's light mode version, and once for dark mode (
+        // since they have unequal but similar color values). This is undesirable.
+        .filter(token => {
+          const isDarkModeToken = token.theme === 'dark';
+          const isDuplicate = relevantColorStyles.some(relevantStyle => {
+            return relevantStyle.name.toLowerCase() === token.name.toLowerCase()
+          })
+          
+          return !(isDuplicate && isDarkModeToken)
         })
         // Take the top 5 closest suggestions
         .slice(0, 4);
