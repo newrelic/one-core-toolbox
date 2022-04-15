@@ -538,7 +538,7 @@ const switchToDarkTheme = async (closeAfterRun: Boolean) => {
     themeSwitchedNotification && themeSwitchedNotification?.cancel();
     
     figma.notify("Select some layers before choosing a theme", {error: true});
-    return figma.closePlugin();
+    return closeAfterRun && figma.closePlugin()
   }
   
   // If the notification is already set, turn it off
@@ -572,7 +572,7 @@ const switchToLightTheme = async (closeAfterRun: Boolean) => {
     themeSwitchedNotification && themeSwitchedNotification?.cancel();
     
     figma.notify("Select some layers before choosing a theme", {error: true});
-    return figma.closePlugin();
+    return closeAfterRun && figma.closePlugin()
   }
   
   // If the notification is already set, turn it off
