@@ -780,7 +780,7 @@ figma.ui.onmessage = async (msg) => {
           type: 'color-stats',
           message: {
             ...customEventData,
-            colorStats: getColorStats(),
+            colorStats: await getColorStats(),
             colorTokens: colorTokens,
             selectionMade: figma.currentPage.selection.length > 0
           },
