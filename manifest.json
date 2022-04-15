@@ -13,6 +13,10 @@
     {"name": "Home", "command": "open-home"},
     {"separator": true},
     {"name": "Table creator", "command": "open-table-creator"},
+    {"name": "Theme switcher", "menu": [
+      {"name": "Light mode", "command": "theme-switcher-to-light"},
+      {"name": "Dark mode", "command": "theme-switcher-to-dark"}
+    ]},
     {"name": "Design linter", "menu": [
       {"name": "Color", "command": "open-color-linter"}
     ]}

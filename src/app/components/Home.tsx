@@ -29,6 +29,12 @@ const Home = (props) => {
         onClick={() => setActivePlugin("table-creator")}
       />
       <PluginTile
+        heading="Theme switcher"
+        description="Convert your designs to dark or light mode"
+        icon={IconDesignLinter}
+        onClick={() => setActivePlugin("theme-switcher")}
+      />
+      <PluginTile
         heading="Design linter"
         description="Checks your layers for color styles, and soon will check for language too."
         icon={IconDesignLinter}

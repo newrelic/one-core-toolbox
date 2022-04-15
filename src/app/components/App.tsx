@@ -4,6 +4,7 @@ import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
 import Resizer from "./Resizer";
+import ThemeSwitcher from "./ThemeSwitcher";
 import { PluginContext } from "./PluginContext";
 import Home from "./Home";
 import "../styles/ui.css";
@@ -173,6 +174,9 @@ const App = ({}) => {
         case "open-table-creator":
           setActivePlugin("table-creator");
           break;
+        case "open-theme-switcher":
+          setActivePlugin("theme-switcher");
+          break;
         case "open-language-linter":
           setActivePlugin("language-linter");
           break;
@@ -216,6 +220,12 @@ const App = ({}) => {
           <DesignLinter
             setActivePlugin={handlePluginNavigation}
             openTo={"language"}
+          />
+        );
+      case "theme-switcher":
+        return (
+          <ThemeSwitcher
+            setActivePlugin={handlePluginNavigation}
           />
         );
       case "color-linter":

@@ -1079,3 +1079,7 @@ input:checked + .slider:before {
   transition: all 0.1s ease;
   opacity: 0.4;
 }
+
+.theme-switcher-container {
+  padding: 24px;
+}
