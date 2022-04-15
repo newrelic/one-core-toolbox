@@ -533,6 +533,14 @@ const selectAndZoomToLayer = (layerId: string) => {
 let themeSwitchedNotification = undefined
 
 const switchToDarkTheme = async (closeAfterRun: Boolean) => {
+  if (figma.currentPage.selection.length === 0) {
+    // If the notification is already set, turn it off
+    themeSwitchedNotification && themeSwitchedNotification?.cancel();
+    
+    figma.notify("Select some layers before choosing a theme", {error: true});
+    return figma.closePlugin();
+  }
+  
   // If the notification is already set, turn it off
   themeSwitchedNotification && themeSwitchedNotification?.cancel();
   
@@ -559,6 +567,14 @@ const switchToDarkTheme = async (closeAfterRun: Boolean) => {
 }
 
 const switchToLightTheme = async (closeAfterRun: Boolean) => {
+  if (figma.currentPage.selection.length === 0) {
+    // If the notification is already set, turn it off
+    themeSwitchedNotification && themeSwitchedNotification?.cancel();
+    
+    figma.notify("Select some layers before choosing a theme", {error: true});
+    return figma.closePlugin();
+  }
+  
   // If the notification is already set, turn it off
   themeSwitchedNotification && themeSwitchedNotification?.cancel();
   

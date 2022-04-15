@@ -2,6 +2,7 @@ import * as React from "react";
 import "../styles/ui.css";
 import IconTableCreator from "../assets/icon-table-creator.svg";
 import IconDesignLinter from "../assets/icon-design-linter.svg";
+import IconThemeSwitcher from "../assets/icon-theme-switcher.svg";
 
 const Home = (props) => {
   const { setActivePlugin } = props;
@@ -30,8 +31,8 @@ const Home = (props) => {
       />
       <PluginTile
         heading="Theme switcher"
-        description="Convert your designs to dark or light mode"
-        icon={IconDesignLinter}
+        description="A dark mode or light mode setting for your layers"
+        icon={IconThemeSwitcher}
         onClick={() => setActivePlugin("theme-switcher")}
       />
       <PluginTile

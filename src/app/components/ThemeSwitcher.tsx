@@ -2,6 +2,8 @@ import * as React from "react";
 import { useState } from "react";
 import "../styles/ui.css";
 import IconChevronLeft from "../assets/icon-chevron-left.svg";
+import LightModeThumbnail from "../assets/light-mode-thumbnail.svg";
+import DarkModeThumbnail from "../assets/dark-mode-thumbnail.svg";
 
 declare function require(path: string): any;
 
@@ -57,8 +59,50 @@ const ThemeSwitcher = (props: props) => {
         {renderNavigationTabs()}
       </ul>
       <main className="theme-switcher-container">
-        <button onClick={() => setLightTheme()}>Light mode</button>
-        <button onClick={() => setDarkTheme()}>Dark mode</button>
+        <h4 className="theme-switcher-heading">Choose a theme</h4>
+        <p className="theme-switcher-description">Select some layers, then chose a theme below.</p>
+        <form className="theme-selection-container">
+          <div className="theme-selection-option">
+            <input 
+              type="radio" 
+              className="theme-selection-input" 
+              id="light-mode-checkbox"
+              name="theme-choice"
+            />
+            <label 
+              htmlFor="light-mode-checkbox" 
+              className="theme-selection-input-label"
+              onClick={() => setLightTheme()}
+            >
+              <img 
+                src={LightModeThumbnail} 
+                alt="Thumbnail of light screen example" 
+                className="theme-selection-thumbnail-image"
+              />
+              <span className="theme-selection-label-text">Light mode</span>
+            </label>
+          </div>
+          <div className="theme-selection-option">
+            <input 
+              type="radio" 
+              className="theme-selection-input"
+              id="dark-mode-checkbox"
+              name="theme-choice"
+            />
+            <label 
+              htmlFor="dark-mode-checkbox" 
+              className="theme-selection-input-label"
+              onClick={() => setDarkTheme()}
+            >
+              <img 
+                src={DarkModeThumbnail} 
+                alt="Thumbnail of dark screen example" 
+                className="theme-selection-thumbnail-image"
+              />
+              <span className="theme-selection-label-text">Dark mode</span>
+            </label>
+          </div>
+        </form>
       </main>
     </>
   );
