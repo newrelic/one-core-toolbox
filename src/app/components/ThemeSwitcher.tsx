@@ -1,5 +1,4 @@
 import * as React from "react";
-import { useState } from "react";
 import "../styles/ui.css";
 import IconChevronLeft from "../assets/icon-chevron-left.svg";
 import LightModeThumbnail from "../assets/light-mode-thumbnail.svg";

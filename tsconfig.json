@@ -2,6 +2,7 @@
   "compilerOptions": {
     "types": [],
     "target": "es6",
+    "lib": ["es2019", "dom"],
     "outDir": "dist",
     "jsx": "react",
     "noUnusedLocals": true,
@@ -11,6 +12,7 @@
     "removeComments": true,
     "noImplicitAny": false,
     "moduleResolution": "node",
-    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"]
+    "typeRoots": ["./node_modules/@types", "./node_modules/@figma"],
+    "resolveJsonModule": true
   }
 }

@@ -320,7 +320,7 @@ const getColorStats = async () => {
 
       const relevantLayers: SceneNode[][] = selection.map((selectedLayer) => {
           // Get all styles in selection that have a color
-          // (the output will have a lot of data stored in prototype properites)
+          // (the output will have a lot of data stored in prototype properties)
           
           let outputForLayersWithChildren: SceneNode[] = []
 
@@ -398,8 +398,16 @@ const getColorStats = async () => {
       const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
       const hasFillAndStroke = hasFill && hasStroke;
       const isChildOfIcon = layer.parent.type === 'BOOLEAN_OPERATION'
-      const parentIconHasFill = layer.parent?.fills?.length > 0
+      let parentIconHasFill = false
       const isChildOfIconWithFill = isChildOfIcon && parentIconHasFill
+      
+      const checkParentForFill = () => {
+        if ("fills" in layer.parent) {
+          parentIconHasFill = (layer.parent.fills as []).length > 0
+        }  
+      }
+      
+      checkParentForFill()
 
       return {
           layerId: layer.id,
@@ -444,25 +452,6 @@ const getColorStats = async () => {
   // const amountOfColorsUsingColorStyle = allInstancesOfColor.reduce((prev, color, index) => {
   //   return color.hasColorStyle ? prev + 1 : prev
   // }, 0)
-
-  const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
-      // for every One Core color style...
-
-      return colorTokens.some((style) => {
-          // if the argument color matches the current style color
-          // return true
-          return colorInHex === style?.color?.color?.hex;
-      }, false);
-  };
-
-  const doesKeyMatchAnyOneCoreColorStyleKey = (key) => {
-      // for every One Core color style...
-      return colorTokens.some((style) => {
-          // if the argument color matches the current style color
-          // return true
-          return key.includes(style.key);
-      }, false);
-  };
 
   // for each color that has a color style
   const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
@@ -532,7 +521,8 @@ const selectAndZoomToLayer = (layerId: string) => {
 // Define the notification here so we can cancel it later
 let themeSwitchedNotification = undefined
 
-const switchToDarkTheme = async (closeAfterRun: Boolean) => {
+const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = false) => {
+  // Check for a selection. If none exists, show error notification.
   if (figma.currentPage.selection.length === 0) {
     // If the notification is already set, turn it off
     themeSwitchedNotification && themeSwitchedNotification?.cancel();
@@ -545,7 +535,7 @@ const switchToDarkTheme = async (closeAfterRun: Boolean) => {
   themeSwitchedNotification && themeSwitchedNotification?.cancel();
   
   // Tell the user we're working on the theme change
-  const loadingNotification = figma.notify("Converting selection to dark mode...");
+  const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
   
   // Get the list of colors that aren't using one core color styles
   const colorStats = await getColorStats()
@@ -553,8 +543,12 @@ const switchToDarkTheme = async (closeAfterRun: Boolean) => {
   // Replace every one core color style with it's 
   // dark mode equivalent
   for (const color of colorStats.colorsUsingOneCoreStyle) {
-    if (color.token.theme === 'light') {
-      await figma.importStyleByKeyAsync(color.token.darkThemeToken).then(imported => {
+    if ("theme" in color.token && color.token?.theme !== theme) {
+      const keyOfTokenInOppositeTheme = theme === 'light' ? 
+        color.token.lightThemeToken : 
+        color.token.darkThemeToken
+      
+      await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme).then(imported => {
         figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
       })
     }
@@ -562,43 +556,79 @@ const switchToDarkTheme = async (closeAfterRun: Boolean) => {
   
   loadingNotification.cancel();
   
-  themeSwitchedNotification = figma.notify("🌙 Selection set to dark mode");
+  themeSwitchedNotification = figma.notify(
+    `${theme === 'light' ? '🔆' : '🌙'} Selection set to ${theme} mode`
+  );
   closeAfterRun && figma.closePlugin()
 }
 
-const switchToLightTheme = async (closeAfterRun: Boolean) => {
-  if (figma.currentPage.selection.length === 0) {
-    // If the notification is already set, turn it off
-    themeSwitchedNotification && themeSwitchedNotification?.cancel();
-    
-    figma.notify("Select some layers before choosing a theme", {error: true});
-    return closeAfterRun && figma.closePlugin()
-  }
-  
-  // If the notification is already set, turn it off
-  themeSwitchedNotification && themeSwitchedNotification?.cancel();
-  
-  // Tell the user we're working on the theme change
-  const loadingNotification = figma.notify("Converting selection to light mode...");
-  
-  // Get the list of colors that aren't using one core color styles
-  const colorStats = await getColorStats()
-  
-  // Replace every one core color style with it's 
-  // dark mode equivalent
-  for (const color of colorStats.colorsUsingOneCoreStyle) {
-    if (color.token.theme === 'dark') {
-      await figma.importStyleByKeyAsync(color.token.lightThemeToken).then(imported => {
-        figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
-      })
-    }
-  }
-  
-  loadingNotification.cancel();
-  
-  themeSwitchedNotification = figma.notify("🔆 Selection set to light mode");
-  closeAfterRun && figma.closePlugin()
-}
+// const switchToDarkTheme = async (closeAfterRun: Boolean = false) => {
+//   if (figma.currentPage.selection.length === 0) {
+//     // If the notification is already set, turn it off
+//     themeSwitchedNotification && themeSwitchedNotification?.cancel();
+//     
+//     figma.notify("Select some layers before choosing a theme", {error: true});
+//     return closeAfterRun && figma.closePlugin()
+//   }
+//   
+//   // If the notification is already set, turn it off
+//   themeSwitchedNotification && themeSwitchedNotification?.cancel();
+//   
+//   // Tell the user we're working on the theme change
+//   const loadingNotification = figma.notify("Converting selection to dark mode...");
+//   
+//   // Get the list of colors that aren't using one core color styles
+//   const colorStats = await getColorStats()
+//   
+//   // Replace every one core color style with it's 
+//   // dark mode equivalent
+//   for (const color of colorStats.colorsUsingOneCoreStyle) {
+//     if (color.token.theme === 'light') {
+//       await figma.importStyleByKeyAsync(color.token.darkThemeToken).then(imported => {
+//         figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
+//       })
+//     }
+//   }
+//   
+//   loadingNotification.cancel();
+//   
+//   themeSwitchedNotification = figma.notify("🌙 Selection set to dark mode");
+//   closeAfterRun && figma.closePlugin()
+// }
+// 
+// const switchToLightTheme = async (closeAfterRun: Boolean = false) => {
+//   if (figma.currentPage.selection.length === 0) {
+//     // If the notification is already set, turn it off
+//     themeSwitchedNotification && themeSwitchedNotification?.cancel();
+//     
+//     figma.notify("Select some layers before choosing a theme", {error: true});
+//     return closeAfterRun && figma.closePlugin()
+//   }
+//   
+//   // If the notification is already set, turn it off
+//   themeSwitchedNotification && themeSwitchedNotification?.cancel();
+//   
+//   // Tell the user we're working on the theme change
+//   const loadingNotification = figma.notify("Converting selection to light mode...");
+//   
+//   // Get the list of colors that aren't using one core color styles
+//   const colorStats = await getColorStats()
+//   
+//   // Replace every one core color style with it's 
+//   // dark mode equivalent
+//   for (const color of colorStats.colorsUsingOneCoreStyle) {
+//     if (color.token.theme === 'dark') {
+//       await figma.importStyleByKeyAsync(color.token.lightThemeToken).then(imported => {
+//         figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
+//       })
+//     }
+//   }
+//   
+//   loadingNotification.cancel();
+//   
+//   themeSwitchedNotification = figma.notify("🔆 Selection set to light mode");
+//   closeAfterRun && figma.closePlugin()
+// }
 
 // ==============================================================
 // Handle navigation
@@ -636,10 +666,10 @@ switch (figma.command) {
     navigateTo('open-table-creator')
     break;
   case "theme-switcher-to-light":
-    switchToLightTheme(true)
+    switchToTheme('light', true)
     break;
   case "theme-switcher-to-dark":
-    switchToDarkTheme(true)
+    switchToTheme('dark', true)
     break;
   case "open-language-linter":
     figma.showUI(__html__, { width: 475, height: 500 });
@@ -822,10 +852,10 @@ figma.ui.onmessage = async (msg) => {
   
   /*-- Theme switcher messages --*/  
   if (msg.type === 'theme-switcher-to-dark') {
-    switchToDarkTheme()
+    switchToTheme('dark')
   }
   if (msg.type === 'theme-switcher-to-light') {  
-    switchToLightTheme()
+    switchToTheme('light')
   }
 };
 
