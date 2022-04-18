@@ -3,7 +3,12 @@ import { isVisibleNode } from "@figma-plugin/helpers";
 import rawLightColorTokens from '../../data/light-mode.json'
 import rawDarkColorTokens from '../../data/dark-mode.json'
 
-figma.showUI(__html__, { width: 300, height: 448 });
+let uiSize = {
+  width: 300,
+  height: 448
+};
+
+figma.showUI(__html__, { width: uiSize.width, height: uiSize.height });
 
 // Used to send a custom event to New Relic
 let customEventData = {
@@ -36,10 +41,18 @@ switch (figma.command) {
     break;
   case "open-language-linter":
     navigateTo('open-language-linter')
+    uiSize = {
+      width: 475,
+      height: 500
+    };
     figma.ui.resize(475, 500)
     break;
   case "open-color-linter":
     navigateTo('open-color-linter')
+    uiSize = {
+      width: 475,
+      height: 500
+    };
     figma.ui.resize(475, 500)
     break;
 }
@@ -546,20 +559,36 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === "navigate-to-tab") {
     switch (msg.tabClicked) {
       case "home":
-        figma.ui.resize(300, 448)
+        uiSize = {
+          width: 300,
+          height: 448
+        };
+        figma.ui.resize(uiSize.width, uiSize.height)
         navigateTo('open-home')
         break;
       case "table-creator":
-        figma.ui.resize(300, 448)
+        uiSize = {
+          width: 300,
+          height: 448
+        };
+        figma.ui.resize(uiSize.width, uiSize.height)
         navigateTo('open-table-creator')
         break;
       case "language-linter":
         sendCurrentTextSelection()
-        figma.ui.resize(475, 500)
+        uiSize = {
+          width: 475,
+          height: 500
+        };
+        figma.ui.resize(uiSize.width, uiSize.height)
         navigateTo('open-language-linter')
         break;
       case "color-linter":
-        figma.ui.resize(475, 500)
+        uiSize = {
+          width: 475,
+          height: 500
+        };
+        figma.ui.resize(uiSize.width, uiSize.height)
         navigateTo('open-color-linter')
         break;
     }
@@ -681,7 +710,13 @@ figma.ui.onmessage = async (msg) => {
           },
       });
     })
-
+  }
+  
+  if (msg.type === "resize") {
+    figma.ui.resize(
+      msg.size.x >= uiSize.width ? msg.size.x : uiSize.width, 
+      msg.size.y >= uiSize.height ? msg.size.y : uiSize.height
+    );
   }
 };
 
