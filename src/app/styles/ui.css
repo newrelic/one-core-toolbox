@@ -1146,3 +1146,7 @@ input:checked + .slider:before {
   color: #283636;
   font-weight: 500;
 }
+
+[class*="modal--frame"] {
+  opacity: .3;
+}

@@ -63,11 +63,17 @@ const App = ({}) => {
     eventName: string,
     customData: Object
   ) => {
-    // newrelic is included at the top of ui.html in a
+    // `newrelic` is included at the top of ui.html in a
     // a script tag. Typescript will complain. So...
     // @ts-ignore
     newrelic.addPageAction(eventName, customData);
     // console.log("custom event posted", eventName);
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('foo');
+      }, 500);
+    })
   };
 
   // Listen for messages from controller
@@ -158,6 +164,19 @@ const App = ({}) => {
           triggerNewRelicCustomEvent(`OneCoreToolbox: color-replaced`, {
             ...message,
           });
+          break;
+        case "theme-switched":
+          const sendThemeSwitcherEvent = async () => {
+            await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
+              ...message,
+            });
+            
+            if (message.closeAfterRun) {
+              parent.postMessage({ pluginMessage: { type: "close-plugin" } }, "*");  
+            }
+          }
+          sendThemeSwitcherEvent();
+          debugger
           break;
       }
     };

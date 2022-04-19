@@ -522,6 +522,10 @@ const selectAndZoomToLayer = (layerId: string) => {
 let themeSwitchedNotification = undefined
 
 const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = false) => {
+  if (closeAfterRun) {
+    figma.showUI(__html__, { width: 70, height: 0 });
+  }
+  
   // Check for a selection. If none exists, show error notification.
   if (figma.currentPage.selection.length === 0) {
     // If the notification is already set, turn it off
@@ -559,7 +563,13 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   themeSwitchedNotification = figma.notify(
     `${theme === 'light' ? '🔆' : '🌙'} Selection set to ${theme} mode`
   );
-  closeAfterRun && figma.closePlugin()
+  
+  figma.ui.postMessage({ type: "theme-switched", message: {
+      switchedTo: theme,
+      closeAfterRun,
+      ...customEventData
+    } 
+  });
 }
 
 // ==============================================================

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": [],
+    "types": ["node"],
     "target": "es6",
     "lib": ["es2019", "dom"],
     "outDir": "dist",
