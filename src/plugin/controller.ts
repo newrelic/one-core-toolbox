@@ -3,6 +3,12 @@ import { isVisibleNode } from "@figma-plugin/helpers";
 import rawLightColorTokens from '../../data/light-mode.json'
 import rawDarkColorTokens from '../../data/dark-mode.json'
 
+// Set the size of the plugin window
+let uiSize = {
+  width: 300,
+  height: 448
+};
+
 // ==============================================================
 // Table creator functions
 // ==============================================================
