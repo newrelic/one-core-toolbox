@@ -176,7 +176,6 @@ const App = ({}) => {
             }
           }
           sendThemeSwitcherEvent();
-          debugger
           break;
       }
     };

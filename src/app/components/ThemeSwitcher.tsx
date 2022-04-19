@@ -1,4 +1,6 @@
 import * as React from "react";
+import { useContext, useEffect, useRef } from "react";
+import { PluginContext } from "./PluginContext";
 import "../styles/ui.css";
 import IconChevronLeft from "../assets/icon-chevron-left.svg";
 import LightModeThumbnail from "../assets/light-mode-thumbnail.svg";
@@ -11,7 +13,19 @@ interface props {
 }
 
 const ThemeSwitcher = (props: props) => {
+  const { state } = useContext(PluginContext);
+  const { currentSelection } = state;
+  
   const { setActivePlugin } = props;
+  const lightModeRadioOption = useRef(null);
+  const darkModeRadioOption = useRef(null);
+  
+  useEffect(() => {
+    if (currentSelection?.length > []) {
+      lightModeRadioOption.current.checked = false
+      darkModeRadioOption.current.checked = false
+    }
+  }, currentSelection)
 
   const handleTabClick = (nameOfTab: string) => {
     setActivePlugin(nameOfTab);
@@ -67,6 +81,7 @@ const ThemeSwitcher = (props: props) => {
               className="theme-selection-input" 
               id="light-mode-checkbox"
               name="theme-choice"
+              ref={lightModeRadioOption}
             />
             <label 
               htmlFor="light-mode-checkbox" 
@@ -87,6 +102,7 @@ const ThemeSwitcher = (props: props) => {
               className="theme-selection-input"
               id="dark-mode-checkbox"
               name="theme-choice"
+              ref={darkModeRadioOption}
             />
             <label 
               htmlFor="dark-mode-checkbox" 
