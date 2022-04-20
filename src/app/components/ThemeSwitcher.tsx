@@ -25,7 +25,7 @@ const ThemeSwitcher = (props: props) => {
       lightModeRadioOption.current.checked = false
       darkModeRadioOption.current.checked = false
     }
-  }, currentSelection)
+  }, [currentSelection])
 
   const handleTabClick = (nameOfTab: string) => {
     setActivePlugin(nameOfTab);
