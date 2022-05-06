@@ -111,6 +111,10 @@ table td {
   gap: 0px;
 }
 
+.tab-navigation:hover .language-beta-tab {
+  opacity: 1; 
+}
+
 .tab-navigation-tab {
   display: grid;
   place-items: center;
@@ -557,6 +561,15 @@ input:checked + .slider:before {
   padding: 10px 6px;
   border-radius: 3px;
   background-color: rgba(0, 0, 0, 0.035);
+}
+
+.language-beta-tab {
+  opacity: 0;
+  transition: .05s opacity ease-out;
+}
+
+.language-beta-tab.active {
+  opacity: 1;
 }
 
 /*-- Home --*/
