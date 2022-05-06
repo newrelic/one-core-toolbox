@@ -318,7 +318,7 @@ const getColorTokens = async (mapThemesToEachOther: Boolean) => {
   tempRectangle.remove()
 }
 
-const getColorStats = async () => {
+const getColorStats = async (forThemeSwitcher: Boolean = false) => {
     await getColorTokens(true)
     const getRawLayersWithColor = () => {
       // get the selected layers
@@ -331,7 +331,7 @@ const getColorStats = async () => {
           let outputForLayersWithChildren: SceneNode[] = []
 
           const isRelevantLayer = (n) => {
-            const acceptableNodetypes = [
+            let acceptableNodetypes = [
                   'ELLIPSE',
                   'FRAME',
                   'GROUP',
@@ -346,6 +346,11 @@ const getColorStats = async () => {
                   'BOOLEAN_OPERATION'
                   // 'VECTOR'
               ];
+
+              // If this function is being run for the Theme switcher, be sure
+              // to include Vector layers so they aren't left unconverted to
+              // the chosen theme.
+              forThemeSwitcher && acceptableNodetypes.push('VECTOR')
               
               let hasFill = "fills" in n && n?.fills[0] !== undefined
               let hasStroke = "strokes" in n && n?.strokes[0] !== undefined
@@ -548,7 +553,7 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
   
   // Get the list of colors that aren't using one core color styles
-  const colorStats = await getColorStats()
+  const colorStats = await getColorStats(true)
   
   // Replace every one core color style with it's 
   // dark mode equivalent
