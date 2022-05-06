@@ -211,31 +211,47 @@ const rgbToHex = (r, g, b) => {
 
 // Utility function for pushing a color into an array
 // it's just saving me from repeating myself a bit
-const pushColorToArray = (layer, colorType: string, array: any[]) => {
+const pushColorToArray = (
+    layer, 
+    colorType: string, 
+    array: any[], 
+    layerHasSegmentStyles: Boolean = false
+  ) => {
     const styleIdType = colorType === 'fills' ? 'fillStyleId' : 'strokeStyleId';
     const isSolidColor = layer?.fills[0]?.type === 'SOLID';
     const colorIsImage = colorType === 'fills' && layer?.fills[0]?.type === 'IMAGE';
     const colorIsGradient = colorType === 'fills' && layer?.fills[0]?.type.includes('GRADIENT')
-    const colorIsVisible = layer[colorType][0].visible
+    const colorIsVisible = layerHasSegmentStyles ? true : layer[colorType][0].visible
+    const colorInHex = (colorInRGB) => {
+        return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
+    };
+    const segmentColorInHex = layerHasSegmentStyles ? colorInHex(layer.segment.fills[0].color) : false
+    const hasColorStyle = () => {
+      if (layerHasSegmentStyles) {
+        return layer.segment.fillStyleId.length > 0
+      } else {
+        return isSolidColor ? layer[styleIdType].length > 0 : false
+      }
+    }
+    
+    console.log(segmentColorInHex);
 
     if (!colorIsImage && !colorIsGradient && colorIsVisible && !layer.isChildOfIconWithFill) {
-        const colorInHex = (colorInRGB) => {
-            return rgbToHex(colorInRGB.r, colorInRGB.g, colorInRGB.b);
-        };
-
         array.push({
             colorId: uuid(), // generate a Unique ID to keep track of colors,
             layerId: layer.layerId,
             layerName: layer.name,
             layerType: layer.type,
-            color: layer[colorType],
-            colorStyleId: layer[styleIdType],
+            color: layerHasSegmentStyles? layer.segment.fills[0] : layer[colorType],
+            colorStyleId: layerHasSegmentStyles ? layer.segment.fillStyleId : layer[styleIdType],
             // if it's a gradient assume it doesn't have a color style
             // Unsafe assumption? Yes. Time saver? Yes.
-            hasColorStyle: isSolidColor ? layer[styleIdType].length > 0 : false,
+            hasColorStyle: hasColorStyle(),
             visible: layer.visible,
             colorType: colorType.slice(0, -1), // it's plural, make it singular
-            colorInHex: colorInHex(layer[colorType][0].color),
+            colorInHex: layerHasSegmentStyles ? segmentColorInHex : colorInHex(layer[colorType][0].color),
+            layerHasSegmentStyles: layerHasSegmentStyles,
+            segment: layerHasSegmentStyles && layer.segment
         });
     }
 };
@@ -302,7 +318,7 @@ const getColorTokens = async (mapThemesToEachOther: Boolean) => {
     
     // Apply the token to `tempRectangle`
     const importedStyle = await figma.importStyleByKeyAsync(style.key)
-    tempRectangle.fillStyleId = importedStyle.id
+    tempRectangle.fillStyleId = importedStyle.id  
     
     // Set the colorStyleWithHex prop for this token
     if (tempRectangle.fills[0].color !== undefined) {
@@ -352,20 +368,30 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
                   'BOOLEAN_OPERATION'
                   // 'VECTOR'
               ];
+              
+              const hasFill = "fills" in n && n?.fills[0] !== undefined
+              const hasStroke = "strokes" in n && n?.strokes[0] !== undefined
+            
+              // Check for segments of text styled differently
+              const textLayerHasSegmentStyles = () => {
+                if (n.type !== 'TEXT') {
+                  return false
+                } else {
+                  return n.getStyledTextSegments(['fills']).length > 1
+                }
+              }
 
               // If this function is being run for the Theme switcher, be sure
               // to include Vector layers so they aren't left unconverted to
               // the chosen theme.
               forThemeSwitcher && acceptableNodetypes.push('VECTOR')
               
-              let hasFill = "fills" in n && n?.fills[0] !== undefined
-              let hasStroke = "strokes" in n && n?.strokes[0] !== undefined
-              
               const hasFillOrStroke = hasFill || hasStroke
               const nodeIsValidNodeType = acceptableNodetypes.some((nodeType) => n.type === nodeType);
-
-              return nodeIsValidNodeType && hasFillOrStroke
+              
+              return nodeIsValidNodeType && (hasFillOrStroke || textLayerHasSegmentStyles())
           }
+          
 
           // return the layer if it fit's the criteria of isRelevantLayer()
           const selectedLayerHasChildren = 
@@ -393,6 +419,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
 
       let output = relevantLayers.flat()
       output = output.filter(layer => isVisibleNode(layer))
+      
+      console.log(output);
 
       return output
   };
@@ -411,8 +439,11 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // Pull out the data taht we care about and make it accessible
   // without needing to access prototype properties.
   const layersWithColor = rawLayersWithColor.map((layer) => {
+      console.log('arrived madue');
+      
       const hasFill = "fills" in layer && layer.fills[0] !== undefined
       const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
+      const textLayerHasSegmentStyles = layer.type === 'TEXT' && layer.getStyledTextSegments(['fills']).length > 1
       const hasFillAndStroke = hasFill && hasStroke;
       const isChildOfIcon = layer.parent.type === 'BOOLEAN_OPERATION'
       let parentIconHasFill = false
@@ -425,7 +456,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       }
       
       checkParentForFill()
-
+      
+      
       return {
           layerId: layer.id,
           name: layer.name,
@@ -438,7 +470,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
           hasFill: hasFill,
           hasStroke: hasStroke,
           hasFillAndStroke: hasFillAndStroke,
-          isChildOfIconWithFill: isChildOfIconWithFill
+          isChildOfIconWithFill: isChildOfIconWithFill,
+          hasSegmentStyles: textLayerHasSegmentStyles
       };
   });
   
@@ -455,11 +488,25 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
               pushColorToArray(layer, 'fills', tempColors);
           } else if (layer.hasStroke) {
               pushColorToArray(layer, 'strokes', tempColors);
+          } else if (layer.hasSegmentStyles) {
+              const node = (figma.getNodeById(layer.layerId) as TextNode)
+              const segmentedFills = node.getStyledTextSegments(['fills'])
+
+              // Store the fillStyleId in the segment
+              segmentedFills.forEach(segment => {
+                const fillStyleId = node.getRangeFillStyleId(segment.start, segment.end)
+                const segmentToBePushed = {...segment, fillStyleId}
+                const layerToBePushed = {...layer, segment: segmentToBePushed}
+                
+                pushColorToArray(layerToBePushed, 'fills', tempColors, true);
+              })
           }
 
           return tempColors;
       })
       .flat();
+      
+      console.log(allInstancesOfColor);
 
   // Checklist for verifying that a layers uses a One Core color style
   // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
@@ -474,11 +521,12 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   const colorsUsingOneCoreStyle = allInstancesOfColor.filter((color) => {
       return colorTokens.some((oneCoreColor) => {
           return color.colorStyleId.includes(oneCoreColor.key)
-      });
+      }); 
   }).map(color => {
     // Save the one core token as property on the color object
     let oneCoreToken = undefined
     
+
     colorTokens.forEach((oneCoreColor) => {
         if (color.colorStyleId.includes(oneCoreColor.key)) {
           oneCoreToken = oneCoreColor
@@ -490,6 +538,9 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       token: oneCoreToken
     }
   })
+  
+  console.log('colorsUsingOneCoreStyle', colorsUsingOneCoreStyle);
+  
   
   if (forThemeSwitcher) {
     return colorsUsingOneCoreStyle
@@ -504,6 +555,7 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // loop through all colors...
   const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
       return !colorTokens.some((oneCoreColor) => {
+          console.log('color.colorStyleId', color.colorStyleId);
           return color.colorStyleId.includes(oneCoreColor.key)
       });
   });
@@ -523,7 +575,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
       idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
   };
-
+  
+  console.log('colorStats', colorStats);
   return colorStats
 }
 
@@ -542,6 +595,9 @@ const selectAndZoomToLayer = (layerId: string) => {
 let themeSwitchedNotification = undefined
 
 const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = false) => {
+  console.log('---');
+  const start = new Date().getTime();
+  
   if (closeAfterRun) {
     figma.showUI(__html__, { width: 70, height: 0 });
   }
@@ -560,30 +616,66 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   
   // Tell the user we're working on the theme change
   const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
+  console.log('ThemeSwitcher Intro: ' + (new Date().getTime() - start)/1000);
+  
+  const getColorStatsTimer = new Date().getTime();
   
   // Get the list of colors that are using one core color styles
   const colorStats = await getColorStats(true)
+  console.log('getColorStats(): ' + (new Date().getTime() - getColorStatsTimer)/1000);
+  
+  console.log(colorStats);
+  
+  const fetchingTimer = new Date().getTime();
+  
+  const importedStyles = []
   
   // Replace every one core color style with it's 
   // dark mode equivalent
   for (const color of colorStats) {
     if ("theme" in color.token && color.token?.theme !== theme) {
+      let importedStyle: BaseStyle = null
+      const node = figma.getNodeById(color.layerId)
+      
       const keyOfTokenInOppositeTheme = theme === 'light' ? 
         color.token.lightThemeToken : 
         color.token.darkThemeToken
       
-      console.log(color);
-      
+      // Check to see if there's an available token to switch to
       if (keyOfTokenInOppositeTheme === null) {
         console.error(`Missing token: No ${theme} theme token found for "${color.token.name}".`);
-      } else {
-        const style = await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme)
-        const node = figma.getNodeById(color.layerId)
-        
-        node[`${color.colorType}StyleId`] = style.id
+        return
       }
+      
+      // Check to see if this token has already been imported
+      // So that we don't waste time importing the same token more than once
+      const styleAlreadyImported = importedStyles.some(style => {
+        return style.key === keyOfTokenInOppositeTheme
+      })
+      
+      // Fetch the token
+      if (styleAlreadyImported) {
+        importedStyle = importedStyles.find(style => style.key === keyOfTokenInOppositeTheme)
+      } else {
+        importedStyle = await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme)
+      }
+      
+      // Get ready to set the token on the layer
+      // First, check to see if the layer has segment styles
+      if (color.layerHasSegmentStyles) {  
+        (node as TextNode).setRangeFillStyleId(color.segment.start, color.segment.end, importedStyle.id)
+      } else {
+        // Set the token on the layer
+        node[`${color.colorType}StyleId`] = importedStyle.id
+      }
+      
+      // Update the importedStyles array if appropriate
+      !styleAlreadyImported && importedStyles.push(importedStyle)
     }
   }
+  
+  console.log('fetch and apply tokens: ' + (new Date().getTime() - fetchingTimer)/1000);
+  const footerTimer = new Date().getTime();
   
   loadingNotification.cancel();
   
@@ -597,6 +689,9 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
       ...customEventData
     } 
   });
+  
+  console.log('Theme switcher footer: ' + (new Date().getTime() - footerTimer)/1000);
+  console.log('Total execution time: ' + (new Date().getTime() - start)/1000);
 }
 
 // ==============================================================
@@ -774,12 +869,16 @@ figma.ui.onmessage = async (msg) => {
   /*-- Color linter messages --*/
     const sendColorData = async () => {
       await getColorTokens(false)
+      
+      const colorStats =  await getColorStats();
+      
+      console.log('gotColorstats yo', colorStats);
 
       figma.ui.postMessage({
           type: 'color-stats',
           message: {
             ...customEventData,
-            colorStats: await getColorStats(),
+            colorStats: colorStats,
             colorTokens: colorTokens,
             selectionMade: figma.currentPage.selection.length > 0
           },

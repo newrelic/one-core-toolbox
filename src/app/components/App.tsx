@@ -135,6 +135,7 @@ const App = ({}) => {
           break;
         // Color linter
         case "color-stats":
+          console.log('color-stats begun');
           setLoadingColorData(false);
           setColorsWithIssues(
             message?.colorStats?.colorsNotUsingOneCoreColorStyle
