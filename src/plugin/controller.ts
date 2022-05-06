@@ -316,11 +316,11 @@ const getColorTokens = async (mapThemesToEachOther: Boolean) => {
         hex: 'None' // Currently, some colors in the file are empty & listed as "TBD"
       }
     }
-    // remove the rectangle from the document
     
     return colorStyleWithHex
   }))
   
+  // remove the rectangle from the document
   tempRectangle.remove()
 }
 
