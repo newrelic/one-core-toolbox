@@ -3,59 +3,11 @@ import { isVisibleNode } from "@figma-plugin/helpers";
 import rawLightColorTokens from '../../data/light-mode.json'
 import rawDarkColorTokens from '../../data/dark-mode.json'
 
+// Set the size of the plugin window
 let uiSize = {
   width: 300,
   height: 448
 };
-
-figma.showUI(__html__, { width: uiSize.width, height: uiSize.height });
-
-// Used to send a custom event to New Relic
-let customEventData = {
-  fileName: figma.currentPage.parent.name,
-  fileKey: figma.fileKey,
-  // setting them in title case because that's how
-  // I did it originally and though I regret it,
-  // I don't want to lose track of historical data
-  "User Name": figma.currentUser.name,
-  "User Avatar": figma.currentUser.photoUrl,
-  "User ID": figma.currentUser.id,
-  "Session ID": figma.currentUser.sessionId,
-};
-
-// handle submenu navigation
-const navigateTo = (screen: string) => {
-  figma.ui.postMessage({ type: "figma-command", message: {
-      openedTo: screen,
-      ...customEventData
-    } 
-  });
-}
-
-switch (figma.command) {
-  case "open-home":
-    navigateTo('open-home')
-    break;
-  case "open-table-creator":
-    navigateTo('open-table-creator')
-    break;
-  case "open-language-linter":
-    navigateTo('open-language-linter')
-    uiSize = {
-      width: 475,
-      height: 500
-    };
-    figma.ui.resize(475, 500)
-    break;
-  case "open-color-linter":
-    navigateTo('open-color-linter')
-    uiSize = {
-      width: 475,
-      height: 500
-    };
-    figma.ui.resize(475, 500)
-    break;
-}
 
 // ==============================================================
 // Table creator functions
@@ -292,26 +244,52 @@ const pushColorToArray = (layer, colorType: string, array: any[]) => {
 let colorTokens = []
 
 // Add hex values to colorTokens objects
-const getColorTokens = async () => {
-  const lightModeTokens = await Promise.all(rawLightColorTokens.meta.styles.map(async (style) => {
+const getColorTokens = async (mapThemesToEachOther: Boolean) => {
+  let lightThemeTokens = await Promise.all(rawLightColorTokens.meta.styles.map(async (style) => {
     return {
       ...style,
       theme: 'light'
     }
   }));
-  const darkModeTokens = await Promise.all(rawDarkColorTokens.meta.styles.map(async (style) => {
+  let darkThemeTokens = await Promise.all(rawDarkColorTokens.meta.styles.map(async (style) => {
     return {
       ...style,
       theme: 'dark'
     }
   }));
   
-  const allColorTokens = lightModeTokens.concat(darkModeTokens)
+  // Add a `lightThemeToken` or `darkThemeToken` to each token
+  // so we know which token to swap it for in the theme switcher
+  if (mapThemesToEachOther) {
+    lightThemeTokens = lightThemeTokens.map(token => {
+      const darkThemeToken = darkThemeTokens.filter(
+        darkToken => token.name.toLowerCase() === darkToken.name.toLowerCase()
+      )
+      
+      return {
+        ...token,
+        darkThemeToken: darkThemeToken[0].key
+      }
+    })
+    
+    darkThemeTokens = darkThemeTokens.map(token => {
+      const lightThemeToken = lightThemeTokens.filter(
+        lightToken => token.name.toLowerCase() === lightToken.name.toLowerCase()
+      )
+      
+      return {
+        ...token,
+        lightThemeToken: lightThemeToken[0].key
+      }
+    })
+  }
+  
+  const allColorTokens = lightThemeTokens.concat(darkThemeTokens)
+  const tempRectangle = figma.createRectangle()
   
   colorTokens = await Promise.all(allColorTokens.map(async (style) => {
     // Create a rectangle which we'll apply the token to
     // in order to get it's hex value
-    const tempRectangle = figma.createRectangle()
     tempRectangle.visible = false
     
     let colorStyleWithHex = {}
@@ -333,21 +311,22 @@ const getColorTokens = async () => {
       }
     }
     // remove the rectangle from the document
-    tempRectangle.remove()
     
     return colorStyleWithHex
   }))
+  
+  tempRectangle.remove()
 }
 
-const getColorStats = () => {
-  getColorTokens()
+const getColorStats = async () => {
+    await getColorTokens(true)
     const getRawLayersWithColor = () => {
       // get the selected layers
       let selection = figma.currentPage.selection;
 
       const relevantLayers: SceneNode[][] = selection.map((selectedLayer) => {
           // Get all styles in selection that have a color
-          // (the output will have a lot of data stored in prototype properites)
+          // (the output will have a lot of data stored in prototype properties)
           
           let outputForLayersWithChildren: SceneNode[] = []
 
@@ -384,8 +363,14 @@ const getColorStats = () => {
             
           if (selectedLayerHasChildren) {
             // if it has children
+            isRelevantLayer(selectedLayer)
             outputForLayersWithChildren = selectedLayer.findAll((n) => isRelevantLayer(n));
-            return [...outputForLayersWithChildren];
+            
+            if (!isRelevantLayer(selectedLayer)) {
+              return [...outputForLayersWithChildren];
+            } else {
+              return [selectedLayer, ...outputForLayersWithChildren];
+            }
           } else if (isRelevantLayer(selectedLayer)) {
             // if it's a single layer
             return [selectedLayer]
@@ -411,7 +396,7 @@ const getColorStats = () => {
   // (To check colors for entire file, swap `figma.currentPage.selection`
   // `for figma.root`)
   const rawLayersWithColor = getRawLayersWithColor();
-
+  
   // Pull out the data taht we care about and make it accessible
   // without needing to access prototype properties.
   const layersWithColor = rawLayersWithColor.map((layer) => {
@@ -419,8 +404,16 @@ const getColorStats = () => {
       const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
       const hasFillAndStroke = hasFill && hasStroke;
       const isChildOfIcon = layer.parent.type === 'BOOLEAN_OPERATION'
-      const parentIconHasFill = layer.parent?.fills?.length > 0
+      let parentIconHasFill = false
       const isChildOfIconWithFill = isChildOfIcon && parentIconHasFill
+      
+      const checkParentForFill = () => {
+        if ("fills" in layer.parent) {
+          parentIconHasFill = (layer.parent.fills as []).length > 0
+        }  
+      }
+      
+      checkParentForFill()
 
       return {
           layerId: layer.id,
@@ -437,7 +430,7 @@ const getColorStats = () => {
           isChildOfIconWithFill: isChildOfIconWithFill
       };
   });
-
+  
   const allInstancesOfColor = layersWithColor
       .map((layer) => {
           let tempColors = [];
@@ -466,54 +459,31 @@ const getColorStats = () => {
   //   return color.hasColorStyle ? prev + 1 : prev
   // }, 0)
 
-  const doesColorMatchAnyOneCoreStyle = (colorInHex) => {
-      // for every One Core color style...
-
-      return colorTokens.some((style) => {
-          // if the argument color matches the current style color
-          // return true
-          return colorInHex === style?.color?.color?.hex;
-      }, false);
-  };
-
-  const doesKeyMatchAnyOneCoreColorStyleKey = (key) => {
-      // for every One Core color style...
-      return colorTokens.some((style) => {
-          // if the argument color matches the current style color
-          // return true
-          return key.includes(style.key);
-      }, false);
-  };
-
   // for each color that has a color style
   const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
       return color.hasColorStyle;
   });
 
   // If it's color matches a One Core color add it an array
-  const colorsUsingOneCoreStyle = (() => {
-      let colors = colorsWithColorStyle.filter((color) => {
-          const {r, g, b} = color.color[0].color;
-          const colorInHex = rgbToHex(r, g, b);
-
-          return doesColorMatchAnyOneCoreStyle(colorInHex) && doesKeyMatchAnyOneCoreColorStyleKey(color.colorStyleId);
+  const colorsUsingOneCoreStyle = allInstancesOfColor.filter((color) => {
+      return colorTokens.some((oneCoreColor) => {
+          return color.colorStyleId.includes(oneCoreColor.key)
       });
-
-      // add the style name to the colors
-      colors.map((color, index) => {
-          colorTokens.map((style) => {
-              if (color.colorStyleId.includes(style.key)) {
-                  colors[index] = {
-                      ...color,
-                      styleName: style.name,
-                  };
-              }
-              return;
-          });
-      });
-
-      return colors;
-  })();
+  }).map(color => {
+    // Save the one core token as property on the color object
+    let oneCoreToken = undefined
+    
+    colorTokens.forEach((oneCoreColor) => {
+        if (color.colorStyleId.includes(oneCoreColor.key)) {
+          oneCoreToken = oneCoreColor
+        }
+    });
+    
+    return {
+      ...color,
+      token: oneCoreToken
+    }
+  })
 
 
   // Every color that isn't using a one core color style
@@ -549,6 +519,116 @@ const selectAndZoomToLayer = (layerId: string) => {
     figma.currentPage.selection = [layer];
     figma.viewport.scrollAndZoomIntoView([layer]);
 };
+
+// ==============================================================
+// Theme switcher
+// ==============================================================
+
+// Define the notification here so we can cancel it later
+let themeSwitchedNotification = undefined
+
+const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = false) => {
+  if (closeAfterRun) {
+    figma.showUI(__html__, { width: 70, height: 0 });
+  }
+  
+  // Check for a selection. If none exists, show error notification.
+  if (figma.currentPage.selection.length === 0) {
+    // If the notification is already set, turn it off
+    themeSwitchedNotification && themeSwitchedNotification?.cancel();
+    
+    figma.notify("Select some layers before choosing a theme", {error: true});
+    return closeAfterRun && figma.closePlugin()
+  }
+  
+  // If the notification is already set, turn it off
+  themeSwitchedNotification && themeSwitchedNotification?.cancel();
+  
+  // Tell the user we're working on the theme change
+  const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
+  
+  // Get the list of colors that aren't using one core color styles
+  const colorStats = await getColorStats()
+  
+  // Replace every one core color style with it's 
+  // dark mode equivalent
+  for (const color of colorStats.colorsUsingOneCoreStyle) {
+    if ("theme" in color.token && color.token?.theme !== theme) {
+      const keyOfTokenInOppositeTheme = theme === 'light' ? 
+        color.token.lightThemeToken : 
+        color.token.darkThemeToken
+      
+      await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme).then(imported => {
+        figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
+      })
+    }
+  }
+  
+  loadingNotification.cancel();
+  
+  themeSwitchedNotification = figma.notify(
+    `${theme === 'light' ? '🔆' : '🌙'} Selection set to ${theme} mode`
+  );
+  
+  figma.ui.postMessage({ type: "theme-switched", message: {
+      switchedTo: theme,
+      closeAfterRun,
+      ...customEventData
+    } 
+  });
+}
+
+// ==============================================================
+// Handle navigation
+// ==============================================================
+
+// Used to send a custom event to New Relic
+let customEventData = {
+  fileName: figma.currentPage.parent.name,
+  fileKey: figma.fileKey,
+  // setting them in title case because that's how
+  // I did it originally and though I regret it,
+  // I don't want to lose track of historical data
+  "User Name": figma.currentUser.name,
+  "User Avatar": figma.currentUser.photoUrl,
+  "User ID": figma.currentUser.id,
+  "Session ID": figma.currentUser.sessionId,
+};
+
+// handle submenu navigation
+const navigateTo = (screen: string) => {
+  figma.ui.postMessage({ type: "figma-command", message: {
+      openedTo: screen,
+      ...customEventData
+    } 
+  });
+}
+
+switch (figma.command) {
+  case "open-home":
+    figma.showUI(__html__, { width: 300, height: 448 });
+    navigateTo('open-home')
+    break;
+  case "open-table-creator":
+    figma.showUI(__html__, { width: 300, height: 448 });
+    navigateTo('open-table-creator')
+    break;
+  case "theme-switcher-to-light":
+    switchToTheme('light', true)
+    break;
+  case "theme-switcher-to-dark":
+    switchToTheme('dark', true)
+    break;
+  case "open-language-linter":
+    figma.showUI(__html__, { width: 475, height: 500 });
+    navigateTo('open-language-linter')
+    break;
+  case "open-color-linter":
+    figma.showUI(__html__, { width: 475, height: 500 });
+    navigateTo('open-color-linter')
+    break;
+}
+
 
 // ==============================================================
 // Receiving messages sent from the UI
@@ -671,21 +751,20 @@ figma.ui.onmessage = async (msg) => {
   }
 
   /*-- Color linter messages --*/
-  if (msg.type === 'run-color-linter') {
     const sendColorData = async () => {
-      await getColorTokens()
+      await getColorTokens(false)
 
       figma.ui.postMessage({
           type: 'color-stats',
           message: {
             ...customEventData,
-            colorStats: getColorStats(),
+            colorStats: await getColorStats(),
             colorTokens: colorTokens,
             selectionMade: figma.currentPage.selection.length > 0
           },
       });
     }
-
+  if (msg.type === 'run-color-linter') {
     sendColorData()
   }
   
@@ -717,6 +796,14 @@ figma.ui.onmessage = async (msg) => {
       msg.size.x >= uiSize.width ? msg.size.x : uiSize.width, 
       msg.size.y >= uiSize.height ? msg.size.y : uiSize.height
     );
+  }
+  
+  /*-- Theme switcher messages --*/  
+  if (msg.type === 'theme-switcher-to-dark') {
+    switchToTheme('dark')
+  }
+  if (msg.type === 'theme-switcher-to-light') {  
+    switchToTheme('light')
   }
 };
 

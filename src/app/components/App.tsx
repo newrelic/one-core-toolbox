@@ -4,6 +4,7 @@ import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
 import Resizer from "./Resizer";
+import ThemeSwitcher from "./ThemeSwitcher";
 import { PluginContext } from "./PluginContext";
 import Home from "./Home";
 import "../styles/ui.css";
@@ -62,11 +63,17 @@ const App = ({}) => {
     eventName: string,
     customData: Object
   ) => {
-    // newrelic is included at the top of ui.html in a
+    // `newrelic` is included at the top of ui.html in a
     // a script tag. Typescript will complain. So...
     // @ts-ignore
     newrelic.addPageAction(eventName, customData);
     // console.log("custom event posted", eventName);
+    
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('foo');
+      }, 500);
+    })
   };
 
   // Listen for messages from controller
@@ -158,6 +165,18 @@ const App = ({}) => {
             ...message,
           });
           break;
+        case "theme-switched":
+          const sendThemeSwitcherEvent = async () => {
+            await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
+              ...message,
+            });
+            
+            if (message.closeAfterRun) {
+              parent.postMessage({ pluginMessage: { type: "close-plugin" } }, "*");  
+            }
+          }
+          sendThemeSwitcherEvent();
+          break;
       }
     };
   }, []);
@@ -172,6 +191,9 @@ const App = ({}) => {
           break;
         case "open-table-creator":
           setActivePlugin("table-creator");
+          break;
+        case "open-theme-switcher":
+          setActivePlugin("theme-switcher");
           break;
         case "open-language-linter":
           setActivePlugin("language-linter");
@@ -216,6 +238,12 @@ const App = ({}) => {
           <DesignLinter
             setActivePlugin={handlePluginNavigation}
             openTo={"language"}
+          />
+        );
+      case "theme-switcher":
+        return (
+          <ThemeSwitcher
+            setActivePlugin={handlePluginNavigation}
           />
         );
       case "color-linter":

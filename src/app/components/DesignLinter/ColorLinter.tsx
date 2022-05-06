@@ -17,7 +17,6 @@ const ColorLinter = () => {
     setLoadingColorData,
     selectionMade,
     colorIssuesFixed,
-    setColorIssuesFixed,
   } = state;
 
   React.useEffect(() => {
