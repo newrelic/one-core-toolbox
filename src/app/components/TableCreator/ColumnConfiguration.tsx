@@ -20,6 +20,10 @@ const ColumnConfiguration = ({
 
     columnConfigurationArray[activeColConfigurationScreen][attr] =
       attr !== "multiValue" ? element.value : element.checked;
+      
+    if (columnConfigurationArray[activeColConfigurationScreen][attr] === 'metric') {
+      columnConfigurationArray[activeColConfigurationScreen]['alignment'] = 'right'
+    }
 
     setColumnConfiguration(columnConfigurationArray);
   };
@@ -120,16 +124,80 @@ const ColumnConfiguration = ({
           />
         </div>
         <div className="input-container">
+          <label htmlFor="column-cell-type">Cell type</label>
+          <div className="select-input-container">
+            <select
+              name="alignment-selection"
+              className="column-configuration-input column-configuration-cell-type-input"
+              id="column-cell-type"
+              onChange={() => handleColumnConfigurationUpdate("cellType")}
+              value={
+                columnConfiguration[activeColConfigurationScreen]["cellType"]
+              }
+            >
+              <option
+                value="text"
+                className="column-configuration-cell-type-input-option"
+              >
+                Text
+              </option>
+              <option
+                value="link"
+                className="column-configuration-cell-type-input-option"
+              >
+                Link
+              </option>
+              <option
+                value="metric"
+                className="column-configuration-cell-type-input-option"
+              >
+                Metric
+              </option>
+              <option
+                value="entity"
+                className="column-configuration-cell-type-input-option"
+              >
+                Entity
+              </option>
+              <option
+                value="favorite"
+                className="column-configuration-cell-type-input-option"
+              >
+                Favorite
+              </option>
+              <option
+                value="user"
+                className="column-configuration-cell-type-input-option"
+              >
+                User
+              </option>
+              <option
+                value="checkbox"
+                className="column-configuration-cell-type-input-option"
+              >
+                Checkbox
+              </option>
+              <option
+                value="actions"
+                className="column-configuration-cell-type-input-option"
+              >
+                Actions
+              </option>
+            </select>
+          </div>
+        </div>
+        <div className="input-container">
           <label htmlFor="column-alignment">Alignment</label>
           <div className="select-input-container">
             <select
               name="alignment-selection"
-              className="column-configuration-alignment-input"
+              className="column-configuration-input column-configuration-alignment-input"
               id="column-alignment"
               onChange={() => handleColumnConfigurationUpdate("alignment")}
               value={
                 columnConfiguration[activeColConfigurationScreen]["alignment"]
               }
+              disabled={columnConfiguration[activeColConfigurationScreen]['cellType'] === 'metric'}
             >
               <option
                 value="left"
@@ -142,69 +210,6 @@ const ColumnConfiguration = ({
                 className="column-configuration-alignment-input-option"
               >
                 Right
-              </option>
-            </select>
-          </div>
-        </div>
-        <div className="input-container">
-          <label htmlFor="column-cell-type">Cell type</label>
-          <div className="select-input-container">
-            <select
-              name="alignment-selection"
-              className="column-configuration-alignment-input"
-              id="column-cell-type"
-              onChange={() => handleColumnConfigurationUpdate("cellType")}
-              value={
-                columnConfiguration[activeColConfigurationScreen]["cellType"]
-              }
-            >
-              <option
-                value="text"
-                className="column-configuration-alignment-input-option"
-              >
-                Text
-              </option>
-              <option
-                value="link"
-                className="column-configuration-alignment-input-option"
-              >
-                Link
-              </option>
-              <option
-                value="metric"
-                className="column-configuration-alignment-input-option"
-              >
-                Metric
-              </option>
-              <option
-                value="entity"
-                className="column-configuration-alignment-input-option"
-              >
-                Entity
-              </option>
-              <option
-                value="favorite"
-                className="column-configuration-alignment-input-option"
-              >
-                Favorite
-              </option>
-              <option
-                value="user"
-                className="column-configuration-alignment-input-option"
-              >
-                User
-              </option>
-              <option
-                value="checkbox"
-                className="column-configuration-alignment-input-option"
-              >
-                Checkbox
-              </option>
-              <option
-                value="actions"
-                className="column-configuration-alignment-input-option"
-              >
-                Actions
               </option>
             </select>
           </div>

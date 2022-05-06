@@ -236,6 +236,10 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   box-shadow: 0 0 0 1px #18a0fb;
 }
 
+.input-container h5.label {
+  padding: 0;
+}
+
 .table-dimensions-config {
   display: flex;
   width: calc(100% + 8px);
@@ -430,6 +434,16 @@ button[disabled] {
   right: calc(8px + 8px);
   top: 12px;
   pointer-events: none;
+}
+
+.column-configuration-input[disabled] {
+  background-color: rgb(0 0 0 / 6%);
+  border-radius: 2px;
+  color: #6b7272;
+}
+
+.column-configuration-input[disabled]:hover {
+  cursor: not-allowed;
 }
 
 /*-- Toggle styles --*/
