@@ -234,8 +234,6 @@ const pushColorToArray = (
       }
     }
     
-    console.log(segmentColorInHex);
-
     if (!colorIsImage && !colorIsGradient && colorIsVisible && !layer.isChildOfIconWithFill) {
         array.push({
             colorId: uuid(), // generate a Unique ID to keep track of colors,
@@ -420,8 +418,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       let output = relevantLayers.flat()
       output = output.filter(layer => isVisibleNode(layer))
       
-      console.log(output);
-
       return output
   };
 
@@ -439,8 +435,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // Pull out the data taht we care about and make it accessible
   // without needing to access prototype properties.
   const layersWithColor = rawLayersWithColor.map((layer) => {
-      console.log('arrived madue');
-      
       const hasFill = "fills" in layer && layer.fills[0] !== undefined
       const hasStroke = "strokes" in layer && layer.strokes[0] !== undefined
       const textLayerHasSegmentStyles = layer.type === 'TEXT' && layer.getStyledTextSegments(['fills']).length > 1
@@ -506,8 +500,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       })
       .flat();
       
-      console.log(allInstancesOfColor);
-
   // Checklist for verifying that a layers uses a One Core color style
   // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
   // 2. The key extracted from it's (fill/stroke)styleId matches a key from the `colorTokens` array
@@ -539,7 +531,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
     }
   })
   
-  console.log('colorsUsingOneCoreStyle', colorsUsingOneCoreStyle);
   
   
   if (forThemeSwitcher) {
@@ -555,7 +546,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // loop through all colors...
   const colorsNotUsingOneCoreColorStyle = allInstancesOfColor.filter((color) => {
       return !colorTokens.some((oneCoreColor) => {
-          console.log('color.colorStyleId', color.colorStyleId);
           return color.colorStyleId.includes(oneCoreColor.key)
       });
   });
@@ -576,7 +566,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
   };
   
-  console.log('colorStats', colorStats);
   return colorStats
 }
 
@@ -624,41 +613,54 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   const colorStats = await getColorStats(true)
   console.log('getColorStats(): ' + (new Date().getTime() - getColorStatsTimer)/1000);
   
-  console.log(colorStats);
-  
   const fetchingTimer = new Date().getTime();
   
-  const importedStyles = []
+  let importedStyles = []
+  let keysToLoad: () => string[] = () => {
+    let keys = []
+      
+    colorStats.forEach((color) => {
+      if ("theme" in color.token && color.token?.theme !== theme) {
+        const keyOfTokenInOppositeTheme = theme === 'light' ? 
+          color.token.lightThemeToken : 
+          color.token.darkThemeToken
+        const keyIsNotDuplicate = !keys.some(key => key === keyOfTokenInOppositeTheme)
+          
+        // Check to see if there's an available token to switch to
+        if (keyOfTokenInOppositeTheme === null) {
+          console.error(`Missing token: No ${theme} theme token found for "${color.token.name}".`);
+          return
+        }
+        
+        keyIsNotDuplicate && keys.push(keyOfTokenInOppositeTheme)
+      }
+    })
+    
+    return keys
+  }
+  
+  console.log(`keysToLoad()`, keysToLoad());
+  
+  // Fetch the tokens
+  importedStyles = await Promise.all(keysToLoad().map(async (key) => figma.importStyleByKeyAsync(key)))
   
   // Replace every one core color style with it's 
   // dark mode equivalent
   for (const color of colorStats) {
     if ("theme" in color.token && color.token?.theme !== theme) {
-      let importedStyle: BaseStyle = null
       const node = figma.getNodeById(color.layerId)
-      
       const keyOfTokenInOppositeTheme = theme === 'light' ? 
         color.token.lightThemeToken : 
         color.token.darkThemeToken
+        
+      const importedStyle: BaseStyle = importedStyles
+        .filter(style => style.key === keyOfTokenInOppositeTheme)[0]
       
       // Check to see if there's an available token to switch to
       if (keyOfTokenInOppositeTheme === null) {
         console.error(`Missing token: No ${theme} theme token found for "${color.token.name}".`);
         return
-      }
-      
-      // Check to see if this token has already been imported
-      // So that we don't waste time importing the same token more than once
-      const styleAlreadyImported = importedStyles.some(style => {
-        return style.key === keyOfTokenInOppositeTheme
-      })
-      
-      // Fetch the token
-      if (styleAlreadyImported) {
-        importedStyle = importedStyles.find(style => style.key === keyOfTokenInOppositeTheme)
-      } else {
-        importedStyle = await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme)
-      }
+      }    
       
       // Get ready to set the token on the layer
       // First, check to see if the layer has segment styles
@@ -668,9 +670,6 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
         // Set the token on the layer
         node[`${color.colorType}StyleId`] = importedStyle.id
       }
-      
-      // Update the importedStyles array if appropriate
-      !styleAlreadyImported && importedStyles.push(importedStyle)
     }
   }
   
@@ -872,8 +871,6 @@ figma.ui.onmessage = async (msg) => {
       
       const colorStats =  await getColorStats();
       
-      console.log('gotColorstats yo', colorStats);
-
       figma.ui.postMessage({
           type: 'color-stats',
           message: {
