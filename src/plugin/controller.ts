@@ -339,7 +339,14 @@ const getColorTokens = async (mapThemesToEachOther: Boolean) => {
 }
 
 const getColorStats = async (forThemeSwitcher: Boolean = false) => {
+    // Set for performance:
+    // https://www.figma.com/plugin-docs/accessing-document/#optimizing-traversals
+    figma.skipInvisibleInstanceChildren = true
+    
+    const start = new Date().getTime();
     await getColorTokens(true)
+    console.log('Inner: getColorTokens(): ' + (new Date().getTime() - start)/1000);
+    const startGetRawLayers = new Date().getTime();
     const getRawLayersWithColor = () => {
       // get the selected layers
       let selection = figma.currentPage.selection;
@@ -431,6 +438,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // (To check colors for entire file, swap `figma.currentPage.selection`
   // `for figma.root`)
   const rawLayersWithColor = getRawLayersWithColor();
+  console.log('Inner: getRawLayersWithColor(): ' + (new Date().getTime() - startGetRawLayers)/1000);
+  const startLayersWithColor = new Date().getTime();
   
   // Pull out the data taht we care about and make it accessible
   // without needing to access prototype properties.
@@ -468,6 +477,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
           hasSegmentStyles: textLayerHasSegmentStyles
       };
   });
+  console.log('Inner: layerswithColor: ' + (new Date().getTime() - startLayersWithColor)/1000);
+  const startAllInstancesOfColor = new Date().getTime();
   
   const allInstancesOfColor = layersWithColor
       .map((layer) => {
@@ -499,6 +510,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
           return tempColors;
       })
       .flat();
+  
+  console.log('Inner: allInstancesOfColor: ' + (new Date().getTime() - startAllInstancesOfColor)/1000);
       
   // Checklist for verifying that a layers uses a One Core color style
   // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
@@ -508,7 +521,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // const amountOfColorsUsingColorStyle = allInstancesOfColor.reduce((prev, color, index) => {
   //   return color.hasColorStyle ? prev + 1 : prev
   // }, 0)
-
+  
+  const startColorStats = new Date().getTime();
   // If it's color matches a One Core color add it an array
   const colorsUsingOneCoreStyle = allInstancesOfColor.filter((color) => {
       return colorTokens.some((oneCoreColor) => {
@@ -534,6 +548,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   
   
   if (forThemeSwitcher) {
+    console.log('Inner: set colorsUsingOneCoreColorStyle: ' + (new Date().getTime() - startColorStats)/1000);
+    console.log('Inner: Total exectuation time (getColorStats()): ' + (new Date().getTime() - start)/1000);
     return colorsUsingOneCoreStyle
   }
   
@@ -565,6 +581,9 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       oneCoreColorStyleCoverage: oneCoreColorStyleCoverage,
       idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
   };
+  
+  console.log('Set color stats(): ' + (new Date().getTime() - startColorStats)/1000);
+  console.log('Total exectuation time (getColorStats()): ' + (new Date().getTime() - start)/1000);
   
   return colorStats
 }
@@ -632,14 +651,13 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
           return
         }
         
+        // Add it to the keys array if it's not already there
         keyIsNotDuplicate && keys.push(keyOfTokenInOppositeTheme)
       }
     })
     
     return keys
   }
-  
-  console.log(`keysToLoad()`, keysToLoad());
   
   // Fetch the tokens
   importedStyles = await Promise.all(keysToLoad().map(async (key) => figma.importStyleByKeyAsync(key)))
