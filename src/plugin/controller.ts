@@ -342,10 +342,10 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
                   'FRAME',
                   'GROUP',
                   'COMPONENT',
-                  'INSTANCE', // GUILTY!!
-                  'LINE', // GUILTY!!
+                  'INSTANCE',
+                  'LINE',
                   'POLYGON',
-                  'RECTANGLE', // GUILTY!!
+                  'RECTANGLE',
                   'SHAPE_WITH_TEXT',
                   'STAR',
                   'TEXT',
@@ -470,11 +470,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   //   return color.hasColorStyle ? prev + 1 : prev
   // }, 0)
 
-  // for each color that has a color style
-  const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
-      return color.hasColorStyle;
-  });
-
   // If it's color matches a One Core color add it an array
   const colorsUsingOneCoreStyle = allInstancesOfColor.filter((color) => {
       return colorTokens.some((oneCoreColor) => {
@@ -495,7 +490,15 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       token: oneCoreToken
     }
   })
-
+  
+  if (forThemeSwitcher) {
+    return colorsUsingOneCoreStyle
+  }
+  
+  // for each color that has a color style
+  const colorsWithColorStyle = allInstancesOfColor.filter((color) => {
+      return color.hasColorStyle;
+  });
 
   // Every color that isn't using a one core color style
   // loop through all colors...
@@ -558,23 +561,26 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   // Tell the user we're working on the theme change
   const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
   
-  // Get the list of colors that aren't using one core color styles
+  // Get the list of colors that are using one core color styles
   const colorStats = await getColorStats(true)
   
   // Replace every one core color style with it's 
   // dark mode equivalent
-  for (const color of colorStats.colorsUsingOneCoreStyle) {
+  for (const color of colorStats) {
     if ("theme" in color.token && color.token?.theme !== theme) {
       const keyOfTokenInOppositeTheme = theme === 'light' ? 
         color.token.lightThemeToken : 
         color.token.darkThemeToken
       
+      console.log(color);
+      
       if (keyOfTokenInOppositeTheme === null) {
         console.error(`Missing token: No ${theme} theme token found for "${color.token.name}".`);
       } else {
-        await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme).then(imported => {
-          figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
-        })
+        const style = await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme)
+        const node = figma.getNodeById(color.layerId)
+        
+        node[`${color.colorType}StyleId`] = style.id
       }
     }
   }
