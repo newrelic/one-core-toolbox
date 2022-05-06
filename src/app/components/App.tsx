@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
+import Resizer from "./Resizer";
 import { PluginContext } from "./PluginContext";
 import Home from "./Home";
 import "../styles/ui.css";
@@ -260,6 +261,7 @@ const App = ({}) => {
 
   return (
     <PluginContext.Provider value={{ functions, state }}>
+      <Resizer />
       <div className="app">{renderPluginBody()}</div>
     </PluginContext.Provider>
   );

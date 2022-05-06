@@ -1053,3 +1053,15 @@ input:checked + .slider:before {
     transform: rotate(1turn);
   }
 }
+
+.resizer {
+  z-index: 99;
+  cursor: nwse-resize;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  height: 14px;
+  width: 14px;
+  transition: all 0.1s ease;
+  opacity: 0.4;
+}
