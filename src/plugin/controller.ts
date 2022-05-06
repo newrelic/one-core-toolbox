@@ -418,7 +418,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
           }
       });
 
-
       let output = relevantLayers.flat()
       output = output.filter(layer => isVisibleNode(layer))
       
@@ -536,10 +535,8 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
     }
   })
   
-  
-  
   if (forThemeSwitcher) {
-    return colorsUsingOneCoreStyle
+    return {colorsUsingOneCoreStyle}
   }
   
   // for each color that has a color style
@@ -620,8 +617,10 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   let importedStyles = []
   let keysToLoad: () => string[] = () => {
     let keys = []
-      
-    colorStats.forEach((color) => {
+    
+    console.log(colorStats.colorsUsingOneCoreStyle);
+    
+    colorStats.colorsUsingOneCoreStyle.forEach((color) => {
       if ("theme" in color.token && color.token?.theme !== theme) {
         const keyOfTokenInOppositeTheme = theme === 'light' ? 
           color.token.lightThemeToken : 
@@ -647,7 +646,7 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   
   // Replace every one core color style with it's 
   // dark mode equivalent
-  for (const color of colorStats) {
+  for (const color of colorStats.colorsUsingOneCoreStyle) {
     if ("theme" in color.token && color.token?.theme !== theme) {
       const node = figma.getNodeById(color.layerId)
       const keyOfTokenInOppositeTheme = theme === 'light' ? 
