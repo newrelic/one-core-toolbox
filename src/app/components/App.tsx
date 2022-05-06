@@ -69,7 +69,6 @@ const App = ({}) => {
     // a script tag. Typescript will complain. So...
     // @ts-ignore
     newrelic.addPageAction(eventName, customData);
-    // console.log("custom event posted", eventName);
     
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -137,7 +136,6 @@ const App = ({}) => {
           break;
         // Color linter
         case "color-stats":
-          console.log('color-stats begun');
           setLoadingColorData(false);
           setColorsWithIssues(
             message?.colorStats?.colorsNotUsingOneCoreColorStyle

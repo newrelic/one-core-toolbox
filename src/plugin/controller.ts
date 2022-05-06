@@ -618,8 +618,6 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   let keysToLoad: () => string[] = () => {
     let keys = []
     
-    console.log(colorStats.colorsUsingOneCoreStyle);
-    
     colorStats.colorsUsingOneCoreStyle.forEach((color) => {
       if ("theme" in color.token && color.token?.theme !== theme) {
         const keyOfTokenInOppositeTheme = theme === 'light' ? 
