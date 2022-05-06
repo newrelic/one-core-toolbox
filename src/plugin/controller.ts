@@ -261,25 +261,31 @@ const getColorTokens = async (mapThemesToEachOther: Boolean) => {
   // Add a `lightThemeToken` or `darkThemeToken` to each token
   // so we know which token to swap it for in the theme switcher
   if (mapThemesToEachOther) {
+    // For every light theme token...
     lightThemeTokens = lightThemeTokens.map(token => {
+      // Check for a dark theme token with a matching name
       const darkThemeToken = darkThemeTokens.filter(
         darkToken => token.name.toLowerCase() === darkToken.name.toLowerCase()
       )
       
+      // Return the token with a new `darkThemeToken` property
       return {
         ...token,
-        darkThemeToken: darkThemeToken[0].key
+        darkThemeToken: darkThemeToken[0]?.key ? darkThemeToken[0].key : null
       }
     })
     
+    // For every dark theme token...
     darkThemeTokens = darkThemeTokens.map(token => {
+      // Check for a dark theme token with a matching name
       const lightThemeToken = lightThemeTokens.filter(
         lightToken => token.name.toLowerCase() === lightToken.name.toLowerCase()
       )
       
+      // Return the token with a new `lightThemeToken` property
       return {
         ...token,
-        lightThemeToken: lightThemeToken[0].key
+        lightThemeToken: lightThemeToken[0]?.key ? lightThemeToken[0].key : null
       }
     })
   }
@@ -563,9 +569,13 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
         color.token.lightThemeToken : 
         color.token.darkThemeToken
       
-      await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme).then(imported => {
-        figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
-      })
+      if (keyOfTokenInOppositeTheme === null) {
+        console.error(`Missing token: No ${theme} theme token found for "${color.token.name}".`);
+      } else {
+        await figma.importStyleByKeyAsync(keyOfTokenInOppositeTheme).then(imported => {
+          figma.getNodeById(color.layerId)[`${color.colorType}StyleId`] = imported.id  
+        })
+      }
     }
   }
   
