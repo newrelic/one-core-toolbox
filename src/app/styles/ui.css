@@ -1062,7 +1062,8 @@ input:checked + .slider:before {
   margin-top: 10px;
 }
 
-.color-loader {
+.color-loader,
+.theme-switcher-loader {
   width: 20px;
   height: 20px;
   border-radius: 50%;
@@ -1149,4 +1150,14 @@ input:checked + .slider:before {
 
 [class*="modal--frame"] {
   opacity: .3;
+}
+
+.theme-switcher-loader {
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  bottom: -2px;
+  right: 10px;
+  background-color: #fff;
+  animation: spin .5s infinite linear;
 }

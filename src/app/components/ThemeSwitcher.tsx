@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { PluginContext } from "./PluginContext";
 import "../styles/ui.css";
 import IconChevronLeft from "../assets/icon-chevron-left.svg";
@@ -14,7 +14,9 @@ interface props {
 
 const ThemeSwitcher = (props: props) => {
   const { state } = useContext(PluginContext);
-  const { currentSelection } = state;
+  const { currentSelection, loadingLightSwitch, loadingDarkSwitch } = state;
+  const [localLoadingLightSwitch, setLocalLoadingLightSwitch] = useState(false);
+  const [localLoadingDarkSwitch, setLocalLoadingDarkSwitch] = useState(false);
   
   const { setActivePlugin } = props;
   const lightModeRadioOption = useRef(null);
@@ -26,6 +28,14 @@ const ThemeSwitcher = (props: props) => {
       darkModeRadioOption.current.checked = false
     }
   }, [currentSelection])
+  
+  useEffect(() => {
+    loadingLightSwitch === false && setLocalLoadingLightSwitch(false)
+  }, [loadingLightSwitch])
+  
+  useEffect(() => {
+    loadingDarkSwitch === false && setLocalLoadingDarkSwitch(false)
+  }, [loadingDarkSwitch])
 
   const handleTabClick = (nameOfTab: string) => {
     setActivePlugin(nameOfTab);
@@ -53,10 +63,12 @@ const ThemeSwitcher = (props: props) => {
   };
   
   const setDarkTheme = () => {
+    setLocalLoadingDarkSwitch(true)
     parent.postMessage({ pluginMessage: { type: "theme-switcher-to-dark" } }, "*");
   }
   
   const setLightTheme = () => {
+    setLocalLoadingLightSwitch(true)
     parent.postMessage({ pluginMessage: { type: "theme-switcher-to-light" } }, "*");
   }
 
@@ -94,6 +106,8 @@ const ThemeSwitcher = (props: props) => {
                 className="theme-selection-thumbnail-image"
               />
               <span className="theme-selection-label-text">Light mode</span>
+              
+              {localLoadingLightSwitch && <div className="theme-switcher-loader"></div>}
             </label>
           </div>
           <div className="theme-selection-option">
@@ -115,6 +129,8 @@ const ThemeSwitcher = (props: props) => {
                 className="theme-selection-thumbnail-image"
               />
               <span className="theme-selection-label-text">Dark mode</span>
+              
+              {localLoadingDarkSwitch && <div className="theme-switcher-loader"></div>}
             </label>
           </div>
         </form>

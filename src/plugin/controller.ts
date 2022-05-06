@@ -343,10 +343,7 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
     // https://www.figma.com/plugin-docs/accessing-document/#optimizing-traversals
     figma.skipInvisibleInstanceChildren = true
     
-    const start = new Date().getTime();
     await getColorTokens(true)
-    console.log('Inner: getColorTokens(): ' + (new Date().getTime() - start)/1000);
-    const startGetRawLayers = new Date().getTime();
     const getRawLayersWithColor = () => {
       // get the selected layers
       let selection = figma.currentPage.selection;
@@ -438,8 +435,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   // (To check colors for entire file, swap `figma.currentPage.selection`
   // `for figma.root`)
   const rawLayersWithColor = getRawLayersWithColor();
-  console.log('Inner: getRawLayersWithColor(): ' + (new Date().getTime() - startGetRawLayers)/1000);
-  const startLayersWithColor = new Date().getTime();
   
   // Pull out the data taht we care about and make it accessible
   // without needing to access prototype properties.
@@ -477,8 +472,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
           hasSegmentStyles: textLayerHasSegmentStyles
       };
   });
-  console.log('Inner: layerswithColor: ' + (new Date().getTime() - startLayersWithColor)/1000);
-  const startAllInstancesOfColor = new Date().getTime();
   
   const allInstancesOfColor = layersWithColor
       .map((layer) => {
@@ -511,7 +504,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       })
       .flat();
   
-  console.log('Inner: allInstancesOfColor: ' + (new Date().getTime() - startAllInstancesOfColor)/1000);
       
   // Checklist for verifying that a layers uses a One Core color style
   // 1. If it's a fill, it's `fillStyleId` isn't an empty string (likewise if it's a stroke but for `strokeStyleId`)
@@ -522,7 +514,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   //   return color.hasColorStyle ? prev + 1 : prev
   // }, 0)
   
-  const startColorStats = new Date().getTime();
   // If it's color matches a One Core color add it an array
   const colorsUsingOneCoreStyle = allInstancesOfColor.filter((color) => {
       return colorTokens.some((oneCoreColor) => {
@@ -548,8 +539,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   
   
   if (forThemeSwitcher) {
-    console.log('Inner: set colorsUsingOneCoreColorStyle: ' + (new Date().getTime() - startColorStats)/1000);
-    console.log('Inner: Total exectuation time (getColorStats()): ' + (new Date().getTime() - start)/1000);
     return colorsUsingOneCoreStyle
   }
   
@@ -582,8 +571,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
       idsOfAllInstancesOfColor: idsOfAllInstancesOfColor,
   };
   
-  console.log('Set color stats(): ' + (new Date().getTime() - startColorStats)/1000);
-  console.log('Total exectuation time (getColorStats()): ' + (new Date().getTime() - start)/1000);
   
   return colorStats
 }
@@ -603,11 +590,11 @@ const selectAndZoomToLayer = (layerId: string) => {
 let themeSwitchedNotification = undefined
 
 const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = false) => {
-  console.log('---');
-  const start = new Date().getTime();
   
   if (closeAfterRun) {
     figma.showUI(__html__, { width: 70, height: 0 });
+  } else {
+    figma.ui.postMessage({ type: `loading-${theme}-theme-switch`});
   }
   
   // Check for a selection. If none exists, show error notification.
@@ -624,15 +611,11 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
   
   // Tell the user we're working on the theme change
   const loadingNotification = figma.notify(`Converting selection to ${theme} mode...`);
-  console.log('ThemeSwitcher Intro: ' + (new Date().getTime() - start)/1000);
   
-  const getColorStatsTimer = new Date().getTime();
   
   // Get the list of colors that are using one core color styles
   const colorStats = await getColorStats(true)
-  console.log('getColorStats(): ' + (new Date().getTime() - getColorStatsTimer)/1000);
   
-  const fetchingTimer = new Date().getTime();
   
   let importedStyles = []
   let keysToLoad: () => string[] = () => {
@@ -691,8 +674,6 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
     }
   }
   
-  console.log('fetch and apply tokens: ' + (new Date().getTime() - fetchingTimer)/1000);
-  const footerTimer = new Date().getTime();
   
   loadingNotification.cancel();
   
@@ -707,8 +688,6 @@ const switchToTheme = async (theme: "light" | "dark", closeAfterRun: Boolean = f
     } 
   });
   
-  console.log('Theme switcher footer: ' + (new Date().getTime() - footerTimer)/1000);
-  console.log('Total execution time: ' + (new Date().getTime() - start)/1000);
 }
 
 // ==============================================================

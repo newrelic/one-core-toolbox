@@ -58,6 +58,8 @@ const App = ({}) => {
   const [colorTokens, setColorTokens] = useState();
   const [activeColorTile, setActiveColorTile] = useState<String>();
   const [colorIssuesFixed, setColorIssuesFixed] = useState<Number>(0);
+  const [ loadingDarkSwitch, setLoadingDarkSwitch ] = useState<Boolean>(false);
+  const [ loadingLightSwitch, setLoadingLightSwitch ] = useState<Boolean>(false);
 
   const triggerNewRelicCustomEvent = (
     eventName: string,
@@ -166,7 +168,19 @@ const App = ({}) => {
             ...message,
           });
           break;
+        case "loading-light-theme-switch":
+          setLoadingLightSwitch(true)
+          break;
+        case "loading-dark-theme-switch":
+          setLoadingDarkSwitch(true)
+          break;
         case "theme-switched":
+          if (message.switchedTo === 'dark') {
+            setLoadingDarkSwitch(false)
+          } else if (message.switchedTo === 'light') {
+            setLoadingLightSwitch(false)
+          }
+          setLoadingDarkSwitch(false)
           const sendThemeSwitcherEvent = async () => {
             await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
               ...message,
@@ -286,6 +300,8 @@ const App = ({}) => {
     setActiveColorTile,
     colorIssuesFixed,
     setColorIssuesFixed,
+    loadingDarkSwitch,
+    loadingLightSwitch
   };
 
   return (
