@@ -777,6 +777,15 @@ const switchToTheme = async (
 // ==============================================================
 
 // Used to send a custom event to New Relic
+
+const fileName = encodeURIComponent(figma.currentPage.parent.name);
+const currentSelection = figma.currentPage.selection;
+const currentNodeId = encodeURIComponent(
+  currentSelection.length > 0 ? currentSelection[0].id : figma.currentPage.id
+);
+
+const fileUrl = `https://figma.com/file/${figma.fileKey}/${fileName}?node-id=${currentNodeId}`;
+
 let customEventData = {
   fileName: figma.currentPage.parent.name,
   fileKey: figma.fileKey,
@@ -787,7 +796,7 @@ let customEventData = {
   "User Avatar": figma.currentUser.photoUrl,
   "User ID": figma.currentUser.id,
   "Session ID": figma.currentUser.sessionId,
-  fileUrl: `https://figma.com/file/${figma.fileKey}`,
+  fileUrl,
 };
 
 // handle submenu navigation

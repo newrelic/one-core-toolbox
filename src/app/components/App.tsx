@@ -58,8 +58,8 @@ const App = ({}) => {
   const [colorTokens, setColorTokens] = useState();
   const [activeColorTile, setActiveColorTile] = useState<String>();
   const [colorIssuesFixed, setColorIssuesFixed] = useState<Number>(0);
-  const [ loadingDarkSwitch, setLoadingDarkSwitch ] = useState<Boolean>(false);
-  const [ loadingLightSwitch, setLoadingLightSwitch ] = useState<Boolean>(false);
+  const [loadingDarkSwitch, setLoadingDarkSwitch] = useState<Boolean>(false);
+  const [loadingLightSwitch, setLoadingLightSwitch] = useState<Boolean>(false);
 
   const triggerNewRelicCustomEvent = (
     eventName: string,
@@ -69,12 +69,12 @@ const App = ({}) => {
     // a script tag. Typescript will complain. So...
     // @ts-ignore
     newrelic.addPageAction(eventName, customData);
-    
+
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve('foo');
+        resolve("foo");
       }, 500);
-    })
+    });
   };
 
   // Listen for messages from controller
@@ -143,7 +143,7 @@ const App = ({}) => {
           setSelectionMade(message?.selectionMade);
           setColorTokens(message.colorTokens);
           setColorIssuesFixed(0);
-          
+
           message?.selectionMade &&
             triggerNewRelicCustomEvent(`OneCoreToolbox: colors-linted`, {
               fileName: message.fileName,
@@ -152,13 +152,20 @@ const App = ({}) => {
               "User Avatar": message["User Avatar"],
               "User ID": message["User ID"],
               "Session ID": message["Session ID"],
-              selectedLayersWithColor: message.colorStats.selectedLayersWithColor.length,
-              allInstancesOfColor: message.colorStats.allInstancesOfColor.length, 
-              colorsWithColorStyle: message.colorStats.colorsWithColorStyle.length, 
-              colorsUsingOneCoreStyle: message.colorStats.colorsUsingOneCoreStyle.length, 
-              colorsNotUsingOneCoreColorStyle: message.colorStats.colorsNotUsingOneCoreColorStyle.length, 
-              oneCoreColorStyleCoverage: message.colorStats.oneCoreColorStyleCoverage.length, 
-              idsOfAllInstancesOfColor: message.colorStats.idsOfAllInstancesOfColor.length, 
+              selectedLayersWithColor:
+                message.colorStats.selectedLayersWithColor.length,
+              allInstancesOfColor:
+                message.colorStats.allInstancesOfColor.length,
+              colorsWithColorStyle:
+                message.colorStats.colorsWithColorStyle.length,
+              colorsUsingOneCoreStyle:
+                message.colorStats.colorsUsingOneCoreStyle.length,
+              colorsNotUsingOneCoreColorStyle:
+                message.colorStats.colorsNotUsingOneCoreColorStyle.length,
+              oneCoreColorStyleCoverage:
+                message.colorStats.oneCoreColorStyleCoverage.length,
+              idsOfAllInstancesOfColor:
+                message.colorStats.idsOfAllInstancesOfColor.length,
             });
           break;
         case "color-replaced":
@@ -167,27 +174,33 @@ const App = ({}) => {
           });
           break;
         case "loading-light-theme-switch":
-          setLoadingLightSwitch(true)
+          setLoadingLightSwitch(true);
           break;
         case "loading-dark-theme-switch":
-          setLoadingDarkSwitch(true)
+          setLoadingDarkSwitch(true);
           break;
         case "theme-switched":
-          if (message.switchedTo === 'dark') {
-            setLoadingDarkSwitch(false)
-          } else if (message.switchedTo === 'light') {
-            setLoadingLightSwitch(false)
+          if (message.switchedTo === "dark") {
+            setLoadingDarkSwitch(false);
+          } else if (message.switchedTo === "light") {
+            setLoadingLightSwitch(false);
           }
-          setLoadingDarkSwitch(false)
+          setLoadingDarkSwitch(false);
+
+          console.log(message.fileUrl);
+
           const sendThemeSwitcherEvent = async () => {
             await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
               ...message,
             });
-            
+
             if (message.closeAfterRun) {
-              parent.postMessage({ pluginMessage: { type: "close-plugin" } }, "*");  
+              parent.postMessage(
+                { pluginMessage: { type: "close-plugin" } },
+                "*"
+              );
             }
-          }
+          };
           sendThemeSwitcherEvent();
           break;
       }
@@ -254,11 +267,7 @@ const App = ({}) => {
           />
         );
       case "theme-switcher":
-        return (
-          <ThemeSwitcher
-            setActivePlugin={handlePluginNavigation}
-          />
-        );
+        return <ThemeSwitcher setActivePlugin={handlePluginNavigation} />;
       case "color-linter":
         return (
           <DesignLinter
@@ -299,7 +308,7 @@ const App = ({}) => {
     colorIssuesFixed,
     setColorIssuesFixed,
     loadingDarkSwitch,
-    loadingLightSwitch
+    loadingLightSwitch,
   };
 
   return (
