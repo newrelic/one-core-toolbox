@@ -185,9 +185,6 @@ const App = ({}) => {
           } else if (message.switchedTo === "light") {
             setLoadingLightSwitch(false);
           }
-          setLoadingDarkSwitch(false);
-
-          console.log(message.fileUrl);
 
           const sendThemeSwitcherEvent = async () => {
             await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
