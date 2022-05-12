@@ -812,11 +812,11 @@ const navigateTo = (screen: string) => {
 
 switch (figma.command) {
   case "open-home":
-    figma.showUI(__html__, { width: 300, height: 448 });
+    figma.showUI(__html__, { themeColors: true, width: 300, height: 448 });
     navigateTo("open-home");
     break;
   case "open-table-creator":
-    figma.showUI(__html__, { width: 300, height: 448 });
+    figma.showUI(__html__, { themeColors: true, width: 300, height: 448 });
     navigateTo("open-table-creator");
     break;
   case "theme-switcher-to-light":
@@ -826,11 +826,11 @@ switch (figma.command) {
     switchToTheme("dark", true);
     break;
   case "open-language-linter":
-    figma.showUI(__html__, { width: 475, height: 500 });
+    figma.showUI(__html__, { themeColors: true, width: 475, height: 500 });
     navigateTo("open-language-linter");
     break;
   case "open-color-linter":
-    figma.showUI(__html__, { width: 475, height: 500 });
+    figma.showUI(__html__, { themeColors: true, width: 475, height: 500 });
     navigateTo("open-color-linter");
     break;
 }

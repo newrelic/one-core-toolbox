@@ -13,19 +13,19 @@ body {
 
 ::-webkit-input-placeholder {
   /* Chrome/Opera/Safari */
-  color: #b3b3b3;
+  color: var(--figma-color-text-tertiary);
 }
 ::-moz-placeholder {
   /* Firefox 19+ */
-  color: #b3b3b3;
+  color: var(--figma-color-text-tertiary);
 }
 :-ms-input-placeholder {
   /* IE 10+ */
-  color: #b3b3b3;
+  color: var(--figma-color-text-tertiary);
 }
 :-moz-placeholder {
   /* Firefox 18- */
-  color: #b3b3b3;
+  color: var(--figma-color-text-tertiary);
 }
 
 h4 {
@@ -37,7 +37,7 @@ h4 {
 
 h6 {
   font-weight: 400;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--figma-color-text);
   margin: 0 0 10px;
   line-height: 14px;
 }
@@ -53,7 +53,7 @@ select {
   border: 1px solid rgba(0, 0, 0, 0.1);
 
   font-size: 11px;
-  color: #283636;
+  color: var(--figma-color-text);
   appearance: none;
 }
 
@@ -66,7 +66,7 @@ select:focus {
 hr {
   border: none;
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--figma-color-border);
 }
 
 table tr {
@@ -103,11 +103,11 @@ table td {
   position: sticky;
   z-index: 100;
   top: 0;
-  background-color: #fff;
+  background-color: var(--figma-color-bg);
   list-style-type: none;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--figma-color-border);
   font-size: 11px;
-  color: #9fa5a5;
+  color: var(--figma-color-text-disabled);
   gap: 0px;
 }
 
@@ -137,7 +137,7 @@ table td {
 
 .tab-navigation-tab.active {
   font-weight: 600;
-  color: rgba(40, 54, 54, 1);
+  color: var(--figma-color-text);
 }
 
 .dimensions-selection-container,
@@ -212,8 +212,7 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   align-items: center;
   height: 32px;
   font-size: 11px;
-  color: #b3b3b3;
-  fill: #b3b3b3;
+  color: var(--figma-color-text-secondary);
   text-align: center;
 }
 
@@ -229,13 +228,12 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 }
 
 .input-container input {
-  color: #333;
-  fill: #333;
+  color: var(--figma-color-text);
   border-radius: 2px;
   cursor: default;
   box-sizing: border-box;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--figma-color-border);
   font-size: 11px;
   background-color: transparent;
   width: 100%;
@@ -303,14 +301,14 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 
 .dimensions-cta-container h6 {
   margin: 0;
-  color: rgba(0, 0, 0, 0.4);
+  color: var(--figma-color-text-tertiary);
 }
 
 .btn {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #fff;
+  color: var(--figma-color-text);
   font-weight: 500;
   text-align: center;
   flex-shrink: 0;
@@ -321,8 +319,7 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   background-color: transparent;
   box-sizing: border-box;
   border-radius: 6px;
-  color: #333;
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--figma-color-text);
   background-clip: padding-box;
   font-size: 11px;
   line-height: 16px;
@@ -330,17 +327,17 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 }
 
 .btn-primary {
-  background-color: #18a0fb;
+  background-color: var(--figma-color-bg-brand);
   border-color: transparent;
-  color: #fff;
+  color: var(--figma-color-text-onbrand);
   background-clip: border-box;
 }
 
 button[disabled] {
-  border-color: #d1d4d4;
-  color: #d1d4d4;
+  border-color: var(--figma-color-border-disabled-strong);
+  color: var(--figma-color-text-disabled);
   cursor: not-allowed;
-  background-color: rgba(0, 0, 0, 0.015);
+  background-color: transparent;
 }
 
 .column-nav {

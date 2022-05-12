@@ -73,7 +73,7 @@ const App = ({}) => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve("foo");
-      }, 500);
+      }, 550);
     });
   };
 
@@ -190,6 +190,8 @@ const App = ({}) => {
             await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
               ...message,
             });
+
+            console.log(message);
 
             if (message.closeAfterRun) {
               parent.postMessage(
