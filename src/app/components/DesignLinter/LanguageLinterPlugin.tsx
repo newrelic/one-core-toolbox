@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
-import isEqual from "lodash.isequal";
+import { isEqual } from "../../utility-functions";
 import classNames from "classnames";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";

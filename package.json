@@ -17,7 +17,6 @@
 		"chroma-js": "^2.4.2",
 		"classnames": "^2.3.1",
 		"dictionary-en": "^3.1.0",
-		"lodash.isequal": "^4.5.0",
 		"new-relic-language-linter": "1.2.25",
 		"prop-types": "^15.8.1",
 		"react": "^17.0.2",

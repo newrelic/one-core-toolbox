@@ -1,12 +1,12 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
-import isEqual from "lodash.isequal";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
 import Resizer from "./Resizer";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { PluginContext } from "./PluginContext";
 import Home from "./Home";
+import { isEqual } from "../utility-functions";
 import "../styles/ui.css";
 
 declare function require(path: string): any;
@@ -72,7 +72,7 @@ const App = ({}) => {
 
     return new Promise((resolve) => {
       setTimeout(() => {
-        resolve("foo");
+        resolve(customData);
       }, 550);
     });
   };
@@ -190,8 +190,6 @@ const App = ({}) => {
             await triggerNewRelicCustomEvent(`OneCoreToolbox: theme-switched`, {
               ...message,
             });
-
-            console.log(message);
 
             if (message.closeAfterRun) {
               parent.postMessage(

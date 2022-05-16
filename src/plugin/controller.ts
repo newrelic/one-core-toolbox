@@ -24,6 +24,7 @@ const createTable = async (msg) => {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
   tableFrame.name = "Table";
+  tableFrame.fills = [];
   tableFrame.counterAxisSizingMode = "AUTO";
   tableFrame.layoutMode = "VERTICAL";
   tableFrame.x = figma.viewport.center.x;
