@@ -112,7 +112,22 @@ const DimensionsSelection = ({
       {renderTable()}
 
       <div className="cta-container dimensions-cta-container">
-        <h6>(Max: 24 columns and 100 rows)</h6>
+        <div className="input-container left-to-right">
+          <input
+            type="checkbox"
+            name="multi-value"
+            id="multi-value"
+            aria-aria-describedby="#multi-value-tooltip"
+            className="multi-value-checkbox"
+          />
+          <label htmlFor="multi-value">Multi-value cells</label>
+          <div className="tooltip-container">
+            <span className="tooltip-trigger"></span>
+            <p className="tooltip" id="multi-value-tooltip" role="tooltip">
+              Optional secondary data displayed on a second line in cells
+            </p>
+          </div>
+        </div>
         <button
           disabled={activeCol < 1}
           className="btn btn-primary btn-create-table"

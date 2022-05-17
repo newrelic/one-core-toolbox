@@ -20,9 +20,12 @@ const ColumnConfiguration = ({
 
     columnConfigurationArray[activeColConfigurationScreen][attr] =
       attr !== "multiValue" ? element.value : element.checked;
-      
-    if (columnConfigurationArray[activeColConfigurationScreen][attr] === 'metric') {
-      columnConfigurationArray[activeColConfigurationScreen]['alignment'] = 'right'
+
+    if (
+      columnConfigurationArray[activeColConfigurationScreen][attr] === "metric"
+    ) {
+      columnConfigurationArray[activeColConfigurationScreen]["alignment"] =
+        "right";
     }
 
     setColumnConfiguration(columnConfigurationArray);
@@ -197,7 +200,11 @@ const ColumnConfiguration = ({
               value={
                 columnConfiguration[activeColConfigurationScreen]["alignment"]
               }
-              disabled={columnConfiguration[activeColConfigurationScreen]['cellType'] === 'metric'}
+              disabled={
+                columnConfiguration[activeColConfigurationScreen][
+                  "cellType"
+                ] === "metric"
+              }
             >
               <option
                 value="left"
@@ -215,25 +222,20 @@ const ColumnConfiguration = ({
           </div>
         </div>
         <label className="input-container" htmlFor="column-multi-value">
-          <h5 className="label">Multi-value</h5>
-          <div
-            className={`ui-switch ${multiValueDisabled() ? "disabled" : ""}`}
-          >
-            <input
-              type="checkbox"
-              id="column-multi-value"
-              onChange={() => handleColumnConfigurationUpdate("multiValue")}
-              checked={
-                !multiValueDisabled()
-                  ? columnConfiguration[activeColConfigurationScreen][
-                      "multiValue"
-                    ]
-                  : false
-              }
-              disabled={multiValueDisabled()}
-            />
-            <span className="slider round"></span>
-          </div>
+          <label htmlFor="column-multi-value">Show multi-value</label>
+          <input
+            type="checkbox"
+            id="column-multi-value"
+            onChange={() => handleColumnConfigurationUpdate("multiValue")}
+            checked={
+              !multiValueDisabled()
+                ? columnConfiguration[activeColConfigurationScreen][
+                    "multiValue"
+                  ]
+                : false
+            }
+            disabled={multiValueDisabled()}
+          />
         </label>
       </section>
     );
