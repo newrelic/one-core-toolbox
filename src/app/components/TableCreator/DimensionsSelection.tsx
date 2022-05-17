@@ -34,11 +34,19 @@ const DimensionsSelection = ({
                 {[...Array(8).keys()].map((colIndex) => {
                   return (
                     <td className={`input__radio`} key={colIndex}>
-                      <input type="radio" id={`t${rowIndex + 1}x${colIndex + 1}`} name="selection" />
+                      <input
+                        type="radio"
+                        id={`t${rowIndex + 1}x${colIndex + 1}`}
+                        name="selection"
+                      />
                       <label
                         htmlFor={`t${rowIndex + 1}x${colIndex + 1}`}
-                        onMouseEnter={() => handleGridSquareMouseEnter(colIndex, rowIndex)}
-                        onClick={() => handleGridSquareClick(colIndex, rowIndex)}
+                        onMouseEnter={() =>
+                          handleGridSquareMouseEnter(colIndex, rowIndex)
+                        }
+                        onClick={() =>
+                          handleGridSquareClick(colIndex, rowIndex)
+                        }
                         className={`
                           ${
                             colIndex <= hoveredCol && rowIndex <= hoveredRow
@@ -51,8 +59,8 @@ const DimensionsSelection = ({
                             !(activeRow === 0 && activeCol === 0)
                               ? "active"
                               : ""
-                          }`
-                      }></label>
+                          }`}
+                      ></label>
                     </td>
                   );
                 })}
@@ -78,7 +86,9 @@ const DimensionsSelection = ({
             className="number-of-cols"
             onChange={() => handeGridSelectionInputs("col")}
             value={activeCol === 0 && activeRow === 0 ? "" : activeCol}
-            placeholder={tableHovered ? (hoveredCol + 1).toString() : ""}
+            placeholder={
+              tableHovered ? (hoveredCol + 1).toString() : "(24 max)"
+            }
           />
         </div>
         <div className="input-container">
@@ -92,7 +102,9 @@ const DimensionsSelection = ({
             className="number-of-rows"
             onChange={() => handeGridSelectionInputs("row")}
             value={activeRow === 0 && activeCol === 0 ? "" : activeRow}
-            placeholder={tableHovered ? (hoveredRow + 1).toString() : ""}
+            placeholder={
+              tableHovered ? (hoveredRow + 1).toString() : "(100 max)"
+            }
           />
         </div>
       </div>
@@ -101,7 +113,11 @@ const DimensionsSelection = ({
 
       <div className="cta-container dimensions-cta-container">
         <h6>(Max: 24 columns and 100 rows)</h6>
-        <button disabled={activeCol < 1} className="btn btn-primary btn-create-table" onClick={goToColumnConfiguration}>
+        <button
+          disabled={activeCol < 1}
+          className="btn btn-primary btn-create-table"
+          onClick={goToColumnConfiguration}
+        >
           Continue
         </button>
       </div>

@@ -181,7 +181,7 @@ table input[type="radio"] ~ label {
 }
 
 .figma-dark table input[type="radio"] ~ label {
-  box-shadow: 0 0 0 1px #5e686e;
+  box-shadow: 0 0 0 1px rgb(127 127 127 / 50%);
 }
 
 table input[type="radio"] ~ label:hover {
