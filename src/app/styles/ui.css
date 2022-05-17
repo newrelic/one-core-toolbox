@@ -367,7 +367,7 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 }
 
 .tooltip {
-  width: 201px;
+  width: 133px;
   display: none;
   position: absolute;
   bottom: 25px;
@@ -376,7 +376,7 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   background-color: rgb(0 0 0 / 75%);
   border-radius: 3px;
   padding-inline: 10px;
-  left: 25px;
+  left: 50px;
   line-height: 135%;
   padding-block: 6px;
   backdrop-filter: blur(5px);
@@ -388,13 +388,13 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   width: 0;
   height: 0;
   position: absolute;
-  top: 41px;
-  left: 97px;
+  top: 41.5px;
+  left: 65px;
   display: block;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid transparent;
-  border-top: 5px solid rgb(0 0 0 / 80%);
+  border-top: 5px solid rgb(0 0 0 / 75%);
 }
 
 .btn {

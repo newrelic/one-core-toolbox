@@ -8,6 +8,8 @@ const DimensionsSelection = ({
   handleGridSquareClick,
   activeCol,
   activeRow,
+  isMultiValue,
+  setIsMultiValue,
   handeGridSelectionInputs,
   goToColumnConfiguration,
 }) => {
@@ -18,6 +20,12 @@ const DimensionsSelection = ({
   const handleGridSquareMouseEnter = (colIndex, rowIndex) => {
     setHoveredCol(colIndex);
     setHoveredRow(rowIndex);
+  };
+
+  const handleMultiValueInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+
+    setIsMultiValue(isChecked);
   };
 
   const renderTable = () => {
@@ -117,14 +125,16 @@ const DimensionsSelection = ({
             type="checkbox"
             name="multi-value"
             id="multi-value"
-            aria-aria-describedby="#multi-value-tooltip"
+            aria-describedby="#multi-value-tooltip"
             className="multi-value-checkbox"
+            value={isMultiValue}
+            onChange={(e) => handleMultiValueInput(e)}
           />
           <label htmlFor="multi-value">Multi-value cells</label>
           <div className="tooltip-container">
             <span className="tooltip-trigger"></span>
             <p className="tooltip" id="multi-value-tooltip" role="tooltip">
-              Optional secondary data displayed on a second line in cells
+              Enables a second line of content for cells
             </p>
           </div>
         </div>

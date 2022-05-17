@@ -8,6 +8,7 @@ const ColumnConfiguration = ({
   createTable,
   goToDimensionsSelection,
   activeCol,
+  isMultiValue,
   columnConfiguration,
   setColumnConfiguration,
 }) => {
@@ -221,22 +222,24 @@ const ColumnConfiguration = ({
             </select>
           </div>
         </div>
-        <label className="input-container" htmlFor="column-multi-value">
-          <label htmlFor="column-multi-value">Show multi-value</label>
-          <input
-            type="checkbox"
-            id="column-multi-value"
-            onChange={() => handleColumnConfigurationUpdate("multiValue")}
-            checked={
-              !multiValueDisabled()
-                ? columnConfiguration[activeColConfigurationScreen][
-                    "multiValue"
-                  ]
-                : false
-            }
-            disabled={multiValueDisabled()}
-          />
-        </label>
+        {isMultiValue && (
+          <div className="input-container">
+            <label htmlFor="column-multi-value">Show multi-value</label>
+            <input
+              type="checkbox"
+              id="column-multi-value"
+              onChange={() => handleColumnConfigurationUpdate("multiValue")}
+              checked={
+                !multiValueDisabled()
+                  ? columnConfiguration[activeColConfigurationScreen][
+                      "multiValue"
+                    ]
+                  : false
+              }
+              disabled={multiValueDisabled()}
+            />
+          </div>
+        )}
       </section>
     );
   };
