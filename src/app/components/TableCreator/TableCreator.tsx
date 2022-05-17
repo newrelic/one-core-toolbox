@@ -76,8 +76,8 @@ const TableCreator = (props) => {
   };
 
   const createTable = () => {
-    const hasNoMultiValueCols = columnConfiguration.some(
-      (col) => !col.colMultiValue
+    const hasNoMultiValueCols = !columnConfiguration.some(
+      (col) => col.multiValue
     );
 
     // Because you shouldn't be able to have a multi-value table with no
