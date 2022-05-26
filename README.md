@@ -1,5 +1,7 @@
 ![Promotional banner](https://user-images.githubusercontent.com/812989/138165766-7b9b7f8c-b03b-4cdb-8791-e87b4a90667a.jpg)
 
+## Video preview
+https://user-images.githubusercontent.com/812989/169329176-a1f0ddd1-f2f7-4ba8-ac4a-588f7773b998.mov
 
 ## Run it locally
 * Run `yarn` to install dependencies.
@@ -18,4 +20,4 @@ This repo is using:
 
 ## Credits
 - Boilerplate plugin template: [Figma Plugin React Template](https://github.com/nirsky/figma-plugin-react-template) by [nirsky](https://github.com/nirsky)
-- The idea for the Grid UI in the table creator came straight from [Table Creator](https://www.figma.com/community/plugin/885838970710285271/Table-Creator) by [Gavin McFarland](https://www.figma.com/@gavinmcfarland)
+- Design for the Grid UI in the table creator came straight from [Table Creator](https://www.figma.com/community/plugin/885838970710285271/Table-Creator) by [Gavin McFarland](https://www.figma.com/@gavinmcfarland)
