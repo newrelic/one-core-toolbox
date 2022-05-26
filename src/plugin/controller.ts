@@ -66,18 +66,29 @@ const createTable = async (msg) => {
       if (rowIndex === 0) {
         let thisHeaderCell = headerCell.createInstance();
         let textNodeOfHeaderCell = (thisHeaderCell.children[0] as InstanceNode)
-          .children[0];
+          .children[0] as TextNode;
+        const isFavoriteCol = colCellType === "Favorite";
+        const hasCustomColName = colName.length;
+        console.log(colCellType);
 
-        thisHeaderCell.name = colName.length > 0 ? colName : "Header";
+        const setHeaderTextCharacters = (newChars: string) => {
+          textNodeOfHeaderCell.deleteCharacters(
+            0,
+            textNodeOfHeaderCell.characters.length
+          );
+          textNodeOfHeaderCell.insertCharacters(0, newChars);
+        };
 
-        (textNodeOfHeaderCell as TextNode).deleteCharacters(
-          0,
-          (textNodeOfHeaderCell as TextNode).characters.length
-        );
-        (textNodeOfHeaderCell as TextNode).insertCharacters(
-          0,
-          colName.length > 0 ? colName : "Header"
-        );
+        if (hasCustomColName) thisHeaderCell.name = colName;
+        if (!hasCustomColName) thisHeaderCell.name = "Header";
+        if (isFavoriteCol) {
+          const arrowsLayer = thisHeaderCell.findOne(
+            (child) => child.name === "Arrows"
+          );
+
+          arrowsLayer.visible = false;
+          setHeaderTextCharacters(" ");
+        }
 
         thisHeaderCell.setProperties({ Alignment: colAlignment });
 

@@ -110,11 +110,12 @@ const ColorTile = (props: props) => {
   };
 
   const renderTokenSuggestions = () => {
-    
     if (colorTokens?.length > 0) {
       // Set `colorTokens` to colorTokensOutput minus the private tokens
-      const filteredColorTokens = colorTokens.filter(token => !token.name.toLowerCase().includes('private'))
-      
+      const filteredColorTokens = colorTokens.filter(
+        (token) => !token.name.toLowerCase().includes("private")
+      );
+
       let relevantColorStyles = [];
       let mostRelevantColorStyles = [];
 
@@ -181,13 +182,15 @@ const ColorTile = (props: props) => {
         // we may end up suggesting `Attention/Text/Text On Notification Inverted`
         // twice. Once for it's light mode version, and once for dark mode (
         // since they have unequal but similar color values). This is undesirable.
-        .filter(token => {
-          const isDarkModeToken = token.theme === 'dark';
-          const isDuplicate = relevantColorStyles.some(relevantStyle => {
-            return relevantStyle.name.toLowerCase() === token.name.toLowerCase()
-          })
-          
-          return !(isDuplicate && isDarkModeToken)
+        .filter((token) => {
+          const isDarkModeToken = token.theme === "dark";
+          const isDuplicate = relevantColorStyles.some((relevantStyle) => {
+            return (
+              relevantStyle.name.toLowerCase() === token.name.toLowerCase()
+            );
+          });
+
+          return !(isDuplicate && isDarkModeToken);
         })
         // Take the top 5 closest suggestions
         .slice(0, 4);

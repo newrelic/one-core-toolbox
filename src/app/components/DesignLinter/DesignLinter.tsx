@@ -40,10 +40,10 @@ const DesignLinter = (props: props) => {
         tabClasses.push("active");
         tabClassesOutput = tabClasses.join(" ");
       }
-      
-      if (tabLabel === 'Language') {
-        tabLabel = 'Language (beta)'
-        tabClassesOutput = `${tabClassesOutput} language-beta-tab`
+
+      if (tabLabel === "Language") {
+        tabLabel = "Language (beta)";
+        tabClassesOutput = `${tabClassesOutput} language-beta-tab`;
       }
 
       return (
@@ -52,7 +52,7 @@ const DesignLinter = (props: props) => {
           onClick={() => handleTabClick(tab)}
           key={index}
         >
-          {tabLabel} {tabLabel === 'Language' && "(beta)"}
+          {tabLabel} {tabLabel === "Language" && "(beta)"}
         </li>
       );
     });

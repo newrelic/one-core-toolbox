@@ -518,6 +518,11 @@ button[disabled] {
   font-weight: 400;
 }
 
+.configuration-body .input-container.disabled label {
+  color: var(--figma-color-text-disabled);
+  cursor: not-allowed;
+}
+
 .select-input-container {
   position: relative;
 }
@@ -548,6 +553,7 @@ button[disabled] {
 
 .column-configuration-input[disabled] {
   background-color: var(--figma-color-bg-disabled);
+  border-color: var(--figma-color-border-disabled-strong);
   border-radius: 2px;
   color: var(--figma-color-text-disabled);
 }

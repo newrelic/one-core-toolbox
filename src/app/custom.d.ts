@@ -3,4 +3,4 @@ declare module "*.svg" {
   export default content;
 }
 
-declare module 'https://*'
+declare module "https://*";

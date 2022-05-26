@@ -4,21 +4,23 @@
   "api": "1.0.0",
   "main": "dist/code.js",
   "ui": "dist/ui.html",
-  "editorType": [
-    "figma"
-  ],
+  "editorType": ["figma"],
   "enablePrivatePluginApi": true,
   "permissions": ["currentuser"],
   "menu": [
-    {"name": "Home", "command": "open-home"},
-    {"separator": true},
-    {"name": "Table creator", "command": "open-table-creator"},
-    {"name": "Theme switcher", "menu": [
-      {"name": "Light mode", "command": "theme-switcher-to-light"},
-      {"name": "Dark mode", "command": "theme-switcher-to-dark"}
-    ]},
-    {"name": "Design linter", "menu": [
-      {"name": "Color", "command": "open-color-linter"}
-    ]}
+    { "name": "Home", "command": "open-home" },
+    { "separator": true },
+    { "name": "Table creator", "command": "open-table-creator" },
+    {
+      "name": "Theme switcher",
+      "menu": [
+        { "name": "Light mode", "command": "theme-switcher-to-light" },
+        { "name": "Dark mode", "command": "theme-switcher-to-dark" }
+      ]
+    },
+    {
+      "name": "Design linter",
+      "menu": [{ "name": "Color", "command": "open-color-linter" }]
+    }
   ]
 }

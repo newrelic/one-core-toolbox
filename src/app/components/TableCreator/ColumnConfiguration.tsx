@@ -106,6 +106,20 @@ const ColumnConfiguration = ({
       }
     };
 
+    const cellTypeIsMetric = (() => {
+      return (
+        columnConfiguration[activeColConfigurationScreen]["cellType"] ===
+        "metric"
+      );
+    })();
+
+    const cellTypeIsFavorite = (() => {
+      return (
+        columnConfiguration[activeColConfigurationScreen]["cellType"] ===
+        "favorite"
+      );
+    })();
+
     return (
       <section className="configuration-body">
         {renderColumnNavigation()}
@@ -115,16 +129,19 @@ const ColumnConfiguration = ({
           <h6>Choose the properties for the cells in this column</h6>
         </div>
 
-        <div className="input-container">
+        <div
+          className={`input-container ${cellTypeIsFavorite ? "disabled" : ""}`}
+        >
           <label htmlFor="column-name">Column name</label>
           <input
             type="text"
             name="column-name"
-            className="column-configuration-name-input"
+            className="column-configuration-input column-configuration-name-input"
             placeholder="e.g. date, account, throughput, etc. "
             id="column-name"
             onChange={() => handleColumnConfigurationUpdate("name")}
             value={columnConfiguration[activeColConfigurationScreen]["name"]}
+            disabled={cellTypeIsFavorite}
           />
         </div>
         <div className="input-container">
@@ -163,12 +180,15 @@ const ColumnConfiguration = ({
               >
                 Entity
               </option>
-              <option
-                value="favorite"
-                className="column-configuration-cell-type-input-option"
-              >
-                Favorite
-              </option>
+
+              {activeColConfigurationScreen === 0 && (
+                <option
+                  value="favorite"
+                  className="column-configuration-cell-type-input-option"
+                >
+                  Favorite
+                </option>
+              )}
               <option
                 value="user"
                 className="column-configuration-cell-type-input-option"
@@ -190,7 +210,11 @@ const ColumnConfiguration = ({
             </select>
           </div>
         </div>
-        <div className="input-container">
+        <div
+          className={`input-container ${
+            cellTypeIsMetric || cellTypeIsFavorite ? "disabled" : ""
+          }`}
+        >
           <label htmlFor="column-alignment">Alignment</label>
           <div className="select-input-container">
             <select
@@ -201,11 +225,7 @@ const ColumnConfiguration = ({
               value={
                 columnConfiguration[activeColConfigurationScreen]["alignment"]
               }
-              disabled={
-                columnConfiguration[activeColConfigurationScreen][
-                  "cellType"
-                ] === "metric"
-              }
+              disabled={cellTypeIsMetric || cellTypeIsFavorite}
             >
               <option
                 value="left"
@@ -223,7 +243,11 @@ const ColumnConfiguration = ({
           </div>
         </div>
         {isMultiValue && (
-          <div className="input-container">
+          <div
+            className={`input-container ${
+              multiValueDisabled() || cellTypeIsFavorite ? "disabled" : ""
+            }`}
+          >
             <label htmlFor="column-multi-value">Show multi-value</label>
             <input
               type="checkbox"
@@ -236,7 +260,7 @@ const ColumnConfiguration = ({
                     ]
                   : false
               }
-              disabled={multiValueDisabled()}
+              disabled={multiValueDisabled() || cellTypeIsFavorite}
             />
           </div>
         )}
