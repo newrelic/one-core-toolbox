@@ -529,32 +529,26 @@ button[disabled] {
 
 .select-input-container:after {
   content: "";
-  width: 1px;
-  height: 5px;
-  background-color: var(--figma-color-text-tertiary);
-  transform: rotate(45deg);
+  inline-size: 7.5px;
+  block-size: 4px;
+  background-image: url("../assets/icon-chevron-down.svg");
   position: absolute;
   right: calc(5px + 8px);
   top: 12px;
   pointer-events: none;
 }
 
-.select-input-container:before {
-  content: "";
-  width: 1px;
-  height: 5px;
-  background-color: var(--figma-color-text-tertiary);
-  transform: rotate(-45deg);
-  position: absolute;
-  right: calc(8px + 8px);
-  top: 12px;
-  pointer-events: none;
+.figma-dark .select-input-container:after {
+  filter: invert(1);
+}
+
+.disabled .select-input-container:after {
+  opacity: 0.5;
 }
 
 .column-configuration-input[disabled] {
   background-color: var(--figma-color-bg-disabled);
-  border-color: var(--figma-color-border-disabled-strong);
-  border-radius: 2px;
+  border-color: var(--figma-color-bg-disabled);
   color: var(--figma-color-text-disabled);
 }
 

@@ -69,7 +69,6 @@ const createTable = async (msg) => {
           .children[0] as TextNode;
         const isFavoriteCol = colCellType === "Favorite";
         const hasCustomColName = colName.length;
-        console.log(colCellType);
 
         const setHeaderTextCharacters = (newChars: string) => {
           textNodeOfHeaderCell.deleteCharacters(
