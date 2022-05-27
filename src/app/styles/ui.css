@@ -349,6 +349,10 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   cursor: pointer;
 }
 
+.input-container input[type="checkbox"][disabled] {
+  cursor: not-allowed;
+}
+
 .dimensions-cta-container .input-container {
   height: auto;
   gap: 4px;

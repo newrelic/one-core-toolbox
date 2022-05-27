@@ -30,7 +30,7 @@ const createTable = async (msg) => {
   tableFrame.x = figma.viewport.center.x;
   tableFrame.y = figma.viewport.center.y;
 
-  const toCapitalizedString = (valueToConvert: Boolean | String): String => {
+  const toCapitalizedString = (valueToConvert: Boolean | String): string => {
     let outputValue = valueToConvert.toString();
     outputValue = outputValue[0].toUpperCase() + outputValue.substring(1);
 
@@ -111,9 +111,17 @@ const createTable = async (msg) => {
         let { cellType: colCellType, multiValue: colMultiValue } =
           msg.columnConfiguration[index];
 
+        const cellTypesThatCanBeMultiValue = ["Text", "Metric", "Entity"];
+        const tableMultiValue = toCapitalizedString(msg.isMultiValue);
+
         // Because this is how the variant properties are formatted :(
         colCellType = toCapitalizedString(colCellType);
         colMultiValue = toCapitalizedString(colMultiValue);
+        const colCanBeMultiValue = cellTypesThatCanBeMultiValue.some(
+          (cellType) => cellType === colCellType
+        );
+
+        console.log(colMultiValue);
 
         cell.name === "Header" ? (cell.name = "Cell") : null;
         cell.setProperties({ Type: "Body" });
@@ -121,7 +129,7 @@ const createTable = async (msg) => {
           (cell.children[0] as FrameNode).children[0] as InstanceNode
         ).setProperties({
           Type: colCellType,
-          "Multi-value": msg.isMultiValue ? "True" : "False",
+          "Multi-value": colCanBeMultiValue ? tableMultiValue : "False",
         });
 
         cell.counterAxisSizingMode = "FIXED";
@@ -129,6 +137,8 @@ const createTable = async (msg) => {
         // If it's a multiValue table then set the visibility of this col's
         // additional value
         if (msg.isMultiValue && colMultiValue === "False") {
+          if (!colCanBeMultiValue) return;
+
           const additionalValueLayer = cell.findOne(
             (child) => child.name === "Secondary value" && child.type === "TEXT"
           );
