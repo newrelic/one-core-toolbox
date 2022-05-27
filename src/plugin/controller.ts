@@ -30,6 +30,13 @@ const createTable = async (msg) => {
   tableFrame.x = figma.viewport.center.x;
   tableFrame.y = figma.viewport.center.y;
 
+  const toCapitalizedString = (valueToConvert: Boolean | String): string => {
+    let outputValue = valueToConvert.toString();
+    outputValue = outputValue[0].toUpperCase() + outputValue.substring(1);
+
+    return outputValue;
+  };
+
   // headerCell.variantProperties.Type = "Body";
 
   // if any cell is set to Multi-value, set a variable we'll use later
@@ -42,7 +49,7 @@ const createTable = async (msg) => {
     // tableRow.layoutAlign = 'STRETCH'
     // tableRow.primaryAxisSizingMode = 'FIXED';
 
-    msg.columnConfiguration.map(async (col) => {
+    msg.columnConfiguration.forEach(async (col) => {
       let {
         name: colName,
         alignment: colAlignment,
@@ -50,12 +57,12 @@ const createTable = async (msg) => {
         multiValue: colMultiValue,
       } = col;
 
-      colAlignment = colAlignment[0].toUpperCase() + colAlignment.substring(1);
-      colCellType = colCellType[0].toUpperCase() + colCellType.substring(1);
-      colMultiValue = colMultiValue.toString();
-      colMultiValue =
-        colMultiValue[0].toUpperCase() + colMultiValue.substring(1);
+      // Because this is how the variant properties are formatted :(
+      colAlignment = toCapitalizedString(colAlignment);
+      colCellType = toCapitalizedString(colCellType);
+      colMultiValue = toCapitalizedString(colMultiValue);
 
+      // Set header cell configuration
       if (rowIndex === 0) {
         let thisHeaderCell = headerCell.createInstance();
         let textNodeOfHeaderCell = (thisHeaderCell.children[0] as InstanceNode)
@@ -75,7 +82,7 @@ const createTable = async (msg) => {
         thisHeaderCell.setProperties({ Alignment: colAlignment });
 
         thisHeaderCell.resize(
-          colMultiValue === "True" ? 120 : thisHeaderCell.width,
+          msg.isMultiValue ? 120 : thisHeaderCell.width,
           thisHeaderCell.height
         );
 
@@ -93,38 +100,57 @@ const createTable = async (msg) => {
     if (rowIndex === 0) {
       tableFrame.appendChild(tableRow);
     } else {
+      // configure all rows except headers
       let thisTableRow = tableRow.createInstance();
 
       // thisTableRow.layoutAlign = 'STRETCH'
       // thisTableRow.primaryAxisSizingMode = 'FIXED';
 
       thisTableRow.children.map((cell, index) => {
+        cell = cell as InstanceNode;
         let { cellType: colCellType, multiValue: colMultiValue } =
           msg.columnConfiguration[index];
 
-        colCellType = colCellType[0].toUpperCase() + colCellType.substring(1);
-        colMultiValue = colMultiValue.toString();
-        colMultiValue =
-          colMultiValue[0].toUpperCase() + colMultiValue.substring(1);
+        const cellTypesThatCanBeMultiValue = ["Text", "Metric", "Entity"];
+        const tableMultiValue = toCapitalizedString(msg.isMultiValue);
+
+        // Because this is how the variant properties are formatted :(
+        colCellType = toCapitalizedString(colCellType);
+        colMultiValue = toCapitalizedString(colMultiValue);
+        const colCanBeMultiValue = cellTypesThatCanBeMultiValue.some(
+          (cellType) => cellType === colCellType
+        );
+
+        console.log(colMultiValue);
 
         cell.name === "Header" ? (cell.name = "Cell") : null;
-        (cell as InstanceNode).setProperties({ Type: "Body" });
+        cell.setProperties({ Type: "Body" });
         (
-          ((cell as InstanceNode).children[0] as FrameNode)
-            .children[0] as InstanceNode
+          (cell.children[0] as FrameNode).children[0] as InstanceNode
         ).setProperties({
           Type: colCellType,
-          "Multi-value": colMultiValue,
+          "Multi-value": colCanBeMultiValue ? tableMultiValue : "False",
         });
+
+        cell.counterAxisSizingMode = "FIXED";
+
+        // If it's a multiValue table then set the visibility of this col's
+        // additional value
+        if (msg.isMultiValue && colMultiValue === "False") {
+          if (!colCanBeMultiValue) return;
+
+          const additionalValueLayer = cell.findOne(
+            (child) => child.name === "Secondary value" && child.type === "TEXT"
+          );
+
+          (additionalValueLayer as TextNode).characters = " ";
+        }
 
         // Because cells can be reset here as they're replaced with another
         // component (variants), we again set the fill container setting if
         // any of the columns is set to "multi value"
-        ((cell as FrameNode).children[0] as FrameNode).layoutGrow =
-          cellFillContainerY ? 1 : 0;
-        (cell as FrameNode).primaryAxisSizingMode = cellFillContainerY
-          ? "FIXED"
-          : "AUTO";
+        (cell.children[0] as FrameNode).layoutGrow = cellFillContainerY ? 1 : 0;
+        cell.primaryAxisSizingMode = cellFillContainerY ? "FIXED" : "AUTO";
       });
 
       tableFrame.appendChild(thisTableRow);
@@ -878,6 +904,9 @@ figma.ui.onmessage = async (msg) => {
         navigateTo("open-color-linter");
         break;
     }
+  }
+  if (msg.type == "display-error") {
+    figma.notify(msg.content, { error: true });
   }
 
   if (msg.type === "initialize-selection") {

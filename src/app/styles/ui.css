@@ -181,7 +181,7 @@ table input[type="radio"] ~ label {
 }
 
 .figma-dark table input[type="radio"] ~ label {
-  box-shadow: 0 0 0 1px #5e686e;
+  box-shadow: 0 0 0 1px rgb(127 127 127 / 50%);
 }
 
 table input[type="radio"] ~ label:hover {
@@ -248,7 +248,7 @@ table.hovered input[type="radio"] ~ label.active.hovered {
   height: 32px;
   font-size: 11px;
   color: var(--figma-color-text-secondary);
-  text-align: center;
+  text-align: left;
 }
 
 .table-dimensions-config .input-container input {
@@ -337,6 +337,68 @@ table.hovered input[type="radio"] ~ label.active.hovered {
 .dimensions-cta-container h6 {
   margin: 0;
   color: var(--figma-color-text-tertiary);
+}
+
+.input-container input[type="checkbox"] {
+  height: auto;
+  width: auto;
+  margin: 0;
+}
+
+.input-container :where(input[type="checkbox"]:hover, label[for]:hover) {
+  cursor: pointer;
+}
+
+.input-container input[type="checkbox"][disabled] {
+  cursor: not-allowed;
+}
+
+.dimensions-cta-container .input-container {
+  height: auto;
+  gap: 4px;
+}
+
+.tooltip-trigger {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  background-image: url("../assets/icon-info.svg");
+}
+
+.tooltip-trigger:hover ~ .tooltip {
+  display: block;
+}
+
+.tooltip {
+  width: 133px;
+  display: none;
+  position: absolute;
+  bottom: 25px;
+  color: rgb(255 255 255 / 90%);
+  font-size: 11px;
+  background-color: rgb(0 0 0 / 75%);
+  border-radius: 3px;
+  padding-inline: 10px;
+  left: 50px;
+  line-height: 135%;
+  padding-block: 6px;
+  backdrop-filter: blur(5px);
+  text-align: center;
+}
+
+.tooltip:after {
+  content: "";
+  width: 0;
+  height: 0;
+  position: absolute;
+  top: 41.5px;
+  left: 65px;
+  display: block;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-top: 5px solid rgb(0 0 0 / 75%);
 }
 
 .btn {
@@ -450,7 +512,7 @@ button[disabled] {
 
 .configuration-body label:not(.input-container),
 .configuration-body .label {
-  width: 80px;
+  width: 106px;
   flex-shrink: 0;
   color: var(--figma-color-text);
   font-weight: 400;

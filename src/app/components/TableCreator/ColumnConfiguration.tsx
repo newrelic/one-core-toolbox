@@ -8,6 +8,7 @@ const ColumnConfiguration = ({
   createTable,
   goToDimensionsSelection,
   activeCol,
+  isMultiValue,
   columnConfiguration,
   setColumnConfiguration,
 }) => {
@@ -20,9 +21,12 @@ const ColumnConfiguration = ({
 
     columnConfigurationArray[activeColConfigurationScreen][attr] =
       attr !== "multiValue" ? element.value : element.checked;
-      
-    if (columnConfigurationArray[activeColConfigurationScreen][attr] === 'metric') {
-      columnConfigurationArray[activeColConfigurationScreen]['alignment'] = 'right'
+
+    if (
+      columnConfigurationArray[activeColConfigurationScreen][attr] === "metric"
+    ) {
+      columnConfigurationArray[activeColConfigurationScreen]["alignment"] =
+        "right";
     }
 
     setColumnConfiguration(columnConfigurationArray);
@@ -197,7 +201,11 @@ const ColumnConfiguration = ({
               value={
                 columnConfiguration[activeColConfigurationScreen]["alignment"]
               }
-              disabled={columnConfiguration[activeColConfigurationScreen]['cellType'] === 'metric'}
+              disabled={
+                columnConfiguration[activeColConfigurationScreen][
+                  "cellType"
+                ] === "metric"
+              }
             >
               <option
                 value="left"
@@ -214,11 +222,9 @@ const ColumnConfiguration = ({
             </select>
           </div>
         </div>
-        <label className="input-container" htmlFor="column-multi-value">
-          <h5 className="label">Multi-value</h5>
-          <div
-            className={`ui-switch ${multiValueDisabled() ? "disabled" : ""}`}
-          >
+        {isMultiValue && (
+          <div className="input-container">
+            <label htmlFor="column-multi-value">Show multi-value</label>
             <input
               type="checkbox"
               id="column-multi-value"
@@ -232,9 +238,8 @@ const ColumnConfiguration = ({
               }
               disabled={multiValueDisabled()}
             />
-            <span className="slider round"></span>
           </div>
-        </label>
+        )}
       </section>
     );
   };

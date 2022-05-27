@@ -14,6 +14,7 @@ const TableCreator = (props) => {
   const [activeScreen, setActiveScreen] = useState("DimensionsSelection");
   const [activeCol, setActiveCol] = useState(0);
   const [activeRow, setActiveRow] = useState(0);
+  const [isMultiValue, setIsMultiValue] = useState(false);
   const [columnConfiguration, setColumnConfiguration] = useState([]);
 
   const handleColumnConfiguration = () => {
@@ -75,12 +76,33 @@ const TableCreator = (props) => {
   };
 
   const createTable = () => {
+    const hasNoMultiValueCols = !columnConfiguration.some(
+      (col) => col.multiValue
+    );
+
+    // Because you shouldn't be able to have a multi-value table with no
+    // multi-value columns.
+    if (isMultiValue && hasNoMultiValueCols) {
+      parent.postMessage(
+        {
+          pluginMessage: {
+            type: "display-error",
+            content: `You must check enable "Show multi-value" on at least one column.`,
+          },
+        },
+        "*"
+      );
+
+      return;
+    }
+
     parent.postMessage(
       {
         pluginMessage: {
           type: "create-table",
           cols: activeCol,
           rows: activeRow,
+          isMultiValue: isMultiValue,
           columnConfiguration: columnConfiguration,
         },
       },
@@ -105,6 +127,8 @@ const TableCreator = (props) => {
           handleGridSquareClick={handleGridSquareClick}
           activeCol={activeCol}
           activeRow={activeRow}
+          isMultiValue={isMultiValue}
+          setIsMultiValue={setIsMultiValue}
           handeGridSelectionInputs={handeGridSelectionInputs}
           goToColumnConfiguration={goToColumnConfiguration}
         />
@@ -115,6 +139,7 @@ const TableCreator = (props) => {
           createTable={createTable}
           goToDimensionsSelection={goToDimensionsSelection}
           activeCol={activeCol}
+          isMultiValue={isMultiValue}
           columnConfiguration={columnConfiguration}
           setColumnConfiguration={setColumnConfiguration}
         />

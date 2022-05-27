@@ -8,6 +8,8 @@ const DimensionsSelection = ({
   handleGridSquareClick,
   activeCol,
   activeRow,
+  isMultiValue,
+  setIsMultiValue,
   handeGridSelectionInputs,
   goToColumnConfiguration,
 }) => {
@@ -18,6 +20,12 @@ const DimensionsSelection = ({
   const handleGridSquareMouseEnter = (colIndex, rowIndex) => {
     setHoveredCol(colIndex);
     setHoveredRow(rowIndex);
+  };
+
+  const handleMultiValueInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+
+    setIsMultiValue(isChecked);
   };
 
   const renderTable = () => {
@@ -34,11 +42,19 @@ const DimensionsSelection = ({
                 {[...Array(8).keys()].map((colIndex) => {
                   return (
                     <td className={`input__radio`} key={colIndex}>
-                      <input type="radio" id={`t${rowIndex + 1}x${colIndex + 1}`} name="selection" />
+                      <input
+                        type="radio"
+                        id={`t${rowIndex + 1}x${colIndex + 1}`}
+                        name="selection"
+                      />
                       <label
                         htmlFor={`t${rowIndex + 1}x${colIndex + 1}`}
-                        onMouseEnter={() => handleGridSquareMouseEnter(colIndex, rowIndex)}
-                        onClick={() => handleGridSquareClick(colIndex, rowIndex)}
+                        onMouseEnter={() =>
+                          handleGridSquareMouseEnter(colIndex, rowIndex)
+                        }
+                        onClick={() =>
+                          handleGridSquareClick(colIndex, rowIndex)
+                        }
                         className={`
                           ${
                             colIndex <= hoveredCol && rowIndex <= hoveredRow
@@ -51,8 +67,8 @@ const DimensionsSelection = ({
                             !(activeRow === 0 && activeCol === 0)
                               ? "active"
                               : ""
-                          }`
-                      }></label>
+                          }`}
+                      ></label>
                     </td>
                   );
                 })}
@@ -78,7 +94,9 @@ const DimensionsSelection = ({
             className="number-of-cols"
             onChange={() => handeGridSelectionInputs("col")}
             value={activeCol === 0 && activeRow === 0 ? "" : activeCol}
-            placeholder={tableHovered ? (hoveredCol + 1).toString() : ""}
+            placeholder={
+              tableHovered ? (hoveredCol + 1).toString() : "(24 max)"
+            }
           />
         </div>
         <div className="input-container">
@@ -92,7 +110,9 @@ const DimensionsSelection = ({
             className="number-of-rows"
             onChange={() => handeGridSelectionInputs("row")}
             value={activeRow === 0 && activeCol === 0 ? "" : activeRow}
-            placeholder={tableHovered ? (hoveredRow + 1).toString() : ""}
+            placeholder={
+              tableHovered ? (hoveredRow + 1).toString() : "(100 max)"
+            }
           />
         </div>
       </div>
@@ -100,8 +120,29 @@ const DimensionsSelection = ({
       {renderTable()}
 
       <div className="cta-container dimensions-cta-container">
-        <h6>(Max: 24 columns and 100 rows)</h6>
-        <button disabled={activeCol < 1} className="btn btn-primary btn-create-table" onClick={goToColumnConfiguration}>
+        <div className="input-container left-to-right">
+          <input
+            type="checkbox"
+            name="multi-value"
+            id="multi-value"
+            aria-describedby="#multi-value-tooltip"
+            className="multi-value-checkbox"
+            value={isMultiValue}
+            onChange={(e) => handleMultiValueInput(e)}
+          />
+          <label htmlFor="multi-value">Multi-value cells</label>
+          <div className="tooltip-container">
+            <span className="tooltip-trigger"></span>
+            <p className="tooltip" id="multi-value-tooltip" role="tooltip">
+              Enables a second line of content for cells
+            </p>
+          </div>
+        </div>
+        <button
+          disabled={activeCol < 1}
+          className="btn btn-primary btn-create-table"
+          onClick={goToColumnConfiguration}
+        >
           Continue
         </button>
       </div>
