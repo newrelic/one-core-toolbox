@@ -7,7 +7,8 @@
 		"build": "webpack --mode=production",
 		"build:watch": "webpack --mode=development --watch",
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
-		"client-build": "cd src/app/components/LanguageLinter && npm install"
+		"client-build": "cd src/app/components/LanguageLinter && npm install",
+		"prepare": "husky install"
 	},
 	"dependencies": {
 		"@figma-plugin/helpers": "^0.15.2",
@@ -32,6 +33,8 @@
 		"css-loader": "^5.0.1",
 		"html-webpack-inline-source-plugin": "^0.0.10",
 		"html-webpack-plugin": "^3.2.0",
+		"husky": ">=6",
+		"lint-staged": ">=10",
 		"prettier": "^2.3.1",
 		"style-loader": "^2.0.0",
 		"ts-loader": "^8.0.11",
@@ -39,5 +42,8 @@
 		"url-loader": "^4.1.1",
 		"webpack": "^4.41.4",
 		"webpack-cli": "^3.3.6"
+	},
+	"lint-staged": {
+		"*.{js,css,md}": "prettier --write"
 	}
 }
