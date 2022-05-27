@@ -1,1 +1,1 @@
-declare module 'https://*'
+declare module "https://*";

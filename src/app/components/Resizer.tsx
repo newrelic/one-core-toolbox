@@ -18,7 +18,12 @@ const Resizer: React.FunctionComponent = () => {
     const handleMouseMove = (e: MouseEvent) => {
       if (pressed) {
         parent.postMessage(
-          { pluginMessage: { type: "resize", size: {x: e.clientX, y: e.clientY }} },
+          {
+            pluginMessage: {
+              type: "resize",
+              size: { x: e.clientX, y: e.clientY },
+            },
+          },
           "*"
         );
       }
