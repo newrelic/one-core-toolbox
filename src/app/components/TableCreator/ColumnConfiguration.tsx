@@ -95,8 +95,8 @@ const ColumnConfiguration = ({
       const currentCellType =
         columnConfiguration[activeColConfigurationScreen]["cellType"];
       if (
-        currentCellType === "Text" ||
         currentCellType === "text" ||
+        currentCellType === "Text" ||
         currentCellType === "metric" ||
         currentCellType === "entity"
       ) {

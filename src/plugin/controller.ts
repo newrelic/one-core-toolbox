@@ -102,7 +102,7 @@ const createTable = async (msg) => {
         thisHeaderCell.primaryAxisSizingMode = cellFillContainerY
           ? "FIXED"
           : "AUTO";
-
+        thisHeaderCell.counterAxisSizingMode = isFavoriteCol ? "AUTO" : "FIXED";
         tableRow.appendChild(thisHeaderCell);
       }
     });
@@ -130,8 +130,6 @@ const createTable = async (msg) => {
         const colCanBeMultiValue = cellTypesThatCanBeMultiValue.some(
           (cellType) => cellType === colCellType
         );
-
-        console.log(colMultiValue);
 
         cell.name === "Header" ? (cell.name = "Cell") : null;
         cell.setProperties({ Type: "Body" });
