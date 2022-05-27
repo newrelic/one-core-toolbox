@@ -1,14 +1,13 @@
 {
 	"name": "one-core-toolbox",
 	"version": "1.0.0",
-	"description": "This plugin template uses Typescript. If you are familiar with Javascript, Typescript will look very familiar. In fact, valid Javascript code is already valid Typescript code.",
+	"description": "A Figma plugin for New Relic product designers.",
 	"license": "ISC",
 	"scripts": {
 		"build": "webpack --mode=production",
 		"build:watch": "webpack --mode=development --watch",
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
-		"client-build": "cd src/app/components/LanguageLinter && npm install",
-		"prepare": "husky install"
+		"client-build": "cd src/app/components/LanguageLinter && npm install"
 	},
 	"dependencies": {
 		"@figma-plugin/helpers": "^0.15.2",
@@ -40,8 +39,5 @@
 		"url-loader": "^4.1.1",
 		"webpack": "^4.41.4",
 		"webpack-cli": "^3.3.6"
-	},
-	"lint-staged": {
-		"*.{js,css,md}": "prettier --write"
 	}
 }
