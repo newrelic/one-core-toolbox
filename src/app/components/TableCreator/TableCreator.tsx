@@ -17,6 +17,8 @@ const TableCreator = (props) => {
   const [isMultiValue, setIsMultiValue] = useState(false);
   const [columnConfiguration, setColumnConfiguration] = useState([]);
 
+  // Because the back button behavior should take you 1 step back
+  // not always to the same place
   const handleBackButtonClick = () => {
     if (activeScreen === "DimensionsSelection") {
       setActivePlugin("home");
