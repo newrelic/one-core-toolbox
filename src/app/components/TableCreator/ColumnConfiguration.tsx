@@ -6,7 +6,6 @@ declare function require(path: string): any;
 
 const ColumnConfiguration = ({
   createTable,
-  goToDimensionsSelection,
   activeCol,
   isMultiValue,
   columnConfiguration,
@@ -271,9 +270,6 @@ const ColumnConfiguration = ({
   const renderCallsToAction = () => {
     return (
       <div className="cta-container">
-        <button className="btn" onClick={goToDimensionsSelection}>
-          Back
-        </button>
         <button
           className="btn btn-primary btn-create-table"
           onClick={createTable}

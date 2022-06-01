@@ -17,6 +17,14 @@ const TableCreator = (props) => {
   const [isMultiValue, setIsMultiValue] = useState(false);
   const [columnConfiguration, setColumnConfiguration] = useState([]);
 
+  const handleBackButtonClick = () => {
+    if (activeScreen === "DimensionsSelection") {
+      setActivePlugin("home");
+    } else if (activeScreen === "ColumnConfiguration") {
+      goToDimensionsSelection();
+    }
+  };
+
   const handleColumnConfiguration = () => {
     let columnConfigurationArray = [];
 
@@ -137,7 +145,6 @@ const TableCreator = (props) => {
       return (
         <ColumnConfiguration
           createTable={createTable}
-          goToDimensionsSelection={goToDimensionsSelection}
           activeCol={activeCol}
           isMultiValue={isMultiValue}
           columnConfiguration={columnConfiguration}
@@ -182,7 +189,7 @@ const TableCreator = (props) => {
       <ul className="tab-navigation">
         <li
           className="tab-navigation-tab back-tab"
-          onClick={() => setActivePlugin("home")}
+          onClick={() => handleBackButtonClick()}
         >
           <img src={IconChevronLeft} alt="back button" />
         </li>
