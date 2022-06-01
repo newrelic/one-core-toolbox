@@ -37,8 +37,6 @@ const createTable = async (msg) => {
     return outputValue;
   };
 
-  // headerCell.variantProperties.Type = "Body";
-
   // if any cell is set to Multi-value, set a variable we'll use later
   msg.columnConfiguration.find((col) => (cellFillContainerY = col.multiValue));
 
@@ -46,8 +44,7 @@ const createTable = async (msg) => {
     tableRow.layoutMode = "HORIZONTAL";
     tableRow.counterAxisSizingMode = "AUTO";
     tableRow.name = "Row";
-    // tableRow.layoutAlign = 'STRETCH'
-    // tableRow.primaryAxisSizingMode = 'FIXED';
+    // tableRow.layoutAlign = 'SgMode = 'FIXED';
 
     msg.columnConfiguration.forEach(async (col) => {
       let {
@@ -69,6 +66,7 @@ const createTable = async (msg) => {
           .children[0] as TextNode;
         const isFavoriteCol = colCellType === "Favorite";
         const hasCustomColName = colName.length;
+        console.log(colName.length);
 
         const setHeaderTextCharacters = (newChars: string) => {
           textNodeOfHeaderCell.deleteCharacters(
@@ -78,8 +76,16 @@ const createTable = async (msg) => {
           textNodeOfHeaderCell.insertCharacters(0, newChars);
         };
 
-        if (hasCustomColName) thisHeaderCell.name = colName;
-        if (!hasCustomColName) thisHeaderCell.name = "Header";
+        // Set column layer name and label text
+        if (hasCustomColName) {
+          thisHeaderCell.name = colName;
+          setHeaderTextCharacters(colName);
+        } else {
+          thisHeaderCell.name = "Header";
+          setHeaderTextCharacters("Header");
+        }
+
+        // If it's favorite col, don't show header text or arrows
         if (isFavoriteCol) {
           const arrowsLayer = thisHeaderCell.findOne(
             (child) => child.name === "Arrows"
@@ -91,8 +97,16 @@ const createTable = async (msg) => {
 
         thisHeaderCell.setProperties({ Alignment: colAlignment });
 
+        const determineHeaderCellWidth = () => {
+          if (msg.isMultiValue) return 120;
+          if (colCellType === "Entity") return 102;
+
+          return thisHeaderCell.width;
+        };
+
+        // Set the width on each header cell
         thisHeaderCell.resize(
-          msg.isMultiValue ? 120 : thisHeaderCell.width,
+          determineHeaderCellWidth(),
           thisHeaderCell.height
         );
 
@@ -121,7 +135,12 @@ const createTable = async (msg) => {
         let { cellType: colCellType, multiValue: colMultiValue } =
           msg.columnConfiguration[index];
 
-        const cellTypesThatCanBeMultiValue = ["Text", "Metric", "Entity"];
+        const cellTypesThatCanBeMultiValue = [
+          "Text",
+          "Metric",
+          "Entity",
+          "Link",
+        ];
         const tableMultiValue = toCapitalizedString(msg.isMultiValue);
 
         // Because this is how the variant properties are formatted :(
