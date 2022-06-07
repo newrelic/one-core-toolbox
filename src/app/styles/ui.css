@@ -451,6 +451,8 @@ button[disabled] {
   position: relative;
   appearance: none;
   background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
   border: none;
   border-radius: 3px;
 }
@@ -464,9 +466,8 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-.nav-arrow[disabled]:after,
-.nav-arrow[disabled]:before {
-  background-color: var(--figma-color-text-disabled);
+.nav-arrow[disabled] {
+  opacity: 0.2;
 }
 
 .nav-arrow:hover {
@@ -474,30 +475,12 @@ button[disabled] {
   cursor: pointer;
 }
 
-.nav-arrow:after {
-  content: "";
-  width: 1px;
-  height: 8px;
-  background-color: var(--figma-color-text-secondary);
-  transform: rotate(45deg);
-  position: absolute;
-  right: 14px;
-  top: 12px;
-}
-
-.nav-arrow:before {
-  content: "";
-  width: 1px;
-  height: 8px;
-  background-color: var(--figma-color-text-secondary);
-  transform: rotate(-45deg);
-  position: absolute;
-  right: 14px;
-  top: 7px;
-}
-
 .left-nav-arrow {
-  transform: rotate(180deg);
+  background-image: url("../assets/icon-chevron-left.svg");
+}
+
+.right-nav-arrow {
+  background-image: url("../assets/icon-chevron-right.svg");
 }
 
 .column-configuration-body {
@@ -647,7 +630,7 @@ input:checked + .slider:before {
   margin-bottom: 8px;
   padding: 10px 6px;
   border-radius: 3px;
-  background-color: var(--figma-color-icon-onbrand);
+  background-color: var(--figma-color-bg-secondary);
 }
 
 .language-beta-tab {

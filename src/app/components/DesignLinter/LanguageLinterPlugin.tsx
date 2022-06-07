@@ -1,9 +1,10 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
-import { isEqual } from "../../utility-functions";
+import { isEqual } from "../utility-functions";
 import classNames from "classnames";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
+import { truncateLayerName } from "../utility-functions";
 require("babel-polyfill");
 import "../../styles/ui.css";
 
@@ -64,7 +65,7 @@ const LanguageLinterPlugin = () => {
         "*"
       );
     }
-  }, [sampleText]);
+  }, [sampleTextIndex, sampleText]);
 
   useEffect(() => {
     console.log("useEffect fired");
@@ -114,15 +115,9 @@ const LanguageLinterPlugin = () => {
     setSampleText(updatedText);
   };
 
-  const handleTextLayerNavigation = (direction) => {
-    // Which direction does the user want to navigate?
-    if (direction === "previous") {
-      setSampleText(textLayersWithSuggestions[sampleTextIndex - 1].characters);
-      setSampleTextIndex(sampleTextIndex - 1);
-    } else if (direction === "next") {
-      setSampleText(textLayersWithSuggestions[sampleTextIndex + 1].characters);
-      setSampleTextIndex(sampleTextIndex + 1);
-    }
+  const handleTextLayerNavigation = (indexOfNewLayer: number) => {
+    setSampleTextIndex(indexOfNewLayer);
+    setSampleText(textLayersWithSuggestions[indexOfNewLayer].characters);
   };
 
   const asyncFilter = async (arr, callback) => {
@@ -213,30 +208,36 @@ const LanguageLinterPlugin = () => {
         <nav className="text-layer-nav">
           <button
             className={"nav-arrow left-nav-arrow"}
-            onClick={() => handleTextLayerNavigation("previous")}
+            onClick={() => handleTextLayerNavigation(sampleTextIndex - 1)}
             disabled={sampleTextIndex - 1 < 0}
           ></button>
 
-          {/*<div className="select-input-container">
+          <div className="select-input-container">
             <select
               name="column-selection"
               className="column-selection-dropdown"
-              onChange={() => setActiveColConfigurationScreen(parseInt(event.target.value) - 1)}
-              value={activeColConfigurationScreen + 1}
+              onChange={(e) =>
+                handleTextLayerNavigation(parseInt(e.target.value))
+              }
+              value={sampleTextIndex}
             >
-              {[...Array(activeCol).keys()].map((index) => {
+              {textLayersWithSuggestions.map((layer, index) => {
                 return (
-                  <option key={index} value={index + 1} className="column-selection-dropdown-option">{`Column ${
-                    index + 1
-                  }`}</option>
+                  <option
+                    key={index}
+                    value={index}
+                    className="language-linter-layer-option"
+                  >
+                    {truncateLayerName(layer.name)}
+                  </option>
                 );
               })}
             </select>
-          </div>*/}
+          </div>
 
           <button
             className={"nav-arrow right-nav-arrow"}
-            onClick={() => handleTextLayerNavigation("next")}
+            onClick={() => handleTextLayerNavigation(sampleTextIndex + 1)}
             disabled={sampleTextIndex + 1 >= maxTextIndex}
           ></button>
         </nav>

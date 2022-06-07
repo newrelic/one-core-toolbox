@@ -63,4 +63,28 @@ const isEqual = (obj1, obj2) => {
   return arePrimativesEqual();
 };
 
-export { isEqual };
+/*!
+ * Get the name of a layer with a maximum length. Trucate it if necessary
+ * @param  {string} layerName    The name of the layer
+ * @param  {number} maxLength    The maximum lenght of the string to be retunred
+ * @return {string}              Returns the layer name truncated if necessary
+ */
+const truncateLayerName = (
+  layerName: string,
+  maxLength: number = 25
+): string => {
+  if (layerName.length > maxLength) {
+    return layerName.substring(0, maxLength) + "...";
+  }
+
+  return layerName;
+};
+
+const toCapitalizedString = (valueToConvert: Boolean | String): string => {
+  let outputValue = valueToConvert.toString();
+  outputValue = outputValue[0].toUpperCase() + outputValue.substring(1);
+
+  return outputValue;
+};
+
+export { isEqual, truncateLayerName, toCapitalizedString };

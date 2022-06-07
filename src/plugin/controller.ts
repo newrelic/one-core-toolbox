@@ -1,5 +1,6 @@
 import uuid from "uuid-random";
 import { isVisibleNode } from "@figma-plugin/helpers";
+import { toCapitalizedString } from "../app/components/utility-functions";
 import rawLightColorTokens from "../../data/light-mode.json";
 import rawDarkColorTokens from "../../data/dark-mode.json";
 
@@ -29,13 +30,6 @@ const createTable = async (msg) => {
   tableFrame.layoutMode = "VERTICAL";
   tableFrame.x = figma.viewport.center.x;
   tableFrame.y = figma.viewport.center.y;
-
-  const toCapitalizedString = (valueToConvert: Boolean | String): string => {
-    let outputValue = valueToConvert.toString();
-    outputValue = outputValue[0].toUpperCase() + outputValue.substring(1);
-
-    return outputValue;
-  };
 
   // if any cell is set to Multi-value, set a variable we'll use later
   msg.columnConfiguration.find((col) => (cellFillContainerY = col.multiValue));
