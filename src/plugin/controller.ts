@@ -842,30 +842,34 @@ const navigateTo = (screen: string) => {
   });
 };
 
-switch (figma.command) {
-  case "open-home":
+const navigationActions = {
+  "open-home": () => {
     figma.showUI(__html__, { themeColors: true, width: 300, height: 448 });
     navigateTo("open-home");
-    break;
-  case "open-table-creator":
+  },
+  "open-table-creator": () => {
     figma.showUI(__html__, { themeColors: true, width: 300, height: 448 });
     navigateTo("open-table-creator");
-    break;
-  case "theme-switcher-to-light":
+  },
+  "theme-switcher-to-light": () => {
     switchToTheme("light", true);
-    break;
-  case "theme-switcher-to-dark":
+  },
+  "theme-switcher-to-dark": () => {
     switchToTheme("dark", true);
-    break;
-  case "open-language-linter":
+  },
+  "open-language-linter": () => {
     figma.showUI(__html__, { themeColors: true, width: 475, height: 500 });
     navigateTo("open-language-linter");
-    break;
-  case "open-color-linter":
+  },
+  "open-color-linter": () => {
     figma.showUI(__html__, { themeColors: true, width: 475, height: 500 });
     navigateTo("open-color-linter");
-    break;
-}
+  },
+};
+
+navigationActions[figma.command]();
+
+console.log(figma.command);
 
 // ==============================================================
 // Receiving messages sent from the UI
