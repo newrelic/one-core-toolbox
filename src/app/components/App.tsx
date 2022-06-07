@@ -6,7 +6,7 @@ import Resizer from "./Resizer";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { PluginContext } from "./PluginContext";
 import Home from "./Home";
-import { isEqual } from "./utility-functions";
+import { isEqual } from "./utils";
 import "../styles/ui.css";
 
 declare function require(path: string): any;

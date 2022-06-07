@@ -1,10 +1,10 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
-import { isEqual } from "../utility-functions";
+import { isEqual } from "../utils";
 import classNames from "classnames";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
-import { truncateLayerName } from "../utility-functions";
+import { truncateLayerName } from "../utils";
 require("babel-polyfill");
 import "../../styles/ui.css";
 

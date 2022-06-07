@@ -80,11 +80,67 @@ const truncateLayerName = (
   return layerName;
 };
 
-const toCapitalizedString = (valueToConvert: Boolean | String): string => {
+/*!
+ * Capitalize the first letter of the value provided
+ * @param  {string|boolean} valueToConvert The name of the layer
+ * @return {string}                        The value with the first letter capitalized
+ */
+const toCapitalizedString = (valueToConvert: boolean | string): string => {
   let outputValue = valueToConvert.toString();
   outputValue = outputValue[0].toUpperCase() + outputValue.substring(1);
 
   return outputValue;
 };
 
-export { isEqual, truncateLayerName, toCapitalizedString };
+/*!
+ * Convert a Figma RGB value to a hex value
+ * @param  {number} r  The red value
+ * @param  {number} g  The green value
+ * @param  {number} b  The blue value
+ * @return {string}    A hex value equivalent to the rgb value provided
+ */
+const rgbToHex = (r: number, g: number, b: number): string => {
+  /*!
+   * Convert an color value to a 2 character hex value
+   * @param  {number} colorValue  The color value
+   * @return {string} A 2 character hex value
+   */
+  const componentToHex = (colorValue: number): string => {
+    colorValue = Math.round(colorValue * 255);
+    let hex = colorValue.toString(16);
+    return hex.length === 1 ? "0" + hex : hex;
+  };
+
+  /*!
+   * Combines the two character hex values into a full hex color
+   * @param  {number} r  The red value
+   * @param  {number} g  The green value
+   * @param  {number} b  The blue value
+   * @return {string} A hex value equivalent to the rgb value provided
+   */
+  const combineComponents = (r: number, g: number, b: number): string => {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+  };
+
+  return combineComponents(r, g, b);
+};
+
+/*!
+ * Selects a layer in Figma and zooms into it at 100%
+ * @param  {string}    layerId  The layerId of the layer to be selected and zoomed
+ * @return {undefined} No value is returned
+ */
+const selectAndZoomToLayer = (layerId: string) => {
+  const layer: SceneNode = figma.getNodeById(layerId) as SceneNode;
+
+  figma.currentPage.selection = [layer];
+  figma.viewport.scrollAndZoomIntoView([layer]);
+};
+
+export {
+  isEqual,
+  truncateLayerName,
+  toCapitalizedString,
+  rgbToHex,
+  selectAndZoomToLayer,
+};

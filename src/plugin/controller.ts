@@ -1,6 +1,10 @@
 import uuid from "uuid-random";
 import { isVisibleNode } from "@figma-plugin/helpers";
-import { toCapitalizedString } from "../app/components/utility-functions";
+import {
+  toCapitalizedString,
+  rgbToHex,
+  selectAndZoomToLayer,
+} from "../app/components/utils";
 import rawLightColorTokens from "../../data/light-mode.json";
 import rawDarkColorTokens from "../../data/dark-mode.json";
 
@@ -246,21 +250,8 @@ const sendCurrentTextSelection = () => {
 };
 
 // ==============================================================
-// Color linter function
+// Color linter functions
 // ==============================================================
-const rgbToHex = (r, g, b) => {
-  const componentToHex = (c) => {
-    c = Math.round(c * 255);
-    let hex = c.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  };
-
-  const combineComponents = (r, g, b) => {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-  };
-
-  return combineComponents(r, g, b);
-};
 
 // Utility function for pushing a color into an array
 // it's just saving me from repeating myself a bit
@@ -669,13 +660,6 @@ const getColorStats = async (forThemeSwitcher: Boolean = false) => {
   };
 
   return colorStats;
-};
-
-const selectAndZoomToLayer = (layerId: string) => {
-  const layer: SceneNode = figma.getNodeById(layerId) as SceneNode;
-
-  figma.currentPage.selection = [layer];
-  figma.viewport.scrollAndZoomIntoView([layer]);
 };
 
 // ==============================================================
