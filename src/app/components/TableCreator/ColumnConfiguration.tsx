@@ -119,6 +119,19 @@ const ColumnConfiguration = ({
       );
     })();
 
+    const cellTypeIsAction = (() => {
+      return (
+        columnConfiguration[activeColConfigurationScreen]["cellType"] ===
+        "actions"
+      );
+    })();
+
+    const colShouldHaveHeaderText = (() => {
+      if (cellTypeIsAction || cellTypeIsFavorite) return false;
+
+      return true;
+    })();
+
     return (
       <section className="configuration-body">
         {renderColumnNavigation()}
@@ -129,7 +142,9 @@ const ColumnConfiguration = ({
         </div>
 
         <div
-          className={`input-container ${cellTypeIsFavorite ? "disabled" : ""}`}
+          className={`input-container ${
+            colShouldHaveHeaderText ? "" : "disabled"
+          }`}
         >
           <label htmlFor="column-name">Column name</label>
           <input
@@ -140,7 +155,7 @@ const ColumnConfiguration = ({
             id="column-name"
             onChange={() => handleColumnConfigurationUpdate("name")}
             value={columnConfiguration[activeColConfigurationScreen]["name"]}
-            disabled={cellTypeIsFavorite}
+            disabled={!colShouldHaveHeaderText}
           />
         </div>
         <div className="input-container">
@@ -211,7 +226,7 @@ const ColumnConfiguration = ({
         </div>
         <div
           className={`input-container ${
-            cellTypeIsMetric || cellTypeIsFavorite ? "disabled" : ""
+            cellTypeIsMetric || !colShouldHaveHeaderText ? "disabled" : ""
           }`}
         >
           <label htmlFor="column-alignment">Alignment</label>
@@ -224,7 +239,7 @@ const ColumnConfiguration = ({
               value={
                 columnConfiguration[activeColConfigurationScreen]["alignment"]
               }
-              disabled={cellTypeIsMetric || cellTypeIsFavorite}
+              disabled={cellTypeIsMetric || !colShouldHaveHeaderText}
             >
               <option
                 value="left"
@@ -244,7 +259,7 @@ const ColumnConfiguration = ({
         {isMultiValue && (
           <div
             className={`input-container ${
-              multiValueDisabled() || cellTypeIsFavorite ? "disabled" : ""
+              multiValueDisabled() || !colShouldHaveHeaderText ? "disabled" : ""
             }`}
           >
             <label htmlFor="column-multi-value">Show multi-value</label>
@@ -259,7 +274,7 @@ const ColumnConfiguration = ({
                     ]
                   : false
               }
-              disabled={multiValueDisabled() || cellTypeIsFavorite}
+              disabled={multiValueDisabled() || !colShouldHaveHeaderText}
             />
           </div>
         )}

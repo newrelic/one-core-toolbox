@@ -62,7 +62,9 @@ const createTable = async (msg) => {
         let thisHeaderCell = headerCell.createInstance();
         let textNodeOfHeaderCell = (thisHeaderCell.children[0] as InstanceNode)
           .children[0] as TextNode;
-        const isFavoriteCol = colCellType === "Favorite";
+        const shouldHaveHeaderText =
+          colCellType !== "Favorite" && colCellType !== "Actions";
+        const cellTypeIsActions = colCellType === "Actions";
         const hasCustomColName = colName.length;
         console.log(colName.length);
 
@@ -83,8 +85,8 @@ const createTable = async (msg) => {
           setHeaderTextCharacters("Header");
         }
 
-        // If it's favorite col, don't show header text or arrows
-        if (isFavoriteCol) {
+        // If it should have header text, don't show header text or arrows
+        if (!shouldHaveHeaderText) {
           const arrowsLayer = thisHeaderCell.findOne(
             (child) => child.name === "Arrows"
           );
@@ -98,6 +100,7 @@ const createTable = async (msg) => {
         const determineHeaderCellWidth = () => {
           if (msg.isMultiValue) return 120;
           if (colCellType === "Entity") return 102;
+          if (!shouldHaveHeaderText) return 50;
 
           return thisHeaderCell.width;
         };
@@ -114,7 +117,12 @@ const createTable = async (msg) => {
         thisHeaderCell.primaryAxisSizingMode = cellFillContainerY
           ? "FIXED"
           : "AUTO";
-        thisHeaderCell.counterAxisSizingMode = isFavoriteCol ? "AUTO" : "FIXED";
+        thisHeaderCell.counterAxisSizingMode = !shouldHaveHeaderText
+          ? "AUTO"
+          : "FIXED";
+        thisHeaderCell.counterAxisSizingMode = cellTypeIsActions
+          ? "FIXED"
+          : thisHeaderCell.counterAxisSizingMode;
         tableRow.appendChild(thisHeaderCell);
       }
     });
