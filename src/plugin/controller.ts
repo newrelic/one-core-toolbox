@@ -38,6 +38,12 @@ const createTable = async (msg) => {
   // if any cell is set to Multi-value, set a variable we'll use later
   msg.columnConfiguration.find((col) => (cellFillContainerY = col.multiValue));
 
+  const hideSortControls = (headerCell) => {
+    const arrowsLayer = headerCell.findOne((child) => child.name === "Arrows");
+
+    arrowsLayer.visible = false;
+  };
+
   [...Array(msg.rows + 1).keys()].map((rowIndex) => {
     tableRow.layoutMode = "HORIZONTAL";
     tableRow.counterAxisSizingMode = "AUTO";
@@ -50,6 +56,7 @@ const createTable = async (msg) => {
         alignment: colAlignment,
         cellType: colCellType,
         multiValue: colMultiValue,
+        sortControls: colSortControls,
       } = col;
 
       // Because this is how the variant properties are formatted :(
@@ -66,7 +73,6 @@ const createTable = async (msg) => {
           colCellType !== "Favorite" && colCellType !== "Actions";
         const cellTypeIsActions = colCellType === "Actions";
         const hasCustomColName = colName.length;
-        console.log(colName.length);
 
         const setHeaderTextCharacters = (newChars: string) => {
           textNodeOfHeaderCell.deleteCharacters(
@@ -87,11 +93,7 @@ const createTable = async (msg) => {
 
         // If it should have header text, don't show header text or arrows
         if (!shouldHaveHeaderText) {
-          const arrowsLayer = thisHeaderCell.findOne(
-            (child) => child.name === "Arrows"
-          );
-
-          arrowsLayer.visible = false;
+          hideSortControls(thisHeaderCell);
           setHeaderTextCharacters(" ");
         }
 
@@ -100,7 +102,9 @@ const createTable = async (msg) => {
         const determineHeaderCellWidth = () => {
           if (msg.isMultiValue) return 120;
           if (colCellType === "Entity") return 102;
+          if (colCellType === "User") return 120;
           if (!shouldHaveHeaderText) return 50;
+          if (shouldHaveHeaderText && colSortControls) return 90;
 
           return thisHeaderCell.width;
         };
@@ -123,7 +127,20 @@ const createTable = async (msg) => {
         thisHeaderCell.counterAxisSizingMode = cellTypeIsActions
           ? "FIXED"
           : thisHeaderCell.counterAxisSizingMode;
+
+        if (shouldHaveHeaderText && !colSortControls) {
+          thisHeaderCell.counterAxisSizingMode = "AUTO";
+        }
+
         tableRow.appendChild(thisHeaderCell);
+
+        // Handle sort controls
+        const handleSortControls = () => {
+          if (colCellType === "Actions") hideSortControls(thisHeaderCell);
+          if (!colSortControls) hideSortControls(thisHeaderCell);
+        };
+
+        handleSortControls();
       }
     });
 
@@ -876,8 +893,6 @@ const navigationActions = {
 };
 
 navigationActions[figma.command]();
-
-console.log(figma.command);
 
 // ==============================================================
 // Receiving messages sent from the UI

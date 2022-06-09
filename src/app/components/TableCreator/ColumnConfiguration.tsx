@@ -21,6 +21,9 @@ const ColumnConfiguration = ({
     columnConfigurationArray[activeColConfigurationScreen][attr] =
       attr !== "multiValue" ? element.value : element.checked;
 
+    columnConfigurationArray[activeColConfigurationScreen][attr] =
+      attr !== "sortControls" ? element.value : element.checked;
+
     if (
       columnConfigurationArray[activeColConfigurationScreen][attr] === "metric"
     ) {
@@ -278,6 +281,26 @@ const ColumnConfiguration = ({
             />
           </div>
         )}
+        <div
+          className={`input-container ${
+            multiValueDisabled() || !colShouldHaveHeaderText ? "disabled" : ""
+          }`}
+        >
+          <label htmlFor="column-sort-controls">Show sort controls</label>
+          <input
+            type="checkbox"
+            id="column-sort-controls"
+            onChange={() => handleColumnConfigurationUpdate("sortControls")}
+            checked={
+              !multiValueDisabled()
+                ? columnConfiguration[activeColConfigurationScreen][
+                    "sortControls"
+                  ]
+                : false
+            }
+            disabled={multiValueDisabled() || !colShouldHaveHeaderText}
+          />
+        </div>
       </section>
     );
   };

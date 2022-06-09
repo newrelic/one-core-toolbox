@@ -37,6 +37,7 @@ const TableCreator = (props) => {
           alignment: "Left",
           cellType: "Text",
           multiValue: false,
+          sortControls: true,
         });
       });
     } else if (columnConfiguration.length > 0) {
@@ -55,6 +56,7 @@ const TableCreator = (props) => {
             alignment: "Left",
             cellType: "Text",
             multiValue: false,
+            sortControls: true,
           });
         });
       }
