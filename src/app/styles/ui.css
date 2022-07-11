@@ -457,6 +457,10 @@ button[disabled] {
   border-radius: 3px;
 }
 
+.figma-dark .nav-arrow {
+  filter: invert(1);
+}
+
 .nav-arrow[disabled] {
   background-color: transparent;
 }
@@ -464,6 +468,14 @@ button[disabled] {
 .nav-arrow[disabled]:hover {
   background-color: transparent;
   cursor: not-allowed;
+}
+
+.figma-dark .nav-arrow[disabled]:hover {
+  background-color: rgb(255 255 255 / 0%);
+}
+
+.figma-dark .nav-arrow:hover {
+  background-color: rgb(255 255 255 / 15%);
 }
 
 .nav-arrow[disabled] {
