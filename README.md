@@ -41,8 +41,8 @@ The plugin is automatically installed for all Figma users at New Relic. [Usage s
 
 ### Built With
 
-- [React](reactjs.org)
-- [webpack](webpack.org)
+- [React](https://reactjs.org)
+- [webpack](https://webpack.org)
 - [TypeScript](http://typescriptlang.org)
 - [Prettier precommit hook](https://prettier.io/docs/en/precommit.html)
 
