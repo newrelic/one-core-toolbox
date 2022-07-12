@@ -1,9 +1,26 @@
 import { toCapitalizedString } from "../../app/components/utils";
 
+interface Message {
+  type: string;
+  [key: string]: any;
+}
+interface CustomEventData {
+  fileName: string;
+  fileKey: string;
+  "User Name": string;
+  "User Avatar": string;
+  "User ID": string;
+  "Session ID": number;
+  fileUrl: string;
+}
+
 // ==============================================================
 // Table creator functions
 // ==============================================================
-export const createTable = async (msg, customEventData) => {
+export const createTable = async (
+  msg: Message,
+  customEventData: CustomEventData
+) => {
   const tableFrame = figma.createFrame();
   let headerCell = await figma.importComponentByKeyAsync(
     "ce8fa8e8cab07a19f83f4181ac8cbe76093c6bc3"
