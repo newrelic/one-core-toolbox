@@ -68,7 +68,6 @@ const LanguageLinterPlugin = () => {
   }, [sampleTextIndex, sampleText]);
 
   useEffect(() => {
-    console.log("useEffect fired");
     if (localCustomDictionaryInitialized && selectedTextLayers.length > 0) {
       getTextLayersWithSuggestions();
     } else if (
