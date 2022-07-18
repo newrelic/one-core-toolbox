@@ -654,6 +654,74 @@ input:checked + .slider:before {
   opacity: 1;
 }
 
+/*-- 
+These rules have extra specificity to override the styles
+that are included in the new-relic-language-linter NPM
+package.
+--*/
+li.suggestion-container {
+  border: 1px solid rgb(127 127 127 / 30%);
+  background-color: var(--figma-color-bg);
+}
+
+li.suggestion-container:hover,
+li.suggestion-container:not(.active-suggestion):hover {
+  border: 1px solid rgb(127 127 127 / 50%);
+}
+
+p.suggestion-description-text,
+span.suggestion-summary-current-text,
+div.summary-basic,
+h5.suggestion-rule-actual {
+  color: var(--figma-color-text);
+}
+
+h6.suggestion-rule-label,
+.active-suggestion-summary h6.suggestion-rule-label,
+.active-suggestion-summary h6.suggestion-rule-label:before,
+button.suggestion-cta-secondary,
+div .suggestion-cta-secondary {
+  color: var(--figma-color-text-secondary);
+}
+
+button.suggestion-cta-secondary:hover,
+a.suggestion-cta-secondary:hover {
+  background-color: var(--figma-color-bg-hover);
+}
+
+.figma-dark div .suggestion-cta-secondary img,
+.figma-dark div .suggestion-cta-secondary img {
+  filter: invert() brightness(1.25);
+}
+
+div.suggestion-summary-replacements-container:after {
+  background-image: linear-gradient(
+    to right,
+    rgba(255 255 255 / 0),
+    var(--figma-color-bg)
+  );
+}
+
+div.suggestion-summary-replacements-container:before {
+  background-image: linear-gradient(
+    to left,
+    rgba(255 255 255 / 0),
+    var(--figma-color-bg)
+  );
+}
+
+p.suggestion-description-text a {
+  color: var(--figma-color-text-brand);
+}
+
+div .suggestion-summary-replacement {
+  background-color: var(--figma-color-bg-brand);
+}
+
+div .suggestion-summary-replacement:hover {
+  background-color: var(--figma-color-bg-brand-hover);
+}
+
 /*-- Home --*/
 
 .home-container {
