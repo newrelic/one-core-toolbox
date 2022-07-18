@@ -2,8 +2,12 @@ import { createTable } from "./table-creator/tableCreator";
 import { sendCurrentTextSelection } from "./language-linter/languageLinter";
 import { getColorStats, getColorTokens } from "./color-linter/colorLinter";
 import { switchToTheme } from "./theme-switcher/themeSwitcher";
-
 import { selectAndZoomToLayer } from "../app/components/utils";
+
+interface Message {
+  type: string;
+  [key: string]: any;
+}
 
 // Set the default size of the plugin window
 let uiSize = {
@@ -22,6 +26,7 @@ const currentNodeId = encodeURIComponent(
   currentSelection.length > 0 ? currentSelection[0].id : figma.currentPage.id
 );
 
+// So that you can click a link in the dashboard and have it open in a
 const fileUrl = `https://figma.com/file/${figma.fileKey}/${fileName}?node-id=${currentNodeId}`;
 
 let customEventData = {
@@ -39,6 +44,7 @@ let customEventData = {
 
 // ==============================================================
 // Handle navigation
+// https://www.figma.com/plugin-docs/api/figma/#command
 // ==============================================================
 
 // handle submenu navigation
@@ -82,29 +88,30 @@ navigationActions[figma.command]();
 
 // ==============================================================
 // Receiving messages sent from the UI
+// https://www.figma.com/plugin-docs/creating-ui#sending-a-message-from-the-plugin-code-to-the-ui
 // ==============================================================
 
-figma.ui.onmessage = async (msg) => {
-  /*-- Handle tab navigation messages --*/
-  if (msg.type === "navigate-to-tab") {
-    switch (msg.tabClicked) {
-      case "home":
+const incomingMessageActions = {
+  // Generic actions
+  "navigate-to-tab": (msg: Message) => {
+    const tabDestinations = {
+      home: () => {
         uiSize = {
           width: 300,
           height: 448,
         };
         figma.ui.resize(uiSize.width, uiSize.height);
         navigateTo("open-home");
-        break;
-      case "table-creator":
+      },
+      "table-creator": () => {
         uiSize = {
           width: 300,
           height: 448,
         };
         figma.ui.resize(uiSize.width, uiSize.height);
         navigateTo("open-table-creator");
-        break;
-      case "language-linter":
+      },
+      "language-linter": () => {
         sendCurrentTextSelection();
         uiSize = {
           width: 475,
@@ -112,43 +119,51 @@ figma.ui.onmessage = async (msg) => {
         };
         figma.ui.resize(uiSize.width, uiSize.height);
         navigateTo("open-language-linter");
-        break;
-      case "color-linter":
+      },
+      "color-linter": () => {
         uiSize = {
           width: 475,
           height: 500,
         };
         figma.ui.resize(uiSize.width, uiSize.height);
         navigateTo("open-color-linter");
-        break;
-    }
-  }
-  if (msg.type == "display-error") {
-    figma.notify(msg.content, { error: true });
-  }
+      },
+    };
 
-  if (msg.type === "initialize-selection") {
+    tabDestinations[msg.tabClicked]();
+  },
+  "display-error": (msg: Message) => {
+    figma.notify(msg.content, { error: true });
+  },
+  "select-layer": (msg: Message) => {
+    selectAndZoomToLayer(msg.layerId);
+  },
+  "initialize-selection": () => {
     figma.ui.postMessage({
       type: "initial-selection",
       message: figma.currentPage.selection,
     });
-  }
-
-  if (msg.type === "close-plugin") {
+  },
+  resize: (msg: Message) => {
+    figma.ui.resize(
+      msg.size.x >= uiSize.width ? msg.size.x : uiSize.width,
+      msg.size.y >= uiSize.height ? msg.size.y : uiSize.height
+    );
+  },
+  "close-plugin": () => {
     figma.closePlugin();
-  }
+  },
 
-  /*-- Table creator messages --*/
-  if (msg.type === "create-table") {
+  // Table creator actions
+  "create-table": (msg: Message) => {
     createTable(msg, customEventData);
-  }
+  },
 
-  /*-- Language linter messages --*/
-  if (msg.type === "run-language-linter") {
+  // Language linter actions
+  "run-language-linter": () => {
     sendCurrentTextSelection();
-  }
-
-  if (msg.type === "request-local-custom-dictionary") {
+  },
+  "request-local-custom-dictionary": () => {
     figma.clientStorage
       .getAsync("languageLinterCustomDictionary")
       .then((result) => {
@@ -157,34 +172,15 @@ figma.ui.onmessage = async (msg) => {
           message: result ? result : [],
         });
       });
-  }
-
-  if (msg.type === "add-to-dictionary") {
-    figma.clientStorage
-      .getAsync("languageLinterCustomDictionary")
-      .then((result) => {
-        let newCustomDictionary = result ? result : [];
-
-        newCustomDictionary.push(msg.wordToAdd);
-
-        figma.clientStorage.setAsync(
-          "languageLinterCustomDictionary",
-          newCustomDictionary
-        );
-      });
-  }
-
-  if (msg.type === "get-sample-text") {
+  },
+  "get-sample-text": () => {
     const sampleText = figma.currentPage.selection;
     figma.ui.postMessage({ type: "sample-text", message: sampleText });
-  }
-
-  // scroll and zoom the active layer into the center of the screen
-  if (msg.type === "sample-text-changed") {
+  },
+  "sample-text-changed": (msg: Message) => {
     selectAndZoomToLayer(msg.activeNodeId);
-  }
-
-  if (msg.type === "update-source-text") {
+  },
+  "update-source-text": async (msg: Message) => {
     const activeTextLayer = figma.getNodeById(msg.layerId) as TextNode;
     let fontName = activeTextLayer.fontName;
 
@@ -207,9 +203,8 @@ figma.ui.onmessage = async (msg) => {
       type: "source-text-updated",
       message: msg.updatedText,
     });
-  }
-
-  if (msg.type === "text-linted") {
+  },
+  "text-linted": (msg: Message) => {
     figma.ui.postMessage({
       type: "text-linted",
       message: {
@@ -218,31 +213,28 @@ figma.ui.onmessage = async (msg) => {
         fullReport: msg.fullReport,
       },
     });
-  }
+  },
 
-  /*-- Color linter messages --*/
-  const sendColorData = async () => {
-    const colorStats = await getColorStats();
+  // Color linter
+  "run-color-linter": () => {
+    const sendColorData = async () => {
+      const colorStats = await getColorStats();
 
-    figma.ui.postMessage({
-      type: "color-stats",
-      message: {
-        ...customEventData,
-        colorStats: colorStats,
-        colorTokens: await getColorTokens(false),
-        selectionMade: figma.currentPage.selection.length > 0,
-      },
-    });
-  };
-  if (msg.type === "run-color-linter") {
+      figma.ui.postMessage({
+        type: "color-stats",
+        message: {
+          ...customEventData,
+          colorStats: colorStats,
+          colorTokens: await getColorTokens(false),
+          selectionMade: figma.currentPage.selection.length > 0,
+        },
+      });
+    };
+
     sendColorData();
-  }
+  },
 
-  if (msg.type === "select-layer") {
-    selectAndZoomToLayer(msg.layerId);
-  }
-
-  if (msg.type === "apply-color-style") {
+  "apply-color-style": (msg: Message) => {
     figma.importStyleByKeyAsync(msg.colorStyleKey).then((imported) => {
       figma.getNodeById(msg.layerId)[`${msg.colorType}StyleId`] = imported.id;
 
@@ -259,22 +251,19 @@ figma.ui.onmessage = async (msg) => {
         },
       });
     });
-  }
-
-  if (msg.type === "resize") {
-    figma.ui.resize(
-      msg.size.x >= uiSize.width ? msg.size.x : uiSize.width,
-      msg.size.y >= uiSize.height ? msg.size.y : uiSize.height
-    );
-  }
+  },
 
   /*-- Theme switcher messages --*/
-  if (msg.type === "theme-switcher-to-dark") {
+  "theme-switcher-to-dark": () => {
     switchToTheme("dark", false, customEventData);
-  }
-  if (msg.type === "theme-switcher-to-light") {
+  },
+  "theme-switcher-to-light": () => {
     switchToTheme("light", false, customEventData);
-  }
+  },
+};
+
+figma.ui.onmessage = async (msg) => {
+  incomingMessageActions[msg.type](msg);
 };
 
 // ==============================================================
@@ -282,8 +271,6 @@ figma.ui.onmessage = async (msg) => {
 // https://www.figma.com/plugin-docs/api/properties/figma-on
 // ==============================================================
 figma.on("selectionchange", () => {
-  console.log("selectionchange event was fired");
-
   figma.ui.postMessage({
     type: "selection-changed",
     message: figma.currentPage.selection,
