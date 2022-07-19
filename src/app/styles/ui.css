@@ -842,7 +842,8 @@ div .suggestion-summary-replacement:hover {
 }
 
 .summary-is-loading,
-.no-selection-made {
+.no-selection-made,
+.empty-state-active {
   display: grid;
   place-items: center;
   height: 100%;

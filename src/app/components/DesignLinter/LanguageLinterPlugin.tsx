@@ -29,6 +29,9 @@ const LanguageLinterPlugin = () => {
     currentLayersLintedForLanguage,
   } = state;
 
+  const emptyStateActive =
+    selectedTextLayers.length === 0 || textLayersWithSuggestions.length === 0;
+
   // Get the selected layer when the plugin loads
   // This is how we read messages sent from the plugin controller
   useEffect(() => {
@@ -75,6 +78,7 @@ const LanguageLinterPlugin = () => {
       selectedTextLayers.length === 0
     ) {
       setSampleText("");
+      setTextLayersWithSuggestions([]);
     } else {
       parent.postMessage(
         { pluginMessage: { type: "request-local-custom-dictionary" } },
@@ -198,61 +202,114 @@ const LanguageLinterPlugin = () => {
   };
 
   const colorLinterContainerClasses = classNames("language-linter-container", {
-    "selection-has-changed": selectionHasChanged,
+    "selection-has-changed": selectionHasChanged && !emptyStateActive,
+    "empty-state-active": emptyStateActive,
   });
+
+  const renderEmptyState = () => {
+    const noSuggestionsFound = textLayersWithSuggestions.length === 0;
+    const headingText =
+      noSuggestionsFound && emptyStateActive
+        ? "Select a text layer(s) to get started"
+        : "Your copy looks good!";
+    const descriptionText = noSuggestionsFound
+      ? `To lint your text select any text layer, frame, or group of text
+          layers and then click Lint selected.`
+      : `We ran several checks on your copy and found no writing issues. 
+        Consider reaching out to the #ui-writing team for some more feedback.`;
+
+    return (
+      <section className="color-empty-state-container">
+        <h4 className="color-empty-state-heading">{headingText}</h4>
+        <p className="color-empty-state-description">{descriptionText}</p>
+        {(!noSuggestionsFound || textLayersWithSuggestions.length === 0) && (
+          <button
+            className="btn btn-primary"
+            onClick={() => lintSelectedLayers()}
+          >
+            Lint selected layers
+          </button>
+        )}
+      </section>
+    );
+  };
+
+  const renderLanguageLinterUI = () => {
+    const textLayerSelected = selectedTextLayers.length > 0;
+
+    if (!textLayerSelected) return renderEmptyState();
+    if (textLayersWithSuggestions.length === 0) return renderEmptyState();
+
+    const languageLinterUI = () => (
+      <LanguageLinter
+        // LanguageLinter will show a "no issue found" empty state
+        // if their sampleText provided to it has no issues. Since
+        // None of our layers have issues, we'll trigger that
+        // empty state.
+        sampleText={provideSampleText()}
+        setSampleText={updateSourceText}
+        updateTimer={100}
+        customDictionary={localCustomDictionary}
+        addToDictionary={addToDictionary}
+        openLinksInNewTab={true}
+      />
+    );
+    const layerNavigationUI = () => (
+      <nav className="text-layer-nav">
+        <button
+          className={"nav-arrow left-nav-arrow"}
+          onClick={() => handleTextLayerNavigation(sampleTextIndex - 1)}
+          disabled={sampleTextIndex - 1 < 0}
+        ></button>
+
+        <div className="select-input-container">
+          <select
+            name="column-selection"
+            className="column-selection-dropdown"
+            onChange={(e) =>
+              handleTextLayerNavigation(parseInt(e.target.value))
+            }
+            value={sampleTextIndex}
+          >
+            {textLayersWithSuggestions.map((layer, index) => {
+              return (
+                <option
+                  key={index}
+                  value={index}
+                  className="language-linter-layer-option"
+                >
+                  {truncateLayerName(layer.name)}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        <button
+          className={"nav-arrow right-nav-arrow"}
+          onClick={() => handleTextLayerNavigation(sampleTextIndex + 1)}
+          disabled={sampleTextIndex + 1 >= maxTextIndex}
+        ></button>
+      </nav>
+    );
+
+    if (textLayersWithSuggestions) {
+      return (
+        <>
+          {layerNavigationUI()} {languageLinterUI()}
+        </>
+      );
+    } else {
+      return languageLinterUI();
+    }
+  };
 
   return (
     <>
       <div className={colorLinterContainerClasses}>
-        <nav className="text-layer-nav">
-          <button
-            className={"nav-arrow left-nav-arrow"}
-            onClick={() => handleTextLayerNavigation(sampleTextIndex - 1)}
-            disabled={sampleTextIndex - 1 < 0}
-          ></button>
+        {renderLanguageLinterUI()}
 
-          <div className="select-input-container">
-            <select
-              name="column-selection"
-              className="column-selection-dropdown"
-              onChange={(e) =>
-                handleTextLayerNavigation(parseInt(e.target.value))
-              }
-              value={sampleTextIndex}
-            >
-              {textLayersWithSuggestions.map((layer, index) => {
-                return (
-                  <option
-                    key={index}
-                    value={index}
-                    className="language-linter-layer-option"
-                  >
-                    {truncateLayerName(layer.name)}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
-          <button
-            className={"nav-arrow right-nav-arrow"}
-            onClick={() => handleTextLayerNavigation(sampleTextIndex + 1)}
-            disabled={sampleTextIndex + 1 >= maxTextIndex}
-          ></button>
-        </nav>
-        <LanguageLinter
-          // LanguageLinter will show a "no issue found" empty state
-          // if their sampleText provided to it has no issues. Since
-          // None of our layers have issues, we'll trigger that
-          // empty state.
-          sampleText={provideSampleText()}
-          setSampleText={updateSourceText}
-          updateTimer={100}
-          customDictionary={localCustomDictionary}
-          addToDictionary={addToDictionary}
-          openLinksInNewTab={true}
-        />
-        {selectionHasChanged && (
+        {selectionHasChanged && !emptyStateActive && (
           <footer className="color-linting-footer">
             <button
               className="btn btn-primary"
