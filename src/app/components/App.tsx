@@ -115,20 +115,20 @@ const App = ({}) => {
           setCurrentLayersLintedForLanguage(message.selectedLayers);
           break;
         case "text-linted":
-          triggerNewRelicCustomEvent("OneCoreToolbox: language-linted", {
-            ...message.customEventData,
-            suggestions: message.minimalReport,
-          });
+          // triggerNewRelicCustomEvent("OneCoreToolbox: language-linted", {
+          //   ...message.customEventData,
+          //   suggestions: message.minimalReport,
+          // });
 
-          message.fullReport.forEach((suggestion) => {
-            triggerNewRelicCustomEvent(
-              "OneCoreToolbox: language-linter-suggestion-made",
-              {
-                ...message.customEventData,
-                ...suggestion,
-              }
-            );
-          });
+          // message.fullReport.forEach((suggestion) => {
+          //   triggerNewRelicCustomEvent(
+          //     "OneCoreToolbox: language-linter-suggestion-made",
+          //     {
+          //       ...message.customEventData,
+          //       ...suggestion,
+          //     }
+          //   );
+          // });
           break;
         case "local-custom-dictionary-retrieved":
           setLocalCustomDictionaryInitialized(true);

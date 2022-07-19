@@ -90,11 +90,35 @@ const LanguageLinterPlugin = () => {
   // Determine whether the the selection has changed.
   // Then save that to state.
   useEffect(() => {
-    if (
-      !isEqual(currentSelection, currentLayersLintedForLanguage) &&
-      currentLayersLintedForLanguage
-    ) {
+    let selectionIsCompletelyNew = true;
+
+    if (currentLayersLintedForLanguage && currentSelection.length) {
+      // Do any of the currently selected layers match any of the
+      // previously selected layers? Because we don't want to show
+      // the "check current selection" button if the only selection
+      // change has been selecting one of the already selected layers
+      selectionIsCompletelyNew = !selectedTextLayers.some(
+        (selectedTextLayer) => {
+          return selectedTextLayer.id === currentSelection[0].id;
+        }
+      );
+
+      // Because if we've *added* to the selection, we should allow
+      // a recheck check of the seleciton
+      if (!selectionIsCompletelyNew) {
+        selectionIsCompletelyNew =
+          currentSelection.length > selectedTextLayers.length;
+      }
+    } else {
+      setSelectionHasChanged(false);
+      return;
+    }
+
+    if (selectionIsCompletelyNew) {
       setSelectionHasChanged(true);
+      return;
+    } else {
+      setSelectionHasChanged(false);
     }
   }, [currentSelection, currentLayersLintedForLanguage]);
 
