@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
 import classNames from "classnames";
-import ExternalLinkIcon from "../../assets/icon-external-link.svg";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
 import { truncateLayerName } from "../utils";
@@ -28,6 +27,10 @@ const LanguageLinterPlugin = () => {
     currentSelection,
     currentLayersLintedForLanguage,
   } = state;
+
+  const [linterIsLoading, setLinterIsLoading] = useState(
+    currentSelection.length > 0
+  );
 
   const emptyStateActive =
     selectedTextLayers.length === 0 || textLayersWithSuggestions.length === 0;
@@ -79,6 +82,7 @@ const LanguageLinterPlugin = () => {
     ) {
       setSampleText("");
       setTextLayersWithSuggestions([]);
+      setLinterIsLoading(false);
     } else {
       parent.postMessage(
         { pluginMessage: { type: "request-local-custom-dictionary" } },
@@ -225,10 +229,14 @@ const LanguageLinterPlugin = () => {
     }
   };
 
-  const colorLinterContainerClasses = classNames("language-linter-container", {
-    "selection-has-changed": selectionHasChanged && !emptyStateActive,
-    "empty-state-active": emptyStateActive,
-  });
+  const languageLinterContainerClasses = classNames(
+    "language-linter-container",
+    {
+      "selection-has-changed": selectionHasChanged && !emptyStateActive,
+      "empty-state-active": emptyStateActive,
+      "linter-is-loading": linterIsLoading,
+    }
+  );
 
   const renderEmptyState = () => {
     const noSuggestionsFound = textLayersWithSuggestions.length === 0;
@@ -242,10 +250,8 @@ const LanguageLinterPlugin = () => {
         ? `To lint your text select any text layer, frame, or group of text
           layers and then click Lint selected.`
         : `No basic language issues found. 
-        Consider reaching out to the #ui-writing team now that some of the basics have been covered.`;
-    const CTAText = selectionHasChanged
-      ? "Lint selected layer(s)"
-      : "Re-lint selected layers";
+        Consider reaching out to the #ui-writing team for more in-depth feedback from a real human.`;
+    const CTAText = "Lint selected layer(s)";
 
     return (
       <section className="color-empty-state-container">
@@ -286,11 +292,24 @@ const LanguageLinterPlugin = () => {
     );
   };
 
+  const renderLoadingState = () => {
+    return (
+      <section className="color-empty-state-container">
+        <div className="color-loader"></div>
+        <h4 className="color-empty-state-heading">
+          Linting selected text layers...
+        </h4>
+        <p className="color-empty-state-description">This may take a moment</p>
+      </section>
+    );
+  };
+
   const renderLanguageLinterUI = () => {
     const textLayerSelected = selectedTextLayers.length > 0;
 
-    if (!textLayerSelected) return renderEmptyState();
-    if (textLayersWithSuggestions.length === 0) return renderEmptyState();
+    if (!textLayerSelected && !linterIsLoading) return renderEmptyState();
+    if (textLayersWithSuggestions.length === 0 && !linterIsLoading)
+      return renderEmptyState();
 
     const languageLinterUI = () => (
       <LanguageLinter
@@ -304,6 +323,7 @@ const LanguageLinterPlugin = () => {
         customDictionary={localCustomDictionary}
         addToDictionary={addToDictionary}
         openLinksInNewTab={true}
+        loadingStateListener={setLinterIsLoading}
       />
     );
     const layerNavigationUI = () => (
@@ -314,27 +334,34 @@ const LanguageLinterPlugin = () => {
           disabled={sampleTextIndex - 1 < 0}
         ></button>
 
-        <div className="select-input-container">
-          <select
-            name="column-selection"
-            className="column-selection-dropdown"
-            onChange={(e) =>
-              handleTextLayerNavigation(parseInt(e.target.value))
-            }
-            value={sampleTextIndex}
-          >
-            {textLayersWithSuggestions.map((layer, index) => {
-              return (
-                <option
-                  key={index}
-                  value={index}
-                  className="language-linter-layer-option"
-                >
-                  {truncateLayerName(layer.name)}
-                </option>
-              );
-            })}
-          </select>
+        <div className="layer-selection-dropdown-container">
+          <div className="select-input-container">
+            <select
+              name="column-selection"
+              className="column-selection-dropdown"
+              onChange={(e) =>
+                handleTextLayerNavigation(parseInt(e.target.value))
+              }
+              value={sampleTextIndex}
+            >
+              {textLayersWithSuggestions.map((layer, index) => {
+                return (
+                  <option
+                    key={index}
+                    value={index}
+                    className="language-linter-layer-option"
+                  >
+                    {truncateLayerName(layer.name)}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <span className="language-linter-nav-layer-pagination-count">
+            {`${sampleTextIndex + 1} of ${
+              currentLayersLintedForLanguage.length
+            } layers with issues`}
+          </span>
         </div>
 
         <button
@@ -348,7 +375,9 @@ const LanguageLinterPlugin = () => {
     if (textLayersWithSuggestions) {
       return (
         <>
-          {textLayersWithSuggestions.length > 1 && layerNavigationUI()}{" "}
+          {textLayersWithSuggestions.length > 1 &&
+            !linterIsLoading &&
+            layerNavigationUI()}{" "}
           {languageLinterUI()}
         </>
       );
@@ -359,7 +388,8 @@ const LanguageLinterPlugin = () => {
 
   return (
     <>
-      <div className={colorLinterContainerClasses}>
+      <div className={languageLinterContainerClasses}>
+        {linterIsLoading && renderLoadingState()}
         {renderLanguageLinterUI()}
 
         {selectionHasChanged && !emptyStateActive && (
