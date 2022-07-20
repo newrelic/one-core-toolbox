@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect, useContext } from "react";
-import { isEqual } from "../utils";
 import classNames from "classnames";
+import ExternalLinkIcon from "../../assets/icon-external-link.svg";
 import LanguageLinter, { lintMyText } from "new-relic-language-linter";
 import { PluginContext } from "../PluginContext";
 import { truncateLayerName } from "../utils";
@@ -232,15 +232,20 @@ const LanguageLinterPlugin = () => {
 
   const renderEmptyState = () => {
     const noSuggestionsFound = textLayersWithSuggestions.length === 0;
+
     const headingText =
-      noSuggestionsFound && emptyStateActive
+      noSuggestionsFound && selectedTextLayers.length === 0
         ? "Select a text layer(s) to get started"
         : "Your copy looks good!";
-    const descriptionText = noSuggestionsFound
-      ? `To lint your text select any text layer, frame, or group of text
+    const descriptionText =
+      noSuggestionsFound && selectedTextLayers.length === 0
+        ? `To lint your text select any text layer, frame, or group of text
           layers and then click Lint selected.`
-      : `We ran several checks on your copy and found no writing issues. 
-        Consider reaching out to the #ui-writing team for some more feedback.`;
+        : `No basic language issues found. 
+        Consider reaching out to the #ui-writing team now that some of the basics have been covered.`;
+    const CTAText = selectionHasChanged
+      ? "Lint selected layer(s)"
+      : "Re-lint selected layers";
 
     return (
       <section className="color-empty-state-container">
@@ -251,9 +256,32 @@ const LanguageLinterPlugin = () => {
             className="btn btn-primary"
             onClick={() => lintSelectedLayers()}
           >
-            Lint selected layers
+            {CTAText}
           </button>
         )}
+
+        <a
+          href="https://peaceful-mclean-b30fef.netlify.app"
+          className="try-web-version"
+          target="_blank"
+        >
+          Try the browser version{" "}
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 14 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="external-link-icon"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M8 1V0H14V6H13V1.7L5.4 9.4L4.6 8.6L12.3 1H8ZM1 5V13H9V9H10V14H0V4H5V5H1Z"
+              fill="var(--figma-color-text-brand)"
+            />
+          </svg>
+        </a>
       </section>
     );
   };
@@ -320,7 +348,8 @@ const LanguageLinterPlugin = () => {
     if (textLayersWithSuggestions) {
       return (
         <>
-          {layerNavigationUI()} {languageLinterUI()}
+          {textLayersWithSuggestions.length > 1 && layerNavigationUI()}{" "}
+          {languageLinterUI()}
         </>
       );
     } else {
@@ -334,7 +363,29 @@ const LanguageLinterPlugin = () => {
         {renderLanguageLinterUI()}
 
         {selectionHasChanged && !emptyStateActive && (
-          <footer className="color-linting-footer">
+          <footer className="language-linting-footer">
+            <a
+              href="https://peaceful-mclean-b30fef.netlify.app"
+              className="try-web-version"
+              target="_blank"
+            >
+              Try the web version{" "}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="external-link-icon"
+              >
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M8 1V0H14V6H13V1.7L5.4 9.4L4.6 8.6L12.3 1H8ZM1 5V13H9V9H10V14H0V4H5V5H1Z"
+                  fill="var(--figma-color-text-brand)"
+                />
+              </svg>
+            </a>
             <button
               className="btn btn-primary"
               onClick={() => lintSelectedLayers()}

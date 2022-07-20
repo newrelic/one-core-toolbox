@@ -112,6 +112,7 @@ table td {
 .tab-navigation {
   height: 40px;
   display: flex;
+  flex-shrink: 0;
   padding: 0;
   margin: 0;
   position: sticky;
@@ -625,6 +626,10 @@ input:checked + .slider:before {
   overflow-y: scroll;
 }
 
+.language-linter-container.empty-state-active {
+  padding-block-start: 0;
+}
+
 .selection-has-changed {
   padding-bottom: 70px;
 }
@@ -652,6 +657,27 @@ input:checked + .slider:before {
 
 .language-beta-tab.active {
   opacity: 1;
+}
+
+.try-web-version {
+  font-size: 12px;
+  color: var(--figma-color-text-brand);
+  text-decoration: none;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.external-link-icon {
+  position: relative;
+  top: 1px;
+  fill: var(--figma-color-text-brand);
+}
+
+.empty-state-active .try-web-version {
+  position: absolute;
+  bottom: 24px;
 }
 
 /*-- 
@@ -1200,7 +1226,8 @@ div .suggestion-summary-replacement:hover {
   box-shadow: inset 0 0 0 1px rgb(150 150 150 / 25%);
 }
 
-.color-linting-footer {
+.color-linting-footer,
+.language-linting-footer {
   display: flex;
   position: absolute;
   bottom: 0;
@@ -1212,6 +1239,11 @@ div .suggestion-summary-replacement:hover {
   border-top: 1px solid var(--figma-color-border);
   padding: 16px 24px;
   gap: 8px;
+}
+
+.language-linting-footer {
+  justify-content: space-between;
+  align-items: center;
 }
 
 .color-tile-menu {
