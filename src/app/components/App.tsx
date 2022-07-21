@@ -1,5 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
+import Konami from "react-konami-code";
+import Team from "../assets/one-core-team-photo.png";
 import TableCreator from "./TableCreator/TableCreator";
 import DesignLinter from "./DesignLinter/DesignLinter";
 import Resizer from "./Resizer";
@@ -250,6 +252,21 @@ const App = ({}) => {
     );
   };
 
+  const memorial = () => {
+    return (
+      <Konami timeout={10000}>
+        <div className="thank-you-container">
+          <img src={Team} className="team-photo" />
+          <p>
+            To one of the greatest groups of folks I've ever worked with: Thank
+            you ❤️
+          </p>
+          <cite>– Daniel</cite>
+        </div>
+      </Konami>
+    );
+  };
+
   const renderPluginBody = () => {
     switch (activePlugin) {
       case "home":
@@ -312,6 +329,7 @@ const App = ({}) => {
     <PluginContext.Provider value={{ functions, state }}>
       <Resizer />
       <div className="app">{renderPluginBody()}</div>
+      {memorial()}
     </PluginContext.Provider>
   );
 };
