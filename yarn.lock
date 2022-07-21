@@ -3414,10 +3414,10 @@ neo-async@^2.5.0, neo-async@^2.6.1:
   resolved "https://registry.npmjs.org/neo-async/-/neo-async-2.6.2.tgz"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-new-relic-language-linter@^1.2.32:
-  version "1.2.32"
-  resolved "https://registry.yarnpkg.com/new-relic-language-linter/-/new-relic-language-linter-1.2.32.tgz#80d2b6d9a3a859da5bff0c55ab82661a01a5642b"
-  integrity sha512-lzEW5YGKniV9HNjwJPBbH8USZF1ZeKedoqHYpzlHLFBBm82nhkdHRlXrrH420AiiLco1LowtQJP5SQVlszrM/Q==
+new-relic-language-linter@^1.2.35:
+  version "1.2.35"
+  resolved "https://registry.yarnpkg.com/new-relic-language-linter/-/new-relic-language-linter-1.2.35.tgz#979a8b7b62d4cf152fcb1934307c2a839bd88ddc"
+  integrity sha512-Se4Ie3vrZuZhadIojsAajWn+H6ttitwMzsWRkTlIAs5Ux4WUjSmXcPtwTyHPcttlrKKz7wGGB5NMP7OyVE74zQ==
   dependencies:
     install "^0.13.0"
     npm "^8.10.0"
