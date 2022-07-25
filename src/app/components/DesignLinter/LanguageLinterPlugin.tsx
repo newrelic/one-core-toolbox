@@ -240,31 +240,43 @@ const LanguageLinterPlugin = () => {
 
   const renderEmptyState = () => {
     const noSuggestionsFound = textLayersWithSuggestions.length === 0;
+    const shouldShowDefaultCopy =
+      noSuggestionsFound && selectedTextLayers.length === 0;
 
-    const headingText =
-      noSuggestionsFound && selectedTextLayers.length === 0
-        ? "Select a text layer(s) to get started"
-        : "Your copy looks good!";
-    const descriptionText =
-      noSuggestionsFound && selectedTextLayers.length === 0
-        ? `To lint your text select any text layer, frame, or group of text
-          layers and then click Lint selected.`
-        : `No basic language issues found. 
-        Consider reaching out to the #ui-writing team for more in-depth feedback from a real human.`;
-    const CTAText = "Lint selected layer(s)";
+    const headingText = shouldShowDefaultCopy
+      ? "Select a text layer(s) to get started"
+      : "Your copy looks good!";
+    const descriptionText = () => {
+      if (shouldShowDefaultCopy) {
+        return `Select one or more text layers to lint them against the One Core writing style guide.`;
+      } else {
+        return (
+          <>
+            No basic language issues found. Consider reaching out to the {` `}
+            <a
+              href="https://newrelic.slack.com/archives/CE7FX92TF"
+              target="_blank"
+            >
+              #ui-writing
+            </a>{" "}
+            team for more in-depth and accurate feedback from one of our
+            wonderful UI writers.
+          </>
+        );
+      }
+    };
+    const CTAText = "Check language";
 
     return (
       <section className="color-empty-state-container">
         <h4 className="color-empty-state-heading">{headingText}</h4>
-        <p className="color-empty-state-description">{descriptionText}</p>
-        {(!noSuggestionsFound || textLayersWithSuggestions.length === 0) && (
-          <button
-            className="btn btn-primary"
-            onClick={() => lintSelectedLayers()}
-          >
-            {CTAText}
-          </button>
-        )}
+        <p className="color-empty-state-description">{descriptionText()}</p>
+        <button
+          className="btn btn-primary"
+          onClick={() => lintSelectedLayers()}
+        >
+          {CTAText}
+        </button>
 
         <a
           href="https://peaceful-mclean-b30fef.netlify.app"

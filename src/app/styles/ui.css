@@ -126,10 +126,6 @@ table td {
   gap: 0px;
 }
 
-.tab-navigation:hover .language-beta-tab {
-  opacity: 1;
-}
-
 .tab-navigation-tab {
   display: grid;
   place-items: center;
@@ -664,15 +660,6 @@ input:checked + .slider:before {
   background-color: var(--figma-color-bg-secondary);
 }
 
-.language-beta-tab {
-  opacity: 0;
-  transition: 0.05s opacity ease-out;
-}
-
-.language-beta-tab.active {
-  opacity: 1;
-}
-
 .try-web-version {
   font-size: 12px;
   color: var(--figma-color-text-brand);
@@ -692,6 +679,10 @@ input:checked + .slider:before {
 .empty-state-active .try-web-version {
   position: absolute;
   bottom: 24px;
+}
+
+.empty-state-active a {
+  color: var(--figma-color-text-brand);
 }
 
 /*-- 

@@ -226,6 +226,9 @@ const App = ({}) => {
         case "open-color-linter":
           setActivePlugin("color-linter");
           break;
+        case "open-language-linter":
+          setActivePlugin("language-linter");
+          break;
       }
     }
   }, [latestFigmaCommand]);

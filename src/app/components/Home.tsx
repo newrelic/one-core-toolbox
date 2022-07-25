@@ -44,8 +44,8 @@ const Home = (props) => {
       <PluginTile
         pluginName="designLinter"
         heading="Design linter"
-        description="Checks your layers for color styles, and soon will check for language too."
-        onClick={() => setActivePlugin("color-linter")}
+        description="Checks for writing mistakes and helps you choose the correct color tokens for your layers."
+        onClick={() => setActivePlugin("language-linter")}
       />
 
       <p className="home-support">

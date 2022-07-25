@@ -20,7 +20,10 @@
     },
     {
       "name": "Design linter",
-      "menu": [{ "name": "Color", "command": "open-color-linter" }]
+      "menu": [
+        { "name": "Language", "command": "open-language-linter" },
+        { "name": "Color", "command": "open-color-linter" }
+      ]
     }
   ]
 }
