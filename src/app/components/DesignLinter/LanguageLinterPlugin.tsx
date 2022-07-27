@@ -259,8 +259,8 @@ const LanguageLinterPlugin = () => {
             >
               #ui-writing
             </a>{" "}
-            team for more in-depth and accurate feedback from one of our
-            wonderful UI writers.
+            team for more in-depth and accurate feedback from our wonderful UI
+            writers.
           </>
         );
       }
@@ -371,7 +371,7 @@ const LanguageLinterPlugin = () => {
           </div>
           <span className="language-linter-nav-layer-pagination-count">
             {`${sampleTextIndex + 1} of ${
-              currentLayersLintedForLanguage.length
+              textLayersWithSuggestions.length
             } layers with issues`}
           </span>
         </div>
