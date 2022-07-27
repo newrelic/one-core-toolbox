@@ -785,6 +785,10 @@ div.suggestions-empty-state {
   gap: 4px;
 }
 
+.column-selection-dropdown {
+  width: 100%;
+}
+
 .language-linter-nav-layer-pagination-count {
   font-size: 10px;
   color: var(--figma-color-text-tertiary);
