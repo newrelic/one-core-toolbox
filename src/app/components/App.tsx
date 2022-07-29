@@ -116,21 +116,20 @@ const App = ({}) => {
           setSelectedTextLayers(message.textLayers);
           setCurrentLayersLintedForLanguage(message.selectedLayers);
           break;
-        case "text-linted":
-          // triggerNewRelicCustomEvent("OneCoreToolbox: language-linted", {
-          //   ...message.customEventData,
-          //   suggestions: message.minimalReport,
-          // });
+        // // The problem with this event is that it fires like 3 times for every layer
+        // // that's linted. That's a problem.
+        // case "text-linted":
+        //   triggerNewRelicCustomEvent("OneCoreToolbox: text-layer-linted", {
+        //     ...message.customEventData,
+        //     suggestions: message.minimalReport,
+        //   });
 
-          // message.fullReport.forEach((suggestion) => {
-          //   triggerNewRelicCustomEvent(
-          //     "OneCoreToolbox: language-linter-suggestion-made",
-          //     {
-          //       ...message.customEventData,
-          //       ...suggestion,
-          //     }
-          //   );
-          // });
+        //   break;
+        case "language-linter-run":
+          triggerNewRelicCustomEvent("OneCoreToolbox: language-linted", {
+            ...message.customEventData,
+          });
+
           break;
         case "local-custom-dictionary-retrieved":
           setLocalCustomDictionaryInitialized(true);

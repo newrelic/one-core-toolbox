@@ -162,6 +162,13 @@ const incomingMessageActions = {
   // Language linter actions
   "run-language-linter": () => {
     sendCurrentTextSelection();
+
+    figma.ui.postMessage({
+      type: "language-linter-run",
+      message: {
+        customEventData,
+      },
+    });
   },
   "request-local-custom-dictionary": () => {
     figma.clientStorage
