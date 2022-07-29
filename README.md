@@ -35,7 +35,7 @@ The plugin is automatically installed for all Figma users at New Relic. [Usage s
 |Table creator|✅ Shipped|Will need to be updated when table redesign ships!|
 |Theme switcher|✅ Shipped|Token library in plugin needs to be [updated regularly](#project-architecture-and-token-management)|
 |Color linter|✅ Shipped|Token library in plugin needs to be [updated regularly](#project-architecture-and-token-management)|
-|Language linter|🛠 In development|Used in the plugin via a [language linter NPM package](https://github.com/danielgolden/language-linter)|
+|Language linter|✅ Shipped|Used in the plugin via a [language linter NPM package](https://github.com/danielgolden/language-linter)|
 
 
 
