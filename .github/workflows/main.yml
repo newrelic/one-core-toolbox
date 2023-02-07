@@ -12,7 +12,7 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
+  # This workflow contains a single job
   fetchFigmaFileData:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -24,11 +24,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           persist-credentials: false
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "v14.18.1"
-          registry-url: "https://registry.npmjs.org"
       - name: Fetch light mode data
         # You may pin to the exact commit or the version.
         # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
