@@ -27,7 +27,7 @@ jobs:
       - name: Fetch light mode data
         # You may pin to the exact commit or the version.
         # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
-        uses: JamesIves/fetch-api-data-action@releases/v2
+        uses: JamesIves/fetch-api-data-action@v2
         with:
           # The URL of the endpoint you would like to retrieve data from.
           endpoint: https://api.figma.com/v1/files/RsXZaTPG4VeIZTSjQPSosc/styles
@@ -38,7 +38,7 @@ jobs:
       - name: Fetch dark mode data
         # You may pin to the exact commit or the version.
         # uses: JamesIves/fetch-api-data-action@c38518c0358c6a522f0d4880212b65963e2d6574
-        uses: JamesIves/fetch-api-data-action@releases/v2
+        uses: JamesIves/fetch-api-data-action@v2
         with:
           # The URL of the endpoint you would like to retrieve data from.
           endpoint: https://api.figma.com/v1/files/r2A9XUUQxda5FmgXSsqPU2/styles
@@ -47,7 +47,7 @@ jobs:
           set-output: false
           save-name: dark-mode
       - name: Build and Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: main # Pushes the updates to the main branch.
           folder: fetch-api-data-action # The location of the data.json file saved by the Fetch API Data action.
