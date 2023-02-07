@@ -4,8 +4,8 @@
 	"description": "A Figma plugin for New Relic product designers.",
 	"license": "ISC",
 	"scripts": {
-		"build": "webpack --mode=production",
-		"build:watch": "webpack --mode=development --watch",
+		"build": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=production",
+		"build:watch": "NODE_OPTIONS=--openssl-legacy-provider webpack --mode=development --watch",
 		"prettier:format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,css,json}' ",
 		"client-build": "cd src/app/components/LanguageLinter && npm install",
 		"prepare": "husky install"
